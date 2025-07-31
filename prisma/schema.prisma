@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// 👤 USUARIOS
+model User {
+  id               String   @id @default(cuid())
+  clerkId          String   @unique
+  email            String   @unique
+  firstName        String?
+  lastName         String?
+  imageUrl         String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Relaciones
+  subscription     Subscription?
+  
+  @@map("users")
+}
+
+// 💳 SUSCRIPCIONES
+model Subscription {
+  id          String            @id @default(cuid())
+  userId      String            @unique
+  plan        SubscriptionPlan
+  status      SubscriptionStatus @default(PENDING)
+  amount      Int               
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  // Relaciones
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("subscriptions")
+}
+
+enum SubscriptionPlan {
+  BASIC     
+  ADVANCED  
+  PREMIUM   
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  CANCELED
+  EXPIRED
+}
