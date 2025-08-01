@@ -1,25 +1,15 @@
 {
   "name": "desarrollopersonal-nextjs",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
-    "build:prod": "NODE_ENV=production next build",
     "start": "next start -p 3001",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
-    "type-check": "tsc --noEmit",
-    "env:check": "node scripts/check-env.js",
-    "db:migrate": "prisma migrate dev",
-    "db:generate": "prisma generate",
-    "db:studio": "prisma studio",
-    "db:seed": "tsx scripts/seed-dashboard.ts",
-    "health:check": "curl -f http://localhost:3001/api/health || exit 1"
+    "lint": "next lint"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.28.0",
-    "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.1",
     "@prisma/client": "^6.13.0",
     "@radix-ui/react-dialog": "^1.1.14",
@@ -35,7 +25,6 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.61.1",
-    "recharts": "^2.15.4",
     "resend": "^4.7.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
@@ -50,7 +39,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
     "tailwindcss": "^4",
-    "tsx": "^4.20.3",
     "typescript": "^5"
   }
 }
