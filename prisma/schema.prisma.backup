@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  clerkId     String   @unique
+  email       String   @unique
+  firstName   String?
+  lastName    String?
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Gamificación
+  level       Int      @default(1)
+  xp          Int      @default(0)
+  streak      Int      @default(0)
+  lastActive  DateTime @default(now())
+  
+  // Relaciones
+  enrollments CourseEnrollment[]
+  achievements UserAchievement[]
+  posts       Post[]
+  comments    Comment[]
+  tallerRegistrations TallerRegistration[]
+  objectives  Objective[]
+  subscription Subscription?
+  
+  @@map("users")
+}
+
+model Course {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  instructor  String
+  duration    String
+  lessons     Int
+  level       String
+  thumbnail   String
+  status      String   @default("published")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  enrollments CourseEnrollment[]
+  @@map("courses")
+}
+
+model CourseEnrollment {
+  id         String   @id @default(cuid())
+  userId     String
+  courseId   String
+  progress   Int      @default(0)
+  status     String   @default("active")
+  startedAt  DateTime @default(now())
+  completedAt DateTime?
+  
+  user       User     @relation(fields: [userId], references: [id])
+  course     Course   @relation(fields: [courseId], references: [id])
+  
+  @@unique([userId, courseId])
+  @@map("course_enrollments")
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  icon        String
+  category    String
+  xp          Int
+  requirements Json
+  createdAt   DateTime @default(now())
+  
+  userAchievements UserAchievement[]
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  
+  user          User        @relation(fields: [userId], references: [id])
+  achievement   Achievement @relation(fields: [achievementId], references: [id])
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model Taller {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  instructor  String
+  date        DateTime
+  duration    Int
+  maxParticipants Int
+  status      String   @default("scheduled")
+  meetingUrl  String?
+  createdAt   DateTime @default(now())
+  
+  registrations TallerRegistration[]
+  @@map("talleres")
+}
+
+model TallerRegistration {
+  id        String   @id @default(cuid())
+  userId    String
+  tallerId  String
+  status    String   @default("registered")
+  registeredAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+  taller    Taller   @relation(fields: [tallerId], references: [id])
+  
+  @@unique([userId, tallerId])
+  @@map("taller_registrations")
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  userId    String
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user      User     @relation(fields: [userId], references: [id])
+  comments  Comment[]
+  @@map("posts")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  userId    String
+  postId    String
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+  
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
+  @@map("comments")
+}
+
+model Objective {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  category    String
+  priority    String
+  status      String   @default("active")
+  progress    Int      @default(0)
+  startDate   DateTime @default(now())
+  endDate     DateTime
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User     @relation(fields: [userId], references: [id])
+  @@map("objectives")
+}
+
+model Subscription {
+  id          String            @id @default(cuid())
+  userId      String            @unique
+  plan        SubscriptionPlan
+  status      SubscriptionStatus @default(PENDING)
+  amount      Int
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@map("subscriptions")
+}
+
+enum SubscriptionPlan {
+  BASIC
+  ADVANCED
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  CANCELED
+  EXPIRED
+}

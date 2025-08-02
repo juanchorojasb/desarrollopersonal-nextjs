@@ -1,25 +1,30 @@
-import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    // Check database connection
-    await db.$queryRaw`SELECT 1`
+    // Test database connection
+    await prisma.$queryRaw`SELECT 1`;
     
-    return NextResponse.json({
-      status: 'healthy',
+    return NextResponse.json({ 
+      status: 'ok',
       timestamp: new Date().toISOString(),
-      service: 'DesarrolloPersonal.uno',
-      version: '1.0.0',
-      database: 'connected',
-      port: 3001
-    })
+      service: 'DesarrolloPersonal API',
+      database: 'connected'
+    });
   } catch (error) {
-    return NextResponse.json({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      service: 'DesarrolloPersonal.uno',
-      error: 'Database connection failed'
-    }, { status: 500 })
+    console.error('Health check failed:', error);
+    return NextResponse.json(
+      { 
+        status: 'error',
+        timestamp: new Date().toISOString(),
+        service: 'DesarrolloPersonal API',
+        database: 'disconnected',
+        message: 'Database connection failed'
+      }, 
+      { status: 500 }
+    );
   }
 }
