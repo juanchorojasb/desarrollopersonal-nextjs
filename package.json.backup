@@ -1,44 +1,153 @@
 {
   "name": "desarrollopersonal-nextjs",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Plataforma de Desarrollo Personal - Next.js 15 con TypeScript",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3001",
+    "dev": "next dev -p 3003",
     "build": "next build",
-    "start": "next start -p 3001",
-    "lint": "next lint"
+    "build:prod": "NODE_ENV=production next build",
+    "start": "next start -p 3003",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
+    "env:check": "node -e \"console.log('✅ NODE_ENV:', process.env.NODE_ENV); console.log('✅ DATABASE_URL:', process.env.DATABASE_URL ? 'Set' : 'Missing'); console.log('✅ CLERK_SECRET_KEY:', process.env.CLERK_SECRET_KEY ? 'Set' : 'Missing'); console.log('✅ All env variables checked');\"",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:prod": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:reset": "prisma migrate reset",
+    "postinstall": "prisma generate",
+    "clean": "rm -rf .next out dist",
+    "analyze": "cross-env ANALYZE=true npm run build",
+    "deploy:local": "./deploy.sh",
+    "deploy:vercel": "vercel --prod",
+    "deploy:check": "./scripts/pre-deploy-check.sh",
+    "backup:db": "mysqldump -h localhost -P 3307 -u root -p desarrollopersonal > backup_$(date +%Y%m%d_%H%M%S).sql",
+    "health:check": "curl -f https://desarrollopersonal.uno/api/health || exit 1",
+    "logs": "pm2 logs desarrollopersonal",
+    "restart": "pm2 restart desarrollopersonal",
+    "stop": "pm2 stop desarrollopersonal",
+    "status": "pm2 status",
+    "monitor": "pm2 monit"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.28.0",
-    "@hookform/resolvers": "^5.2.1",
-    "@prisma/client": "^6.13.0",
-    "@radix-ui/react-dialog": "^1.1.14",
-    "@radix-ui/react-dropdown-menu": "^2.1.15",
-    "@radix-ui/react-slot": "^1.2.3",
-    "class-variance-authority": "^0.7.1",
+    "@clerk/nextjs": "^6.3.2",
+    "@prisma/client": "^5.22.0",
+    "@radix-ui/react-avatar": "^1.1.1",
+    "@radix-ui/react-button": "^2.1.0",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.2",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-progress": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.2",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.1",
+    "@radix-ui/react-toast": "^1.2.2",
+    "@radix-ui/react-tooltip": "^1.1.3",
+    "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
-    "date-fns": "^4.1.0",
-    "lucide-react": "^0.534.0",
-    "mysql2": "^3.14.3",
+    "lucide-react": "^0.263.1",
+    "mysql2": "^3.11.4",
     "next": "15.4.5",
-    "prisma": "^6.13.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-hook-form": "^7.61.1",
-    "resend": "^4.7.0",
-    "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7",
-    "zod": "^4.0.14"
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "tailwind-merge": "^2.5.4",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
+    "@next/bundle-analyzer": "^15.4.5",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^8.15.0",
+    "@typescript-eslint/parser": "^8.15.0",
+    "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.1",
     "eslint-config-next": "15.4.5",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "postcss": "^8.4.49",
+    "prettier": "^3.3.3",
+    "prisma": "^5.22.0",
+    "tailwindcss": "^3.4.14",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/desarrollopersonal-nextjs.git"
+  },
+  "keywords": [
+    "next.js",
+    "react",
+    "typescript",
+    "desarrollo personal",
+    "psicologia",
+    "cursos online",
+    "tailwindcss",
+    "clerk",
+    "prisma",
+    "mysql"
+  ],
+  "author": "DesarrolloPersonal.uno",
+  "license": "MIT",
+  "browserslist": {
+    "production": [
+      ">0.3%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.js"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/.next/",
+      "<rootDir>/node_modules/"
+    ],
+    "moduleNameMapping": {
+      "^@/(.*)$": "<rootDir>/$1"
+    }
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "printWidth": 80,
+    "arrowParens": "avoid"
+  },
+  "eslintConfig": {
+    "extends": [
+      "next/core-web-vitals",
+      "prettier"
+    ],
+    "rules": {
+      "prefer-const": "error",
+      "no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": "warn"
+    }
   }
 }
