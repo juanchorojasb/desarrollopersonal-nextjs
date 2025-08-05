@@ -19,18 +19,19 @@ async function getCourse(id: string) {
         modules: {
           include: {
             lessons: {
-              orderBy: { position: 'asc' }
+              orderBy: { sortOrder: 'asc' }
             }
           },
-          orderBy: { position: 'asc' }
+          orderBy: { sortOrder: 'asc' }
         }
       }
     });
-
     return course;
   } catch (error) {
     console.error('Error fetching course:', error);
     return null;
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
@@ -47,10 +48,10 @@ export async function generateMetadata({ params }: CoursePageProps): Promise<Met
 
   return {
     title: `${course.title} | DesarrolloPersonal.uno`,
-    description: course.shortDesc || course.description.substring(0, 160),
+    description: course.shortDesc || course.description?.substring(0, 160) || 'Curso de desarrollo personal',
     openGraph: {
       title: course.title,
-      description: course.shortDesc || course.description,
+      description: course.shortDesc || course.description || 'Curso de desarrollo personal',
       images: course.thumbnail ? [course.thumbnail] : [],
       type: 'website',
     },

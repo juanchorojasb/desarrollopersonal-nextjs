@@ -1,5 +1,4 @@
-'use client';
-
+"use client";
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Award, Zap, Calendar, Crown } from 'lucide-react';
@@ -10,7 +9,7 @@ interface Lesson {
   title: string;
   description: string | null;
   content: string | null;
-  position: number;
+  sortOrder: number;
   type: string;
   videoUrl: string | null;
   videoDuration: number | null;
@@ -22,7 +21,7 @@ interface Module {
   id: string;
   title: string;
   description: string | null;
-  position: number;
+  sortOrder: number;
   isRequired: boolean;
   duration: number | null;
   lessons: Lesson[];
@@ -56,11 +55,11 @@ interface CourseDetailViewProps {
 export default function CourseDetailView({ course }: CourseDetailViewProps) {
   const { user } = useUser();
   const [selectedPlan, setSelectedPlan] = useState<'basic' | 'premium'>('basic');
-  
-  const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
-  const previewLessons = course.modules.reduce((acc, module) => 
-    acc + module.lessons.filter(lesson => lesson.isPreview).length, 0);
-  
+
+  const totalLessons = course.modules?.reduce((acc, module) => acc + (module.lessons?.length || 0), 0) || 0;
+  const previewLessons = course.modules?.reduce((acc, module) =>
+    acc + (module.lessons?.filter(lesson => lesson.isPreview)?.length || 0), 0) || 0;
+
   const formatDuration = (minutes: number | null) => {
     if (!minutes) return 'N/A';
     const hours = Math.floor(minutes / 60);
@@ -68,7 +67,8 @@ export default function CourseDetailView({ course }: CourseDetailViewProps) {
     return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
   };
 
-  const getLevelColor = (level: string) => {
+  const getLevelColor = (level: string | null | undefined) => {
+    if (!level) return 'bg-gray-100 text-gray-800';
     switch (level.toLowerCase()) {
       case 'beginner': return 'bg-green-100 text-green-800';
       case 'intermediate': return 'bg-yellow-100 text-yellow-800';
@@ -77,7 +77,8 @@ export default function CourseDetailView({ course }: CourseDetailViewProps) {
     }
   };
 
-  const getLevelText = (level: string) => {
+  const getLevelText = (level: string | null | undefined) => {
+    if (!level) return 'N/A';
     switch (level.toLowerCase()) {
       case 'beginner': return 'Principiante';
       case 'intermediate': return 'Intermedio';
@@ -85,6 +86,18 @@ export default function CourseDetailView({ course }: CourseDetailViewProps) {
       default: return level;
     }
   };
+
+  // Verificación de seguridad para course
+  if (!course) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Curso no encontrado</h1>
+          <p className="text-gray-600 mt-2">El curso que buscas no está disponible.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -97,7 +110,7 @@ export default function CourseDetailView({ course }: CourseDetailViewProps) {
               <div className="relative h-64 md:h-full">
                 <Image
                   src={course.thumbnail}
-                  alt={course.title}
+                  alt={course.title || 'Curso'}
                   fill
                   className="object-cover"
                 />
@@ -133,11 +146,11 @@ export default function CourseDetailView({ course }: CourseDetailViewProps) {
             </div>
 
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {course.title}
+              {course.title || 'Curso sin título'}
             </h1>
 
             <p className="text-gray-600 mb-6">
-              {course.shortDesc || course.description}
+              {course.shortDesc || course.description || 'Descripción no disponible'}
             </p>
 
             {/* Estadísticas */}
@@ -152,7 +165,7 @@ export default function CourseDetailView({ course }: CourseDetailViewProps) {
               </div>
               <div className="flex items-center gap-1">
                 <Users className="w-4 h-4" />
-                <span>{course.studentsCount} estudiantes</span>
+                <span>{course.studentsCount || 0} estudiantes</span>
               </div>
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4" />
@@ -209,7 +222,7 @@ export default function CourseDetailView({ course }: CourseDetailViewProps) {
               Acerca de este curso
             </h2>
             <div className="prose max-w-none text-gray-600">
-              <p>{course.description}</p>
+              <p>{course.description || 'Descripción no disponible'}</p>
             </div>
 
             {/* Valor de la Suscripción */}
@@ -237,54 +250,62 @@ export default function CourseDetailView({ course }: CourseDetailViewProps) {
             </h2>
 
             {/* Lecciones */}
-            {course.modules.map((module) => (
-              <div key={module.id} className="space-y-4">
-                {module.description && (
-                  <p className="text-gray-600 mb-4">{module.description}</p>
-                )}
-                
-                {module.lessons.map((lesson) => (
-                  <div
-                    key={lesson.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="flex-shrink-0">
-                          {lesson.isPreview ? (
-                            <Play className="w-5 h-5 text-green-600" />
-                          ) : (
-                            <Lock className="w-5 h-5 text-gray-400" />
-                          )}
-                        </div>
-                        <div>
-                          <h3 className="font-medium text-gray-900">
-                            {lesson.title}
-                          </h3>
-                          {lesson.description && (
-                            <p className="text-sm text-gray-600 mt-1">
-                              {lesson.description}
-                            </p>
-                          )}
+            {course.modules && course.modules.length > 0 ? (
+              course.modules.map((module) => (
+                <div key={module.id} className="space-y-4">
+                  {module.description && (
+                    <p className="text-gray-600 mb-4">{module.description}</p>
+                  )}
+
+                  {module.lessons && module.lessons.length > 0 ? (
+                    module.lessons.map((lesson) => (
+                      <div
+                        key={lesson.id}
+                        className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0">
+                              {lesson.isPreview ? (
+                                <Play className="w-5 h-5 text-green-600" />
+                              ) : (
+                                <Lock className="w-5 h-5 text-gray-400" />
+                              )}
+                            </div>
+                            <div>
+                              <h3 className="font-medium text-gray-900">
+                                {lesson.title || 'Lección sin título'}
+                              </h3>
+                              {lesson.description && (
+                                <p className="text-sm text-gray-600 mt-1">
+                                  {lesson.description}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <span>{formatDuration(lesson.videoDuration ? Math.ceil(lesson.videoDuration / 60) : null)}</span>
+                            {lesson.isPreview ? (
+                              <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                                Gratis
+                              </span>
+                            ) : (
+                              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
+                                Suscripción
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span>{formatDuration(lesson.videoDuration ? Math.ceil(lesson.videoDuration / 60) : null)}</span>
-                        {lesson.isPreview ? (
-                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
-                            Gratis
-                          </span>
-                        ) : (
-                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
-                            Suscripción
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ))}
+                    ))
+                  ) : (
+                    <p className="text-gray-500 italic">No hay lecciones disponibles en este módulo.</p>
+                  )}
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 italic">No hay contenido disponible para este curso.</p>
+            )}
           </div>
         </div>
 
@@ -351,11 +372,11 @@ export default function CourseDetailView({ course }: CourseDetailViewProps) {
             </div>
 
             <button className={`w-full py-3 rounded-lg font-medium mb-4 transition-colors ${
-              selectedPlan === 'basic' 
+              selectedPlan === 'basic'
                 ? 'bg-blue-600 hover:bg-blue-700 text-white'
                 : 'bg-purple-600 hover:bg-purple-700 text-white'
             }`}>
-              {selectedPlan === 'basic' 
+              {selectedPlan === 'basic'
                 ? 'Comenzar Plan Básico - $25,000/mes'
                 : 'Comenzar Plan Premium - $80,000/mes'
               }
