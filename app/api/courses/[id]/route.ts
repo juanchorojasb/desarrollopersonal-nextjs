@@ -59,7 +59,7 @@ export async function GET(
     // Calcular progreso del curso
     const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
     const completedLessons = course.modules.reduce((acc, module) => 
-      acc + module.lessons.filter(lesson => lesson.progress.length > 0 && lesson.progress[0].isCompleted).length, 0
+      acc + module.lessons.filter(lesson => lesson.progress.length > 0 && lesson.progress[0].completed).length, 0
     );
     
     const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;

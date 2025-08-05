@@ -206,7 +206,7 @@ export default function CursoDetailPage() {
       setCourse(MOCK_COURSE);
       setLoading(false);
     }, 1000);
-  }, [params.id]);
+  }, [params?.id]);
 
   const toggleModule = (moduleId: string) => {
     setExpandedModules(prev => 

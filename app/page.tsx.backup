@@ -1,0 +1,430 @@
+'use client';
+
+import { useState } from 'react';
+import { Play, CheckCircle, Star, Users, Clock, BookOpen, Zap, Crown, Calendar, Heart, Shield, Award } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+export default function HomePage() {
+  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'premium'>('basic');
+
+  const courses = [
+    {
+      title: "Navegando la Tormenta Interior",
+      description: "Transforma la crisis emocional en crecimiento personal",
+      sessions: 5,
+      duration: "4h 20m",
+      level: "Intermedio",
+      link: "/courses/cmdw4jwty0000evpiciqvz2sl"
+    },
+    {
+      title: "Transformando tus Emociones", 
+      description: "De la autocrítica a la autocompasión genuina",
+      sessions: 8,
+      duration: "6h 30m",
+      level: "Principiante",
+      link: "/cursos"
+    },
+    {
+      title: "NeuroCalm: Mente en Equilibrio",
+      description: "Neurociencia aplicada para la calma interior",
+      sessions: 10,
+      duration: "8h 15m", 
+      level: "Intermedio",
+      link: "/cursos"
+    },
+    {
+      title: "Superando la Depresión",
+      description: "Un camino de esperanza respaldado en ciencia",
+      sessions: 12,
+      duration: "10h 45m",
+      level: "Avanzado",
+      link: "/cursos"
+    },
+    {
+      title: "Emociones en Equilibrio",
+      description: "Armonía interior a través del autoconocimiento",
+      sessions: 6,
+      duration: "5h 20m",
+      level: "Intermedio",
+      link: "/cursos"
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: "Ana María",
+      text: "Después de años sintiéndome mi peor enemiga, finalmente aprendí a ser mi propia aliada. Cada sesión fue como encender una luz en la oscuridad.",
+      course: "Navegando la Tormenta Interior"
+    },
+    {
+      name: "Carlos R.",
+      text: "La neurociencia explicada con tanto corazón cambió mi perspectiva. Ahora entiendo que mi cerebro puede aprender nuevos patrones de calma.",
+      course: "NeuroCalm"
+    },
+    {
+      name: "María José",
+      text: "Los talleres en vivo fueron transformadores. Tener respuestas a MIS preguntas específicas no tiene precio.",
+      course: "Plan Premium"
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden py-20 sm:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 lg:gap-y-20">
+            <div className="relative z-10 mx-auto max-w-2xl lg:col-span-7 lg:max-w-none lg:pt-6 xl:col-span-6">
+              <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+                Transforma la Voz Interior que Te{' '}
+                <span className="text-blue-600">Hiere</span> en Tu Mayor{' '}
+                <span className="text-purple-600">Aliada</span>
+              </h1>
+              
+              <p className="mt-6 text-lg text-gray-600">
+                Descubre cómo la neurociencia y la autocompasión pueden liberarte de la autocrítica destructiva 
+                y guiarte hacia una vida de equilibrio emocional auténtico.
+              </p>
+
+              <div className="mt-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border border-blue-100">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <Heart className="w-8 h-8 text-red-500" />
+                  </div>
+                  <div>
+                    <p className="text-gray-900 font-medium mb-2">
+                      ¿Alguna vez te has dicho "no sirvo para nada" o "todo es culpa mía"?
+                    </p>
+                    <p className="text-gray-700 text-sm">
+                      Esa voz interna puede ser más dañina que cualquier crítica externa. 
+                      Pero aquí está la esperanza: <strong>no somos un error, somos quienes están aprendiendo</strong> 
+                      a transitar, regular y gestionar nuestro bienestar emocional.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-10 flex items-center gap-x-6">
+                <Link href="/pricing">
+                  <button className="rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    Comenzar Transformación - $25,000/mes
+                  </button>
+                </Link>
+                <Link href="/videos">
+                  <button className="text-lg font-semibold leading-6 text-gray-900 flex items-center gap-2">
+                    <Play className="w-5 h-5" />
+                    Ver Lección Gratuita
+                  </button>
+                </Link>
+              </div>
+
+              <div className="mt-8 flex items-center gap-8 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  <span>+1,247 estudiantes transformados</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-yellow-500" />
+                  <span>4.9/5 en satisfacción</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative mx-auto mt-10 max-w-sm lg:col-span-5 lg:mx-0 lg:mt-0 xl:col-span-6">
+              <div className="aspect-[3/2] bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-2xl overflow-hidden">
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center text-white">
+                    <BookOpen className="w-16 h-16 mx-auto mb-4 opacity-80" />
+                    <p className="text-xl font-semibold">40+ Horas de Contenido</p>
+                    <p className="text-blue-100">Respaldado en Neurociencia</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Planes de Suscripción */}
+      <section className="py-20 bg-gray-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Elige Tu Camino de Transformación
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Por menos que un café al día, accede a toda nuestra biblioteca de bienestar emocional
+            </p>
+          </div>
+
+          <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+            {/* Plan Básico */}
+            <div className="relative rounded-3xl bg-white p-8 shadow-2xl ring-1 ring-gray-900/10">
+              <div className="flex items-center gap-3 mb-6">
+                <Zap className="w-8 h-8 text-blue-600" />
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Plan Básico</h3>
+                  <p className="text-gray-600">Acceso Total - Transforma tu Vida Interior</p>
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-bold text-gray-900">$25,000</span>
+                  <span className="text-lg text-gray-600">/mes</span>
+                </div>
+                <p className="mt-2 text-sm text-green-600 font-medium">
+                  Solo $833 pesos por día ☕ • Cancela cuando quieras
+                </p>
+              </div>
+
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>Acceso completo</strong> a todos los cursos</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>40+ horas</strong> de contenido premium</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>Nuevos cursos</strong> incluidos automáticamente</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>Progreso personalizado</strong> y certificados</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>Acceso móvil</strong> y descarga offline</span>
+                </li>
+              </ul>
+
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>💰 Valor individual de cursos: $150,000+</strong><br/>
+                  Tu precio mensual: Solo $25,000 COP
+                </p>
+              </div>
+
+              <Link href="/pricing">
+                <button className="w-full rounded-lg bg-blue-600 px-4 py-3 text-center text-lg font-semibold text-white shadow-sm hover:bg-blue-500">
+                  Comenzar Plan Básico
+                </button>
+              </Link>
+
+              <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-500">
+                <Shield className="w-4 h-4" />
+                <span>Garantía de 7 días • Cancela cuando quieras</span>
+              </div>
+            </div>
+
+            {/* Plan Premium */}
+            <div className="relative rounded-3xl bg-gradient-to-b from-purple-50 to-purple-100 p-8 shadow-2xl ring-2 ring-purple-500">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span className="bg-purple-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                  Más Popular
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3 mb-6">
+                <Crown className="w-8 h-8 text-purple-600" />
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Plan Premium</h3>
+                  <p className="text-gray-600">Transformación con Acompañamiento Directo</p>
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-bold text-gray-900">$80,000</span>
+                  <span className="text-lg text-gray-600">/mes</span>
+                </div>
+                <p className="mt-2 text-sm text-purple-600 font-medium">
+                  Valor talleres: $450,000+ • Ahorras $370,000 mensual
+                </p>
+              </div>
+
+              <ul className="space-y-4 mb-8">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>Todo lo del Plan Básico +</strong></span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Calendar className="w-5 h-5 text-purple-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>2 talleres en vivo</strong> por mes</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Users className="w-5 h-5 text-purple-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>Q&A directo</strong> con expertos</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Crown className="w-5 h-5 text-purple-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>Comunidad exclusiva</strong> Premium</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <Award className="w-5 h-5 text-purple-500 mt-0.5" />
+                  <span className="text-gray-700"><strong>Casos personalizados</strong> en talleres</span>
+                </li>
+              </ul>
+
+              <div className="mb-6 p-4 bg-purple-100 rounded-lg border border-purple-200">
+                <p className="text-sm text-purple-900">
+                  <strong>💜 El poder del acompañamiento directo:</strong><br/>
+                  Imagínate tener acceso a expertos que pueden responder TUS preguntas específicas, 
+                  con TUS circunstancias únicas, en tiempo real.
+                </p>
+              </div>
+
+              <Link href="/pricing">
+                <button className="w-full rounded-lg bg-purple-600 px-4 py-3 text-center text-lg font-semibold text-white shadow-sm hover:bg-purple-500">
+                  Comenzar Plan Premium
+                </button>
+              </Link>
+
+              <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-500">
+                <Shield className="w-4 h-4" />
+                <span>Garantía de 7 días • Acceso VIP inmediato</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Biblioteca de Cursos */}
+      <section className="py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Tu Biblioteca Completa de Transformación
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Accede a TODOS estos cursos con cualquier plan de suscripción
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {courses.map((course, index) => (
+              <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+                <div className="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                  <BookOpen className="w-12 h-12 text-white opacity-70" />
+                </div>
+                <div className="p-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded">
+                      {course.level}
+                    </span>
+                    <span className="text-gray-500 text-sm">{course.sessions} sesiones</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    {course.title}
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-4">
+                    {course.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <Clock className="w-4 h-4" />
+                      <span>{course.duration}</span>
+                    </div>
+                    <Link href={course.link}>
+                      <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                        Ver Detalles →
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <div className="inline-flex items-center gap-2 bg-green-50 text-green-800 px-6 py-3 rounded-full border border-green-200">
+              <CheckCircle className="w-5 h-5" />
+              <span className="font-medium">
+                Nuevos cursos se agregan mensualmente - Siempre incluidos en tu suscripción
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonios */}
+      <section className="py-20 bg-gray-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+              Historias de Transformación Real
+            </h2>
+            <p className="mt-4 text-lg text-gray-600">
+              Cada paso cuenta en tu camino de transformación
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="bg-white rounded-xl p-8 shadow-lg">
+                <div className="flex items-center gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} className="w-4 h-4 text-yellow-400 fill-current" />
+                  ))}
+                </div>
+                <p className="text-gray-700 mb-6 italic">
+                  "{testimonial.text}"
+                </p>
+                <div>
+                  <p className="font-semibold text-gray-900">{testimonial.name}</p>
+                  <p className="text-sm text-gray-600">{testimonial.course}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">
+            Tu Bienestar Emocional No Puede Esperar
+          </h2>
+          <p className="mt-4 text-xl text-blue-100">
+            Cada día que pases con autocrítica destructiva es un día menos de paz interior.
+            <br />
+            <strong>Mereces tu propia compasión y apoyo.</strong>
+          </p>
+          
+          <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link href="/pricing">
+              <button className="rounded-lg bg-white px-8 py-4 text-lg font-semibold text-blue-600 shadow-sm hover:bg-gray-50">
+                Comenzar Transformación Hoy - $25,000/mes
+              </button>
+            </Link>
+            <Link href="/videos">
+              <button className="rounded-lg border-2 border-white px-8 py-4 text-lg font-semibold text-white hover:bg-white hover:text-blue-600">
+                Ver Lección Gratuita Primero
+              </button>
+            </Link>
+          </div>
+
+          <div className="mt-8 flex items-center justify-center gap-8 text-blue-100">
+            <div className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              <span>Garantía 7 días</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              <span>+1,247 estudiantes</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Award className="w-5 h-5" />
+              <span>Cancela cuando quieras</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

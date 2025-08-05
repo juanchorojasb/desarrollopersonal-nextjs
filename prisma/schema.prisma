@@ -10,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 👤 MODELO DE USUARIO (Integrado con Clerk)
 model User {
   id        String   @id @default(cuid())
   clerkId   String   @unique
@@ -17,303 +18,268 @@ model User {
   firstName String?
   lastName  String?
   imageUrl  String?
-  
-  // Campos adicionales
-  bio       String?  @db.Text
-  phone     String?
-  birthDate DateTime?
-  gender    String?
-  
-  // Suscripción
-  subscriptionStatus String @default("free") // free, basic, premium, vip
-  subscriptionExpiry DateTime?
-  
-  // Progreso
-  totalXP       Int @default(0)
-  currentLevel  Int @default(1)
-  streakDays    Int @default(0)
-  lastActivity  DateTime?
-  
-  // Relaciones
-  enrollments   Enrollment[]
-  lessonProgress LessonProgress[]
-  notes         Note[]
-  certificates  Certificate[]
-  achievements  UserAchievement[]
-  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relaciones
+  subscriptions    Subscription[]
+  qrPayments       QRPayment[]
+  enrollments      Enrollment[]
+  lessonProgress   LessonProgress[]
 
   @@map("users")
 }
 
-model Course {
+// 💳 MODELO DE PLANES
+model Plan {
   id          String @id @default(cuid())
+  name        String
+  description String?
+  price       Int    // Precio en centavos (25000 = $25.000)
+  currency    String @default("COP")
+  
+  // Características del plan
+  billingCycle     String  // "MONTHLY", "QUARTERLY", "YEARLY"
+  features         Json?   // Array de características
+  maxCourses       Int?    // Límite de cursos
+  hasLiveSupport   Boolean @default(false)
+  hasGroupCoaching Boolean @default(false)
+  hasPrioritySupport Boolean @default(false)
+  
+  // Metadata
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  subscriptions Subscription[]
+
+  @@map("plans")
+}
+
+// 📱 MODELO DE SUSCRIPCIONES
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String
+  planId    String
+  
+  // Estado y facturación
+  status       String  // "PENDING", "ACTIVE", "CANCELLED", "EXPIRED"
+  billingCycle String  // "MONTHLY", "QUARTERLY", "YEARLY"
+  priceAmount  Int     // Precio pagado
+  currency     String  @default("COP")
+  
+  // Períodos de facturación (OPCIONALES PARA EVITAR EL ERROR)
+  currentPeriodStart DateTime?
+  currentPeriodEnd   DateTime?
+  
+  // Metadata
+  isActive    Boolean  @default(true)
+  cancelledAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan Plan @relation(fields: [planId], references: [id])
+
+  @@map("subscriptions")
+}
+
+// 💰 MODELO DE PAGOS QR
+model QRPayment {
+  id          String   @id @default(cuid())
+  userId      String
+  planId      String
+  
+  // Información del pago
+  amount      Int      // Monto en centavos
+  currency    String   @default("COP")
+  status      String   // "PENDING", "APPROVED", "REJECTED"
+  
+  // Datos bancarios usados
+  bankName    String?  // "Bancolombia", "Davivienda"
+  accountInfo String?  // Información de cuenta
+  
+  // Comprobante
+  receiptUrl    String?  // URL del comprobante subido
+  receiptFileName String?
+  
+  // Datos de aprobación
+  approvedBy    String?   // ID del admin que aprobó
+  approvedAt    DateTime?
+  rejectedAt    DateTime?
+  rejectionReason String?
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("qr_payments")
+}
+
+// 📚 MODELO DE CURSOS
+model Course {
+  id          String  @id @default(cuid())
   title       String
-  description String @db.Text
-  shortDesc   String?
+  description String?
+  imageUrl    String?
   
-  // Media
-  thumbnail   String?
-  trailerVideo String?
+  // Configuración del curso
+  isActive    Boolean @default(true)
+  isFree      Boolean @default(false)
+  sortOrder   Int     @default(0)
+  duration    Int?    // Duración estimada en minutos
   
-  // Configuración
-  level       String @default("beginner") // beginner, intermediate, advanced
-  category    String
-  tags        String? // JSON array as string
-  
-  // Pricing
-  price       Float @default(0)
-  currency    String @default("USD")
-  
-  // Estado
-  status      String @default("draft") // draft, published, archived
-  featured    Boolean @default(false)
-  
-  // Estimaciones
-  duration    Int? // en minutos
-  studentsCount Int @default(0)
-  
-  // Instructor
-  instructorId String?
-  instructor   String? // Nombre del instructor
-  
-  // Orden y organización
-  position    Int @default(0)
-  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
   // Relaciones
   modules     Module[]
   enrollments Enrollment[]
-  reviews     Review[]
-  certificates Certificate[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("courses")
 }
 
+// 📖 MODELO DE MÓDULOS
 model Module {
-  id          String @id @default(cuid())
-  title       String
-  description String? @db.Text
-  
-  // Orden
-  position    Int
+  id        String  @id @default(cuid())
+  courseId  String
+  title     String
+  description String?
   
   // Configuración
-  isRequired  Boolean @default(true)
-  duration    Int? // en minutos
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
   
-  // Relaciones
-  courseId    String
-  course      Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lessons     Lesson[]
-  
+  // Metadata
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relaciones
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
 
   @@map("modules")
 }
 
+// 🎥 MODELO DE LECCIONES
 model Lesson {
-  id          String @id @default(cuid())
-  title       String
-  description String? @db.Text
-  content     String? @db.Text // Contenido adicional o transcripción
+  id       String  @id @default(cuid())
+  moduleId String
+  title    String
+  content  String? // Contenido de texto
   
-  // Orden
-  position    Int
-  
-  // Tipo de lección
-  type        String @default("video") // video, text, quiz, assignment
-  
-  // Video (Bunny.net)
-  videoUrl    String?
-  videoId     String? // ID del video en Bunny.net
-  videoDuration Int? // en segundos
+  // Video
+  videoUrl      String? // URL del video en Bunny.net
+  videoDuration Int?    // Duración en segundos
+  thumbnailUrl  String?
   
   // Configuración
-  isPreview   Boolean @default(false) // Gratis para preview
-  isRequired  Boolean @default(true)
-  minWatchTime Int @default(80) // % mínimo para marcar como visto
+  sortOrder Int     @default(0)
+  isActive  Boolean @default(true)
+  isFree    Boolean @default(false)
   
-  // Recursos
-  resources   String? // JSON array de recursos descargables
-  
-  // Relaciones
-  moduleId    String
-  module      Module @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  progress    LessonProgress[]
-  notes       Note[]
-  
+  // Metadata
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relaciones
+  module   Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
 
   @@map("lessons")
 }
 
+// 📝 MODELO DE INSCRIPCIONES
 model Enrollment {
-  id        String @id @default(cuid())
-  
-  // Relaciones
-  userId    String
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courseId  String
-  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  userId   String
+  courseId String
   
   // Estado
-  status    String @default("active") // active, completed, paused, expired
-  progress  Float @default(0) // 0-100
-  
-  // Fechas importantes
-  enrolledAt DateTime @default(now())
+  status      String   @default("ACTIVE") // "ACTIVE", "COMPLETED", "CANCELLED"
+  progress    Float    @default(0) // Porcentaje de progreso (0-100)
   completedAt DateTime?
-  expiresAt   DateTime?
   
-  // Progreso
-  lastAccessedAt DateTime?
-  totalWatchTime Int @default(0) // en segundos
-  
+  // Metadata
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Relaciones
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  // Índice único para evitar inscripciones duplicadas
   @@unique([userId, courseId])
   @@map("enrollments")
 }
 
+// 📊 MODELO DE PROGRESO DE LECCIONES
 model LessonProgress {
-  id        String @id @default(cuid())
-  
-  // Relaciones
-  userId    String
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lessonId  String
-  lesson    Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  id       String @id @default(cuid())
+  userId   String
+  lessonId String
   
   // Progreso
-  isCompleted Boolean @default(false)
-  watchTime   Int @default(0) // en segundos
-  watchPercentage Float @default(0) // 0-100
+  completed    Boolean   @default(false)
+  watchTime    Int       @default(0) // Tiempo visto en segundos
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
   
-  // Fechas
-  startedAt   DateTime @default(now())
-  completedAt DateTime?
-  lastWatchedAt DateTime?
-  
-  createdAt DateTime @default(now())
+  // Metadata
   updatedAt DateTime @updatedAt
 
+  // Relaciones
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  // Índice único para evitar duplicados
   @@unique([userId, lessonId])
   @@map("lesson_progress")
 }
 
-model Note {
-  id        String @id @default(cuid())
-  content   String @db.Text
-  
-  // Timestamp en el video (si aplica)
-  timestamp Int? // en segundos
-  
-  // Relaciones
-  userId    String
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lessonId  String
-  lesson    Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("notes")
-}
-
+// 🏆 MODELO DE CERTIFICADOS (OPCIONAL)
 model Certificate {
-  id        String @id @default(cuid())
+  id       String @id @default(cuid())
+  userId   String
+  courseId String
   
   // Información del certificado
-  certificateNumber String @unique
-  title       String
-  description String?
-  
-  // Relaciones
-  userId    String
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  courseId  String
-  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  
-  // Fechas
-  issuedAt  DateTime @default(now())
-  expiresAt DateTime?
+  certificateNumber String  @unique
+  issuedAt         DateTime @default(now())
+  expiresAt        DateTime?
   
   // URL del certificado generado
   certificateUrl String?
   
+  // Metadata
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("certificates")
 }
 
+// 💬 MODELO DE COMENTARIOS/RESEÑAS (OPCIONAL)
 model Review {
-  id        String @id @default(cuid())
-  rating    Int // 1-5 estrellas
-  comment   String? @db.Text
+  id       String @id @default(cuid())
+  userId   String
+  courseId String
   
-  // Relaciones
-  userId    String
-  courseId  String
-  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  // Reseña
+  rating  Int     // 1-5 estrellas
+  comment String?
   
   // Estado
-  isVerified Boolean @default(false)
-  isPublic   Boolean @default(true)
+  isApproved Boolean @default(false)
   
+  // Metadata
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([userId, courseId])
   @@map("reviews")
-}
-
-// Para sistema de gamificación (preparación)
-model Achievement {
-  id          String @id @default(cuid())
-  name        String
-  description String
-  icon        String?
-  
-  // Tipo y criterios
-  type        String // course_completion, streak, level_up, etc.
-  criteria    String @db.Text // JSON con criterios
-  
-  // Recompensas
-  xpReward    Int @default(0)
-  badgeUrl    String?
-  
-  // Estado
-  isActive    Boolean @default(true)
-  
-  // Relaciones
-  userAchievements UserAchievement[]
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("achievements")
-}
-
-model UserAchievement {
-  id            String @id @default(cuid())
-  
-  // Relaciones
-  userId        String
-  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  achievementId String
-  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-  
-  // Fecha de desbloqueo
-  unlockedAt    DateTime @default(now())
-  
-  @@unique([userId, achievementId])
-  @@map("user_achievements")
 }

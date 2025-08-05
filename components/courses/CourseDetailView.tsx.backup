@@ -1,0 +1,333 @@
+'use client';
+
+import { useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+import { Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Award } from 'lucide-react';
+import Image from 'next/image';
+
+interface Lesson {
+  id: string;
+  title: string;
+  description: string | null;
+  content: string | null;
+  position: number;
+  type: string;
+  videoUrl: string | null;
+  videoDuration: number | null;
+  isPreview: boolean;
+  isRequired: boolean;
+}
+
+interface Module {
+  id: string;
+  title: string;
+  description: string | null;
+  position: number;
+  isRequired: boolean;
+  duration: number | null;
+  lessons: Lesson[];
+}
+
+interface Course {
+  id: string;
+  title: string;
+  description: string;
+  shortDesc: string | null;
+  thumbnail: string | null;
+  trailerVideo: string | null;
+  level: string;
+  category: string;
+  tags: string | null;
+  price: number;
+  currency: string;
+  status: string;
+  featured: boolean;
+  duration: number | null;
+  studentsCount: number;
+  instructorId: string | null;
+  instructor: string | null;
+  modules: Module[];
+}
+
+interface CourseDetailViewProps {
+  course: Course;
+}
+
+export default function CourseDetailView({ course }: CourseDetailViewProps) {
+  const { user } = useUser();
+  const [selectedModule, setSelectedModule] = useState<string>(course.modules[0]?.id || '');
+  
+  const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
+  const previewLessons = course.modules.reduce((acc, module) => 
+    acc + module.lessons.filter(lesson => lesson.isPreview).length, 0);
+  
+  const formatDuration = (minutes: number | null) => {
+    if (!minutes) return 'N/A';
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
+  };
+
+  const formatPrice = (price: number, currency: string) => {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: currency === 'COP' ? 'COP' : 'USD',
+      minimumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const getLevelColor = (level: string) => {
+    switch (level.toLowerCase()) {
+      case 'beginner': return 'bg-green-100 text-green-800';
+      case 'intermediate': return 'bg-yellow-100 text-yellow-800';
+      case 'advanced': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getLevelText = (level: string) => {
+    switch (level.toLowerCase()) {
+      case 'beginner': return 'Principiante';
+      case 'intermediate': return 'Intermedio';
+      case 'advanced': return 'Avanzado';
+      default: return level;
+    }
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header del Curso */}
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+        <div className="md:flex">
+          {/* Imagen/Video */}
+          <div className="md:w-1/2">
+            {course.thumbnail ? (
+              <div className="relative h-64 md:h-full">
+                <Image
+                  src={course.thumbnail}
+                  alt={course.title}
+                  fill
+                  className="object-cover"
+                />
+                {course.trailerVideo && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <button className="bg-white bg-opacity-90 rounded-full p-4 hover:bg-opacity-100 transition-all">
+                      <Play className="w-8 h-8 text-blue-600" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="h-64 md:h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                <BookOpen className="w-16 h-16 text-white opacity-50" />
+              </div>
+            )}
+          </div>
+
+          {/* Información */}
+          <div className="md:w-1/2 p-8">
+            <div className="flex items-center gap-2 mb-4">
+              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getLevelColor(course.level)}`}>
+                {getLevelText(course.level)}
+              </span>
+              {course.featured && (
+                <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
+                  Destacado
+                </span>
+              )}
+            </div>
+
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+              {course.title}
+            </h1>
+
+            <p className="text-gray-600 mb-6">
+              {course.shortDesc || course.description}
+            </p>
+
+            {/* Estadísticas */}
+            <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600">
+              <div className="flex items-center gap-1">
+                <Clock className="w-4 h-4" />
+                <span>{formatDuration(course.duration)}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <BookOpen className="w-4 h-4" />
+                <span>{totalLessons} lecciones</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Users className="w-4 h-4" />
+                <span>{course.studentsCount} estudiantes</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4" />
+                <span>4.8 (124 reseñas)</span>
+              </div>
+            </div>
+
+            {/* Instructor */}
+            {course.instructor && (
+              <div className="mb-6">
+                <p className="text-sm text-gray-600">Instructor:</p>
+                <p className="font-medium text-gray-900">{course.instructor}</p>
+              </div>
+            )}
+
+            {/* Precio y CTA */}
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-3xl font-bold text-gray-900">
+                  {formatPrice(course.price, course.currency)}
+                </span>
+                {previewLessons > 0 && (
+                  <p className="text-sm text-green-600 font-medium">
+                    {previewLessons} lección{previewLessons > 1 ? 'es' : ''} gratuita{previewLessons > 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+              <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors">
+                Inscribirse Ahora
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="lg:flex lg:gap-8">
+        {/* Contenido del Curso */}
+        <div className="lg:w-2/3">
+          {/* Descripción Completa */}
+          <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              Acerca de este curso
+            </h2>
+            <div className="prose max-w-none text-gray-600">
+              <p>{course.description}</p>
+            </div>
+          </div>
+
+          {/* Contenido del Curso */}
+          <div className="bg-white rounded-xl shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              Contenido del curso
+            </h2>
+
+            {/* Tabs de Módulos */}
+            {course.modules.length > 1 && (
+              <div className="flex gap-2 mb-6 border-b">
+                {course.modules.map((module) => (
+                  <button
+                    key={module.id}
+                    onClick={() => setSelectedModule(module.id)}
+                    className={`px-4 py-2 font-medium transition-colors ${
+                      selectedModule === module.id
+                        ? 'border-b-2 border-blue-600 text-blue-600'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    {module.title}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Lecciones */}
+            {course.modules
+              .filter(module => !selectedModule || module.id === selectedModule)
+              .map((module) => (
+                <div key={module.id} className="space-y-4">
+                  {module.description && (
+                    <p className="text-gray-600 mb-4">{module.description}</p>
+                  )}
+                  
+                  {module.lessons.map((lesson) => (
+                    <div
+                      key={lesson.id}
+                      className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="flex-shrink-0">
+                            {lesson.isPreview ? (
+                              <Play className="w-5 h-5 text-green-600" />
+                            ) : (
+                              <Lock className="w-5 h-5 text-gray-400" />
+                            )}
+                          </div>
+                          <div>
+                            <h3 className="font-medium text-gray-900">
+                              {lesson.title}
+                            </h3>
+                            {lesson.description && (
+                              <p className="text-sm text-gray-600 mt-1">
+                                {lesson.description}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                          <span>{formatDuration(lesson.videoDuration ? Math.ceil(lesson.videoDuration / 60) : null)}</span>
+                          {lesson.isPreview && (
+                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
+                              Gratis
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))}
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="lg:w-1/3 mt-8 lg:mt-0">
+          {/* Card de Compra */}
+          <div className="bg-white rounded-xl shadow-sm p-6 sticky top-8">
+            <div className="text-center mb-6">
+              <span className="text-3xl font-bold text-gray-900">
+                {formatPrice(course.price, course.currency)}
+              </span>
+            </div>
+
+            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium mb-4 transition-colors">
+              Inscribirse Ahora
+            </button>
+
+            {previewLessons > 0 && (
+              <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium mb-6 hover:bg-gray-50 transition-colors">
+                Ver Lección Gratuita
+              </button>
+            )}
+
+            {/* Lo que incluye */}
+            <div className="space-y-3 text-sm">
+              <h3 className="font-medium text-gray-900">Este curso incluye:</h3>
+              <div className="flex items-center gap-2 text-gray-600">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>{formatDuration(course.duration)} de contenido en video</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>{totalLessons} lecciones</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>Acceso de por vida</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>Certificado de finalización</span>
+              </div>
+              <div className="flex items-center gap-2 text-gray-600">
+                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span>Acceso en móvil y TV</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
