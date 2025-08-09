@@ -1,20 +1,23 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { Play, Clock, Users, Star, CheckCircle, Lock, BookOpen, Award, Zap, Calendar, Crown } from 'lucide-react';
+import { Play, Clock, Users, CheckCircle, Lock, BookOpen, Award, Calendar, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 
+// ✅ INTERFACES CORREGIDAS - Solo campos que EXISTEN en Prisma
 interface Lesson {
   id: string;
   title: string;
-  description: string | null;
   content: string | null;
   sortOrder: number;
-  type: string;
   videoUrl: string | null;
   videoDuration: number | null;
-  isPreview: boolean;
-  isRequired: boolean;
+  isFree: boolean;
+  isActive: boolean;
+  moduleId: string;
+  thumbnailUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface Module {
@@ -22,418 +25,447 @@ interface Module {
   title: string;
   description: string | null;
   sortOrder: number;
-  isRequired: boolean;
-  duration: number | null;
+  isActive: boolean;
+  courseId: string;
   lessons: Lesson[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface Course {
   id: string;
   title: string;
-  description: string;
-  shortDesc: string | null;
-  thumbnail: string | null;
-  trailerVideo: string | null;
-  level: string;
-  category: string;
-  tags: string | null;
-  price: number;
-  currency: string;
-  status: string;
-  featured: boolean;
+  description: string | null;
+  imageUrl: string | null;
+  isActive: boolean;
+  isFree: boolean;
+  sortOrder: number;
   duration: number | null;
-  studentsCount: number;
-  instructorId: string | null;
-  instructor: string | null;
+  createdAt: string;
+  updatedAt: string;
   modules: Module[];
+  enrollments: Enrollment[];
+  // Campos calculados por API
+  totalLessons: number;
+  isEnrolled: boolean;
+  progressPercentage: number;
+}
+
+interface Enrollment {
+  id: string;
+  userId: string;
+  courseId: string;
+  createdAt: string;
+}
+
+interface LessonProgress {
+  id: string;
+  userId: string;
+  lessonId: string;
+  isCompleted: boolean;
+  completedAt: string | null;
+  watchTimeSeconds: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface CourseDetailViewProps {
-  course: Course;
+  courseId: string;
 }
 
-export default function CourseDetailView({ course }: CourseDetailViewProps) {
+export default function CourseDetailView({ courseId }: CourseDetailViewProps) {
   const { user } = useUser();
-  const [selectedPlan, setSelectedPlan] = useState<'basic' | 'premium'>('basic');
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [lessonProgress, setLessonProgress] = useState<LessonProgress[]>([]);
+  const [enrolling, setEnrolling] = useState(false);
 
-  const totalLessons = course.modules?.reduce((acc, module) => acc + (module.lessons?.length || 0), 0) || 0;
-  const previewLessons = course.modules?.reduce((acc, module) =>
-    acc + (module.lessons?.filter(lesson => lesson.isPreview)?.length || 0), 0) || 0;
+  useEffect(() => {
+    fetchCourse();
+    if (user) {
+      fetchLessonProgress();
+    }
+  }, [courseId, user]);
 
-  const formatDuration = (minutes: number | null) => {
-    if (!minutes) return 'N/A';
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    return hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
-  };
+  const fetchCourse = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const response = await fetch(`/api/courses/${courseId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          setError('Curso no encontrado');
+          return;
+        }
+        if (response.status === 401) {
+          setError('Por favor inicia sesión para ver este curso');
+          return;
+        }
+        throw new Error(`Error: ${response.status}`);
+      }
 
-  const getLevelColor = (level: string | null | undefined) => {
-    if (!level) return 'bg-gray-100 text-gray-800';
-    switch (level.toLowerCase()) {
-      case 'beginner': return 'bg-green-100 text-green-800';
-      case 'intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      const data = await response.json();
+      setCourse(data);
+    } catch (error) {
+      console.error('Error fetching course:', error);
+      setError('Error al cargar el curso. Intenta recargar la página.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const getLevelText = (level: string | null | undefined) => {
-    if (!level) return 'N/A';
-    switch (level.toLowerCase()) {
-      case 'beginner': return 'Principiante';
-      case 'intermediate': return 'Intermedio';
-      case 'advanced': return 'Avanzado';
-      default: return level;
+  const fetchLessonProgress = async () => {
+    try {
+      const response = await fetch(`/api/lessons/progress?courseId=${courseId}`);
+      if (response.ok) {
+        const progress = await response.json();
+        setLessonProgress(progress);
+      }
+    } catch (error) {
+      console.error('Error fetching lesson progress:', error);
     }
   };
 
-  // Verificación de seguridad para course
-  if (!course) {
+  const handleEnroll = async () => {
+    if (!user || !course) return;
+
+    try {
+      setEnrolling(true);
+      const response = await fetch('/api/courses/enroll', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ courseId: course.id }),
+      });
+
+      if (response.ok) {
+        // Refrescar datos del curso
+        await fetchCourse();
+        await fetchLessonProgress();
+      } else {
+        const error = await response.json();
+        alert(error.message || 'Error al inscribirse en el curso');
+      }
+    } catch (error) {
+      console.error('Error enrolling:', error);
+      alert('Error al inscribirse en el curso');
+    } finally {
+      setEnrolling(false);
+    }
+  };
+
+  const markLessonComplete = async (lessonId: string) => {
+    try {
+      const response = await fetch('/api/lessons/complete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ lessonId }),
+      });
+
+      if (response.ok) {
+        // Actualizar progreso local
+        setLessonProgress(prev => [
+          ...prev.filter(p => p.lessonId !== lessonId),
+          {
+            id: `temp-${Date.now()}`,
+            userId: user?.id || '',
+            lessonId,
+            isCompleted: true,
+            completedAt: new Date().toISOString(),
+            watchTimeSeconds: 0,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        ]);
+      }
+    } catch (error) {
+      console.error('Error marking lesson complete:', error);
+    }
+  };
+
+  const getLessonProgress = (lessonId: string) => {
+    return lessonProgress.find(p => p.lessonId === lessonId);
+  };
+
+  const isLessonCompleted = (lessonId: string) => {
+    return getLessonProgress(lessonId)?.isCompleted || false;
+  };
+
+  const canAccessLesson = (lesson: Lesson) => {
+    return lesson.isFree || course?.isEnrolled || false;
+  };
+
+  if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900">Curso no encontrado</h1>
-          <p className="text-gray-600 mt-2">El curso que buscas no está disponible.</p>
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="animate-pulse">
+          <div className="h-64 bg-gray-200 rounded-lg mb-6"></div>
+          <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2 mb-6"></div>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-20 bg-gray-200 rounded"></div>
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
+  if (error || !course) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <div className="text-red-600 text-lg font-medium mb-2">Error</div>
+          <div className="text-red-700 mb-4">{error || 'Curso no encontrado'}</div>
+          <button
+            onClick={fetchCourse}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Calcular estadísticas
+  const completedLessons = course.modules.flatMap(m => m.lessons).filter(lesson => 
+    isLessonCompleted(lesson.id)
+  ).length;
+  
+  const totalLessons = course.modules.flatMap(m => m.lessons).length;
+  const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header del Curso */}
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
-        <div className="md:flex">
-          {/* Imagen/Video */}
-          <div className="md:w-1/2">
-            {course.thumbnail ? (
-              <div className="relative h-64 md:h-full">
-                <Image
-                  src={course.thumbnail}
-                  alt={course.title || 'Curso'}
-                  fill
-                  className="object-cover"
-                />
-                {course.trailerVideo && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <button className="bg-white bg-opacity-90 rounded-full p-4 hover:bg-opacity-100 transition-all">
-                      <Play className="w-8 h-8 text-blue-600" />
-                    </button>
-                  </div>
+    <div className="max-w-4xl mx-auto p-6">
+      {/* Header del curso */}
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+        {/* Imagen de portada */}
+        <div className="relative h-64 bg-gradient-to-r from-indigo-500 to-purple-600">
+          {course.imageUrl ? (
+            <Image
+              src={course.imageUrl}
+              alt={course.title}
+              fill
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <BookOpen className="h-24 w-24 text-white opacity-50" />
+            </div>
+          )}
+          
+          {/* Overlay con estado */}
+          <div className="absolute inset-0 bg-black bg-opacity-20 flex items-end">
+            <div className="p-6 text-white">
+              <div className="flex items-center mb-2">
+                {course.isEnrolled ? (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    Inscrito
+                  </span>
+                ) : course.isFree ? (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                    Gratis
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                    Premium
+                  </span>
                 )}
               </div>
-            ) : (
-              <div className="h-64 md:h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                <BookOpen className="w-16 h-16 text-white opacity-50" />
-              </div>
-            )}
-          </div>
-
-          {/* Información */}
-          <div className="md:w-1/2 p-8">
-            <div className="flex items-center gap-2 mb-4">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${getLevelColor(course.level)}`}>
-                {getLevelText(course.level)}
-              </span>
-              {course.featured && (
-                <span className="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                  Destacado
-                </span>
-              )}
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                Incluido en Suscripción
-              </span>
-            </div>
-
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {course.title || 'Curso sin título'}
-            </h1>
-
-            <p className="text-gray-600 mb-6">
-              {course.shortDesc || course.description || 'Descripción no disponible'}
-            </p>
-
-            {/* Estadísticas */}
-            <div className="flex flex-wrap gap-4 mb-6 text-sm text-gray-600">
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>{formatDuration(course.duration)}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <BookOpen className="w-4 h-4" />
-                <span>{totalLessons} lecciones</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Users className="w-4 h-4" />
-                <span>{course.studentsCount || 0} estudiantes</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Star className="w-4 h-4" />
-                <span>4.8 (124 reseñas)</span>
-              </div>
-            </div>
-
-            {/* Instructor */}
-            {course.instructor && (
-              <div className="mb-6">
-                <p className="text-sm text-gray-600">Instructor:</p>
-                <p className="font-medium text-gray-900">{course.instructor}</p>
-              </div>
-            )}
-
-            {/* Valor de Suscripción */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <Zap className="w-5 h-5 text-blue-600" />
-                <span className="font-semibold text-gray-900">Parte de tu Suscripción</span>
-              </div>
-              <p className="text-sm text-gray-600">
-                Este curso + TODOS nuestros cursos disponibles por solo{' '}
-                <span className="font-bold text-blue-600">$25,000/mes</span>
-              </p>
-              {previewLessons > 0 && (
-                <p className="text-sm text-green-600 font-medium mt-1">
-                  {previewLessons} lección{previewLessons > 1 ? 'es' : ''} gratuita{previewLessons > 1 ? 's' : ''} disponible{previewLessons > 1 ? 's' : ''}
-                </p>
-              )}
-            </div>
-
-            {/* CTA Principal */}
-            <div className="space-y-3">
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition-colors">
-                Comenzar Suscripción - $25,000/mes
-              </button>
-              {previewLessons > 0 && (
-                <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-                  Ver Lección Gratuita Primero
-                </button>
-              )}
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="lg:flex lg:gap-8">
-        {/* Contenido del Curso */}
-        <div className="lg:w-2/3">
-          {/* Descripción Completa */}
-          <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Acerca de este curso
-            </h2>
-            <div className="prose max-w-none text-gray-600">
-              <p>{course.description || 'Descripción no disponible'}</p>
+        {/* Información del curso */}
+        <div className="p-6">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            {course.title}
+          </h1>
+          
+          <p className="text-gray-600 text-lg mb-6">
+            {course.description || 'Sin descripción disponible'}
+          </p>
+
+          {/* Estadísticas */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-2">
+                <BookOpen className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div className="text-sm text-gray-600">Lecciones</div>
+              <div className="text-xl font-bold text-gray-900">{totalLessons}</div>
+            </div>
+            
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Clock className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div className="text-sm text-gray-600">Duración</div>
+              <div className="text-xl font-bold text-gray-900">
+                {course.duration ? `${course.duration} min` : 'N/A'}
+              </div>
             </div>
 
-            {/* Valor de la Suscripción */}
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <h3 className="font-semibold text-blue-900 mb-2">
-                🎯 Con tu suscripción también accedes a:
-              </h3>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Curso "Transformando tus Emociones" (8 sesiones)</li>
-                <li>• Curso "NeuroCalm: Mente en Equilibrio" (10 sesiones)</li>
-                <li>• Curso "Superando la Depresión" (12 sesiones)</li>
-                <li>• Curso "Emociones en Equilibrio" (6 sesiones)</li>
-                <li>• TODOS los cursos futuros automáticamente</li>
-              </ul>
-              <p className="text-xs text-blue-600 mt-2 font-medium">
-                Valor individual: $150,000+ • Tu precio: Solo $25,000/mes
-              </p>
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Users className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div className="text-sm text-gray-600">Módulos</div>
+              <div className="text-xl font-bold text-gray-900">{course.modules.length}</div>
+            </div>
+
+            <div className="text-center">
+              <div className="flex items-center justify-center mb-2">
+                <Award className="h-5 w-5 text-indigo-600" />
+              </div>
+              <div className="text-sm text-gray-600">Progreso</div>
+              <div className="text-xl font-bold text-gray-900">{progressPercentage}%</div>
             </div>
           </div>
 
-          {/* Contenido del Curso */}
-          <div className="bg-white rounded-xl shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Contenido del curso
-            </h2>
+          {/* Progreso visual */}
+          {course.isEnrolled && (
+            <div className="mb-6">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Tu progreso: {completedLessons} de {totalLessons} lecciones</span>
+                <span>{progressPercentage}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className="bg-indigo-600 h-3 rounded-full transition-all duration-300"
+                  style={{ width: `${progressPercentage}%` }}
+                ></div>
+              </div>
+            </div>
+          )}
 
-            {/* Lecciones */}
-            {course.modules && course.modules.length > 0 ? (
-              course.modules.map((module) => (
-                <div key={module.id} className="space-y-4">
-                  {module.description && (
-                    <p className="text-gray-600 mb-4">{module.description}</p>
-                  )}
+          {/* Botón de acción principal */}
+          {!course.isEnrolled && (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">
+                  {course.isFree ? 'Curso gratuito' : 'Requiere suscripción premium'}
+                </p>
+              </div>
+              <button
+                onClick={handleEnroll}
+                disabled={enrolling}
+                className="px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {enrolling ? 'Inscribiendo...' : 'Inscribirse Ahora'}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
-                  {module.lessons && module.lessons.length > 0 ? (
-                    module.lessons.map((lesson) => (
-                      <div
-                        key={lesson.id}
-                        className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="flex-shrink-0">
-                              {lesson.isPreview ? (
-                                <Play className="w-5 h-5 text-green-600" />
-                              ) : (
-                                <Lock className="w-5 h-5 text-gray-400" />
-                              )}
-                            </div>
-                            <div>
-                              <h3 className="font-medium text-gray-900">
-                                {lesson.title || 'Lección sin título'}
-                              </h3>
-                              {lesson.description && (
-                                <p className="text-sm text-gray-600 mt-1">
-                                  {lesson.description}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-4 text-sm text-gray-500">
-                            <span>{formatDuration(lesson.videoDuration ? Math.ceil(lesson.videoDuration / 60) : null)}</span>
-                            {lesson.isPreview ? (
-                              <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium">
-                                Gratis
-                              </span>
-                            ) : (
-                              <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
-                                Suscripción
-                              </span>
-                            )}
-                          </div>
+      {/* Contenido del curso - Módulos */}
+      <div className="space-y-6">
+        {course.modules
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((module, moduleIndex) => (
+          <div key={module.id} className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                Módulo {moduleIndex + 1}: {module.title}
+              </h2>
+              {module.description && (
+                <p className="text-gray-600">{module.description}</p>
+              )}
+            </div>
+
+            <div className="divide-y divide-gray-200">
+              {module.lessons
+                .sort((a, b) => a.sortOrder - b.sortOrder)
+                .map((lesson, lessonIndex) => {
+                const canAccess = canAccessLesson(lesson);
+                const isCompleted = isLessonCompleted(lesson.id);
+
+                return (
+                  <div
+                    key={lesson.id}
+                    className={`p-4 flex items-center justify-between hover:bg-gray-50 transition-colors ${
+                      !canAccess ? 'opacity-60' : ''
+                    }`}
+                  >
+                    <div className="flex items-center flex-1">
+                      <div className="flex-shrink-0 mr-3">
+                        {isCompleted ? (
+                          <CheckCircle className="h-5 w-5 text-green-600" />
+                        ) : canAccess ? (
+                          <Play className="h-5 w-5 text-indigo-600" />
+                        ) : (
+                          <Lock className="h-5 w-5 text-gray-400" />
+                        )}
+                      </div>
+
+                      <div className="flex-1">
+                        <div className="flex items-center">
+                          <h3 className="text-sm font-medium text-gray-900 mr-2">
+                            {lessonIndex + 1}. {lesson.title}
+                          </h3>
+                          {lesson.isFree && (
+                            <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+                              Gratis
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="flex items-center text-xs text-gray-500 mt-1">
+                          {lesson.videoDuration && (
+                            <>
+                              <Clock className="h-3 w-3 mr-1" />
+                              <span className="mr-3">{lesson.videoDuration} min</span>
+                            </>
+                          )}
+                          <Calendar className="h-3 w-3 mr-1" />
+                          <span>Módulo {moduleIndex + 1}</span>
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-gray-500 italic">No hay lecciones disponibles en este módulo.</p>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p className="text-gray-500 italic">No hay contenido disponible para este curso.</p>
-            )}
-          </div>
-        </div>
+                    </div>
 
-        {/* Sidebar */}
-        <div className="lg:w-1/3 mt-8 lg:mt-0">
-          {/* Planes de Suscripción */}
-          <div className="bg-white rounded-xl shadow-sm p-6 sticky top-8">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">
-              Elige tu Plan de Transformación
-            </h3>
-
-            {/* Plan Básico */}
-            <div className={`border-2 rounded-lg p-4 mb-4 cursor-pointer transition-all ${
-              selectedPlan === 'basic' ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
-            }`} onClick={() => setSelectedPlan('basic')}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-5 h-5 text-blue-600" />
-                  <span className="font-semibold">Plan Básico</span>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-gray-900">$25,000</div>
-                  <div className="text-sm text-gray-600">/mes</div>
-                </div>
-              </div>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Acceso a TODOS los cursos</li>
-                <li>• 40+ horas de contenido</li>
-                <li>• Nuevos cursos incluidos</li>
-                <li>• Progreso personalizado</li>
-              </ul>
-              <div className="text-xs text-green-600 font-medium mt-2">
-                Solo $833 pesos por día ☕
-              </div>
-            </div>
-
-            {/* Plan Premium */}
-            <div className={`border-2 rounded-lg p-4 mb-6 cursor-pointer transition-all ${
-              selectedPlan === 'premium' ? 'border-purple-500 bg-purple-50' : 'border-gray-200'
-            }`} onClick={() => setSelectedPlan('premium')}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-purple-600" />
-                  <span className="font-semibold">Plan Premium</span>
-                  <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded text-xs">
-                    Popular
-                  </span>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-gray-900">$80,000</div>
-                  <div className="text-sm text-gray-600">/mes</div>
-                </div>
-              </div>
-              <ul className="text-sm text-gray-600 space-y-1">
-                <li>• Todo lo del Plan Básico</li>
-                <li>• 2 talleres en vivo por mes</li>
-                <li>• Q&A directo con expertos</li>
-                <li>• Comunidad exclusiva</li>
-                <li>• Casos personalizados</li>
-              </ul>
-              <div className="text-xs text-purple-600 font-medium mt-2">
-                Valor talleres: $450,000+ • Ahorras $370,000
-              </div>
-            </div>
-
-            <button className={`w-full py-3 rounded-lg font-medium mb-4 transition-colors ${
-              selectedPlan === 'basic'
-                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                : 'bg-purple-600 hover:bg-purple-700 text-white'
-            }`}>
-              {selectedPlan === 'basic'
-                ? 'Comenzar Plan Básico - $25,000/mes'
-                : 'Comenzar Plan Premium - $80,000/mes'
-              }
-            </button>
-
-            {previewLessons > 0 && (
-              <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-medium mb-6 hover:bg-gray-50 transition-colors">
-                Probar con Lección Gratuita Primero
-              </button>
-            )}
-
-            {/* Lo que incluye */}
-            <div className="space-y-3 text-sm">
-              <h4 className="font-medium text-gray-900">Tu suscripción incluye:</h4>
-              <div className="flex items-center gap-2 text-gray-600">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Acceso ilimitado a toda la biblioteca</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>40+ horas de contenido premium</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Nuevos cursos automáticamente</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span>Cancela cuando quieras</span>
-              </div>
-              {selectedPlan === 'premium' && (
-                <>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Calendar className="w-4 h-4 text-purple-600" />
-                    <span>2 talleres en vivo mensuales</span>
+                    <div className="flex items-center">
+                      {canAccess ? (
+                        <button
+                          onClick={() => !isCompleted && markLessonComplete(lesson.id)}
+                          className="text-indigo-600 hover:text-indigo-700 flex items-center text-sm font-medium"
+                        >
+                          {isCompleted ? 'Completado' : 'Ver Lección'}
+                          <ArrowRight className="h-4 w-4 ml-1" />
+                        </button>
+                      ) : (
+                        <span className="text-sm text-gray-400">Bloqueado</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Users className="w-4 h-4 text-purple-600" />
-                    <span>Comunidad exclusiva Premium</span>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Garantía */}
-            <div className="mt-6 p-3 bg-green-50 rounded-lg">
-              <div className="flex items-center gap-2 mb-1">
-                <CheckCircle className="w-4 h-4 text-green-600" />
-                <span className="text-sm font-medium text-green-800">Garantía de 7 días</span>
-              </div>
-              <p className="text-xs text-green-700">
-                Si no sientes valor en los primeros 7 días, cancela y recibe reembolso completo.
-              </p>
+                );
+              })}
             </div>
           </div>
-        </div>
+        ))}
       </div>
+
+      {/* Estado vacío */}
+      {course.modules.length === 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-8 text-center">
+          <BookOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">
+            Contenido en desarrollo
+          </h3>
+          <p className="text-gray-600">
+            Este curso está siendo preparado. El contenido estará disponible pronto.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
