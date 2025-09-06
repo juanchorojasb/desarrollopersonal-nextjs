@@ -34,7 +34,7 @@ model User {
 model Plan {
   id          String @id @default(cuid())
   name        String
-  description String?
+  description String? @db.Text
   price       Int    // Precio en centavos (25000 = $25.000)
   currency    String @default("COP")
   
@@ -110,7 +110,7 @@ model QRPayment {
   approvedBy    String?   // ID del admin que aprobó
   approvedAt    DateTime?
   rejectedAt    DateTime?
-  rejectionReason String?
+  rejectionReason String? @db.Text
   
   // Metadata
   createdAt   DateTime @default(now())
@@ -126,7 +126,7 @@ model QRPayment {
 model Course {
   id          String  @id @default(cuid())
   title       String
-  description String?
+  description String? @db.Text
   imageUrl    String?
   
   // Configuración del curso
@@ -151,7 +151,7 @@ model Module {
   id        String  @id @default(cuid())
   courseId  String
   title     String
-  description String?
+  description String? @db.Text
   
   // Configuración
   sortOrder Int     @default(0)
@@ -173,7 +173,7 @@ model Lesson {
   id       String  @id @default(cuid())
   moduleId String
   title    String
-  content  String? // Contenido de texto
+  content  String? @db.Text // Contenido de texto
   
   // Video
   videoUrl      String? // URL del video en Bunny.net
@@ -272,7 +272,7 @@ model Review {
   
   // Reseña
   rating  Int     // 1-5 estrellas
-  comment String?
+  comment String? @db.Text
   
   // Estado
   isApproved Boolean @default(false)

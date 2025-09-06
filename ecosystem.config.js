@@ -5,17 +5,17 @@ module.exports = {
       script: 'npm',
       args: 'start',
       cwd: '/var/www/desarrollopersonal-nextjs',
-      instances: 1,
+      exec_mode: 'fork',
       autorestart: true,
       watch: false,
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'development',
-        PORT: 3003
+        PORT: 3004
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3003,
+        PORT: 3004,
         // 🔐 CLERK BASIC CONFIGURATION
         NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_Ym9sZC13YXJ0aG9nLTg4LmNsZXJrLmFjY291bnRzLmRldiQ',
         CLERK_SECRET_KEY: 'sk_test_m4B1bNprIOqvxwY0J2CuwgXGfqqAnGZFcCm1gt8ZAx',
