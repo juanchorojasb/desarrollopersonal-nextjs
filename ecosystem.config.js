@@ -11,14 +11,14 @@ module.exports = {
       max_memory_restart: '1G',
       env: {
         NODE_ENV: 'development',
-        PORT: 3004
+        PORT: 3010
       },
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3004,
-        // 🔐 CLERK BASIC CONFIGURATION
-        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_test_Ym9sZC13YXJ0aG9nLTg4LmNsZXJrLmFjY291bnRzLmRldiQ',
-        CLERK_SECRET_KEY: 'sk_test_m4B1bNprIOqvxwY0J2CuwgXGfqqAnGZFcCm1gt8ZAx',
+        PORT: 3010,
+        // 🔐 CLERK PRODUCTION CONFIGURATION
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: 'pk_live_Y2xlcmsubG9jYWwkKyQqPzknUktCT0NMRVJLLkxPQ0FM',
+        CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
         NEXT_PUBLIC_CLERK_SIGN_IN_URL: '/sign-in',
         NEXT_PUBLIC_CLERK_SIGN_UP_URL: '/sign-up',
         NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: 'https://desarrollopersonal.uno/dashboard',
@@ -29,12 +29,12 @@ module.exports = {
         BUNNY_STORAGE_ZONE_NAME: 'desarrollopersonal',
         BUNNY_HOSTNAME: 'br.storage.bunnycdn.com',
         BUNNY_USERNAME: 'desarrollopersonal',
-        BUNNY_PASSWORD: '0e0e861a-1456-4e47-a89a758f3cd5-a2b5-4da7',
+        BUNNY_PASSWORD: process.env.BUNNY_PASSWORD,
         NEXT_PUBLIC_BUNNY_CDN_URL: 'https://desarrollopersonal.b-cdn.net'
       },
-      error_file: '/var/log/pm2/desarrollopersonal-error.log',
-      out_file: '/var/log/pm2/desarrollopersonal-out.log',
-      log_file: '/var/log/pm2/desarrollopersonal.log',
+      error_file: '/var/log/projects/desarrollopersonal/error.log',
+      out_file: '/var/log/projects/desarrollopersonal/out.log',
+      log_file: '/var/log/projects/desarrollopersonal/combined.log',
       time: true
     }
   ]

@@ -45,11 +45,11 @@ pm2 status | grep desarrollopersonal
 
 # Test functionality
 echo "🧪 Testing deployment..."
-HEALTH_CHECK=$(curl -s http://localhost:3003/api/health)
+HEALTH_CHECK=$(curl -s http://localhost:3004/api/health)
 echo "Health Check: $HEALTH_CHECK"
 
 # Test main page
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3003/)
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3004/)
 echo "HTTP Status: $HTTP_STATUS"
 
 if [ "$HTTP_STATUS" = "200" ]; then
