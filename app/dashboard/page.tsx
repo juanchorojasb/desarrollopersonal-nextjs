@@ -58,36 +58,20 @@ export default function DashboardPage() {
 
   const fetchUserData = async () => {
     try {
-      // Simular datos por ahora - luego crearemos el API
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Datos simulados basados en la estructura real
-      setSubscription({
-        id: 'sub_123',
-        status: 'ACTIVE',
-        plan: {
-          name: 'premium',
-          displayName: 'Plan Premium',
-          hasLiveWorkshops: true,
-          hasCoaching: false,
-          maxCourses: -1
-        },
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        priceAmount: 8000000, // 80.000 en centavos
-        billingCycle: 'MONTHLY'
-      })
+      const [subscriptionRes, statsRes] = await Promise.all([
+        fetch('/api/user/subscription'),
+        fetch('/api/user/stats')
+      ])
 
-      setStats({
-        totalCourses: 12,
-        completedCourses: 3,
-        totalWatchTime: 847, // minutos
-        currentStreak: 7,
-        nextWorkshop: {
-          title: 'Fundamentos de la Autoestima',
-          date: '2025-08-02T14:00:00Z'
-        }
-      })
+      if (subscriptionRes.ok) {
+        const subData = await subscriptionRes.json()
+        setSubscription(subData.subscription)
+      }
+
+      if (statsRes.ok) {
+        const statsData = await statsRes.json()
+        setStats(statsData)
+      }
     } catch (error) {
       console.error('Error fetching user data:', error)
     } finally {
