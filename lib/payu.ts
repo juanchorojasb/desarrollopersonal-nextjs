@@ -98,9 +98,9 @@ class PayUService {
   getPlanPricing(planType: string, country: string) {
     const basePrices = {
       free: { COP: 0, USD: 0 },
-      basic: { COP: 25000, USD: 7.00 },
-      premium: { COP: 40000, USD: 10.00 },
-      premiumPlus: { COP: 50000, USD: 15.00 }
+      basic: { COP: 25000, USD: 6.00 },
+      premium: { COP: 80000, USD: 20.00 },
+      personal: { COP: 140000, USD: 35.00 }
     }
 
     const currency = country === 'EC' ? 'USD' : 'COP'

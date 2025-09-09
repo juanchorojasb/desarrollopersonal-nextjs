@@ -89,8 +89,8 @@ export default function PricingPage() {
       buttonText: 'Suscribirse Ahora'
     },
     {
-      id: 'premium-plus',
-      name: 'Plan Premium Plus',
+      id: 'personal',
+      name: 'Plan Personal',
       price: country === 'CO' ? 140000 : 35,
       currency: country === 'CO' ? 'COP' : 'USD',
       description: 'Todo lo premium + sesión personal mensual',

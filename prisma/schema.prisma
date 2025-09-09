@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,378 +7,269 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// 👤 MODELO DE USUARIO (Integrado con Clerk)
 model User {
-  id        String   @id @default(cuid())
-  clerkId   String   @unique
-  email     String   @unique
-  firstName String?
-  lastName  String?
-  imageUrl  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relaciones
-  subscriptions         Subscription[]
+  id                    String                 @id @default(cuid())
+  clerkId               String                 @unique
+  email                 String                 @unique
+  firstName             String?
+  lastName              String?
+  imageUrl              String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  enrollments           Enrollment[]
+  lessonProgress        LessonProgress[]
   paymentTransactions   PaymentTransaction[]
-  qrPayments           QRPayment[]
-  enrollments          Enrollment[]
-  lessonProgress       LessonProgress[]
+  qrPayments            QRPayment[]
+  subscriptions         Subscription[]
   workshopRegistrations WorkshopRegistration[]
 
   @@map("users")
 }
 
-// 💳 MODELO DE PLANES
 model Plan {
-  id          String @id @default(cuid())
-  name        String
-  description String? @db.Text
-  price       Int    // Precio en centavos (25000 = $25.000)
-  currency    String @default("COP")
-  
-  // Características del plan
-  billingCycle     String  // "MONTHLY", "QUARTERLY", "YEARLY"
-  features         Json?   // Array de características
-  maxCourses       Int?    // Límite de cursos
-  hasLiveSupport   Boolean @default(false)
-  hasGroupCoaching Boolean @default(false)
-  hasPrioritySupport Boolean @default(false)
-  
-  // Metadata
-  isActive    Boolean  @default(true)
-  sortOrder   Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relaciones
-  subscriptions Subscription[]
+  id                 String         @id @default(cuid())
+  name               String
+  description        String?        @db.Text
+  price              Int
+  currency           String         @default("COP")
+  billingCycle       String
+  features           Json?
+  maxCourses         Int?
+  hasLiveSupport     Boolean        @default(false)
+  hasGroupCoaching   Boolean        @default(false)
+  hasPrioritySupport Boolean        @default(false)
+  isActive           Boolean        @default(true)
+  sortOrder          Int            @default(0)
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  subscriptions      Subscription[]
 
   @@map("plans")
 }
 
-// 📱 MODELO DE SUSCRIPCIONES
 model Subscription {
-  id        String   @id @default(cuid())
-  userId    String
-  planId    String
-  
-  // Estado y facturación
-  status       String  // "PENDING", "ACTIVE", "CANCELLED", "EXPIRED"
-  billingCycle String  // "MONTHLY", "QUARTERLY", "YEARLY"
-  priceAmount  Int     // Precio pagado
-  currency     String  @default("COP")
-  
-  // Períodos de facturación (OPCIONALES PARA EVITAR EL ERROR)
-  currentPeriodStart DateTime?
-  currentPeriodEnd   DateTime?
-  
-  // Metadata
-  isActive    Boolean  @default(true)
-  cancelledAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relaciones
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan Plan @relation(fields: [planId], references: [id])
+  id                  String               @id @default(cuid())
+  userId              String
+  planId              String
+  status              String
+  billingCycle        String
+  priceAmount         Int
+  currency            String               @default("COP")
+  currentPeriodStart  DateTime?
+  currentPeriodEnd    DateTime?
+  isActive            Boolean              @default(true)
+  cancelledAt         DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
   paymentTransactions PaymentTransaction[]
+  plan                Plan                 @relation(fields: [planId], references: [id])
+  user                User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@index([planId], map: "subscriptions_planId_fkey")
+  @@index([userId], map: "subscriptions_userId_fkey")
   @@map("subscriptions")
 }
 
-// 💰 MODELO DE TRANSACCIONES PAYU
 model PaymentTransaction {
-  id              String   @id @default(cuid())
-  userId          String
-  subscriptionId  String?  // Referencia a la suscripción
-  
-  // Información del pago PayU
-  referenceCode   String   @unique
-  transactionId   String?
-  amount          Int      // Monto en centavos
-  currency        String   // "COP", "USD"
-  country         String   // "CO", "EC"
-  
-  // Estado de la transacción
-  status          String   // "PENDING", "APPROVED", "DECLINED", "ERROR"
-  paymentMethod   String?  // Método de pago usado
-  
-  // Datos PayU
-  payuOrderId     String?
+  id                String        @id @default(cuid())
+  userId            String
+  subscriptionId    String?
+  referenceCode     String        @unique
+  transactionId     String?
+  amount            Int
+  currency          String
+  country           String
+  status            String
+  paymentMethod     String?
+  payuOrderId       String?
   payuTransactionId String?
-  signature       String?
-  
-  // Metadata del pago
-  description     String?  @db.Text
-  extra1          String?  // userId
-  extra2          String?  // planId
-  extra3          String?  // billingCycle
-  
-  // Respuestas PayU
-  responseCode    String?
-  responseMessage String?
-  
-  // Timestamps
-  processedAt     DateTime?
-  confirmedAt     DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  signature         String?
+  description       String?       @db.Text
+  extra1            String?
+  extra2            String?
+  extra3            String?
+  responseCode      String?
+  responseMessage   String?
+  processedAt       DateTime?
+  confirmedAt       DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  subscription      Subscription? @relation(fields: [subscriptionId], references: [id])
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relaciones
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
-
+  @@index([subscriptionId], map: "payment_transactions_subscriptionId_fkey")
+  @@index([userId], map: "payment_transactions_userId_fkey")
   @@map("payment_transactions")
 }
 
-// 💰 MODELO DE PAGOS QR
 model QRPayment {
-  id          String   @id @default(cuid())
-  userId      String
-  planId      String
-  
-  // Información del pago
-  amount      Int      // Monto en centavos
-  currency    String   @default("COP")
-  status      String   // "PENDING", "APPROVED", "REJECTED"
-  
-  // Datos bancarios usados
-  bankName    String?  // "Bancolombia", "Davivienda"
-  accountInfo String?  // Información de cuenta
-  
-  // Comprobante
-  receiptUrl    String?  // URL del comprobante subido
+  id              String    @id @default(cuid())
+  userId          String
+  planId          String
+  amount          Int
+  currency        String    @default("COP")
+  status          String
+  bankName        String?
+  accountInfo     String?
+  receiptUrl      String?
   receiptFileName String?
-  
-  // Datos de aprobación
-  approvedBy    String?   // ID del admin que aprobó
-  approvedAt    DateTime?
-  rejectedAt    DateTime?
+  approvedBy      String?
+  approvedAt      DateTime?
+  rejectedAt      DateTime?
   rejectionReason String?
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relaciones
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
+  @@index([userId], map: "qr_payments_userId_fkey")
   @@map("qr_payments")
 }
 
-// 📚 MODELO DE CURSOS
 model Course {
-  id          String  @id @default(cuid())
+  id          String       @id @default(cuid())
   title       String
-  slug        String? @unique // URL slug para acceso directo
-  description String? @db.Text
+  description String?      @db.Text
   imageUrl    String?
-  
-  // Configuración del curso
-  isActive    Boolean @default(true)
-  isFree      Boolean @default(false)
-  sortOrder   Int     @default(0)
-  duration    Int?    // Duración estimada en minutos
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relaciones
-  modules     Module[]
+  isActive    Boolean      @default(true)
+  isFree      Boolean      @default(false)
+  sortOrder   Int          @default(0)
+  duration    Int?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  slug        String?      @unique
   enrollments Enrollment[]
+  modules     Module[]
 
   @@map("courses")
 }
 
-// 📖 MODELO DE MÓDULOS
 model Module {
-  id        String  @id @default(cuid())
-  courseId  String
-  title     String
-  description String? @db.Text
-  
-  // Configuración
-  sortOrder Int     @default(0)
-  isActive  Boolean @default(true)
-  
-  // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  courseId    String
+  title       String
+  description String?  @db.Text
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lessons     Lesson[]
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  // Relaciones
-  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  lessons Lesson[]
-
+  @@index([courseId], map: "modules_courseId_fkey")
   @@map("modules")
 }
 
-// 🎥 MODELO DE LECCIONES
 model Lesson {
-  id       String  @id @default(cuid())
-  moduleId String
-  title    String
-  content  String? @db.Text // Contenido de texto
-  
-  // Video MediaDelivery
-  videoId       String? // ID del video en MediaDelivery
-  videoUrl      String? // URL completa del iframe
-  videoDuration Int?    // Duración en segundos
+  id            String           @id @default(cuid())
+  moduleId      String
+  title         String
+  content       String?          @db.Text
+  videoUrl      String?
+  videoDuration Int?
   thumbnailUrl  String?
-  
-  // Configuración
-  sortOrder Int     @default(0)
-  isActive  Boolean @default(true)
-  isFree    Boolean @default(false)
-  
-  // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  sortOrder     Int              @default(0)
+  isActive      Boolean          @default(true)
+  isFree        Boolean          @default(false)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  videoId       String?
+  progress      LessonProgress[]
+  module        Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
-  // Relaciones
-  module   Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  progress LessonProgress[]
-
+  @@index([moduleId], map: "lessons_moduleId_fkey")
   @@map("lessons")
 }
 
-// 📝 MODELO DE INSCRIPCIONES
 model Enrollment {
-  id       String @id @default(cuid())
-  userId   String
-  courseId String
-  
-  // Estado
-  status      String   @default("ACTIVE") // "ACTIVE", "COMPLETED", "CANCELLED"
-  progress    Float    @default(0) // Porcentaje de progreso (0-100)
+  id          String    @id @default(cuid())
+  userId      String
+  courseId    String
+  status      String    @default("ACTIVE")
+  progress    Float     @default(0)
   completedAt DateTime?
-  enrolledAt  DateTime @default(now()) // Fecha de inscripción
-  
-  // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  enrolledAt  DateTime  @default(now())
+  course      Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
 
-  // Relaciones
-  user   User   @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  // Índice único para evitar inscripciones duplicadas
   @@unique([userId, courseId])
+  @@index([courseId], map: "enrollments_courseId_fkey")
   @@map("enrollments")
 }
 
-// 📊 MODELO DE PROGRESO DE LECCIONES
 model LessonProgress {
-  id       String @id @default(cuid())
-  userId   String
-  lessonId String
-  
-  // Progreso
-  completed    Boolean   @default(false)
-  watchTime    Int       @default(0) // Tiempo visto en segundos
-  startedAt    DateTime  @default(now())
-  completedAt  DateTime?
-  
-  // Metadata
-  updatedAt DateTime @updatedAt
+  id          String    @id @default(cuid())
+  userId      String
+  lessonId    String
+  watchTime   Int       @default(0)
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime  @updatedAt
+  completed   Boolean   @default(false)
+  lesson      Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Relaciones
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-  // Índice único para evitar duplicados
   @@unique([userId, lessonId])
+  @@index([lessonId], map: "lesson_progress_lessonId_fkey")
   @@map("lesson_progress")
 }
 
-// 🗓️ MODELO DE TALLERES EN VIVO
 model LiveWorkshop {
-  id          String @id @default(cuid())
-  title       String
-  description String? @db.Text
-  
-  // Programación
-  scheduledAt DateTime
-  duration    Int      // Duración en minutos
-  maxStudents Int      @default(50)
-  
-  // Estado
-  status      String   @default("SCHEDULED") // "SCHEDULED", "LIVE", "COMPLETED", "CANCELLED"
-  meetingUrl  String?  // URL de la reunión (Zoom, Meet, etc.)
-  
-  // Restricción de plan
-  requiredPlan String  @default("PREMIUM") // "BASIC", "PREMIUM", "PREMIUM_PLUS"
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relaciones
+  id            String                 @id @default(cuid())
+  title         String
+  description   String?                @db.Text
+  scheduledAt   DateTime
+  duration      Int
+  maxStudents   Int                    @default(50)
+  status        String                 @default("SCHEDULED")
+  meetingUrl    String?
+  requiredPlan  String                 @default("PREMIUM")
+  createdAt     DateTime               @default(now())
+  updatedAt     DateTime               @updatedAt
   registrations WorkshopRegistration[]
 
   @@map("live_workshops")
 }
 
-// 📝 MODELO DE INSCRIPCIONES A TALLERES
 model WorkshopRegistration {
-  id          String @id @default(cuid())
-  userId      String
-  workshopId  String
-  
-  // Estado
-  status      String   @default("REGISTERED") // "REGISTERED", "ATTENDED", "MISSED", "CANCELLED"
-  registeredAt DateTime @default(now())
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String       @id @default(cuid())
+  userId       String
+  workshopId   String
+  status       String       @default("REGISTERED")
+  registeredAt DateTime     @default(now())
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  user         User         @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  workshop     LiveWorkshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
 
-  // Relaciones
-  user     User         @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
-  workshop LiveWorkshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
-
-  // Índice único
   @@unique([userId, workshopId])
+  @@index([workshopId], map: "workshop_registrations_workshopId_fkey")
   @@map("workshop_registrations")
 }
 
-// 🏆 MODELO DE CERTIFICADOS (OPCIONAL)
 model Certificate {
-  id       String @id @default(cuid())
-  userId   String
-  courseId String
-  
-  // Información del certificado
-  certificateNumber String  @unique
-  issuedAt         DateTime @default(now())
-  expiresAt        DateTime?
-  
-  // URL del certificado generado
-  certificateUrl String?
-  
-  // Metadata
-  createdAt DateTime @default(now())
+  id                String    @id @default(cuid())
+  userId            String
+  courseId          String
+  certificateNumber String    @unique
+  issuedAt          DateTime  @default(now())
+  expiresAt         DateTime?
+  certificateUrl    String?
+  createdAt         DateTime  @default(now())
 
   @@map("certificates")
 }
 
-// 💬 MODELO DE COMENTARIOS/RESEÑAS (OPCIONAL)
 model Review {
-  id       String @id @default(cuid())
-  userId   String
-  courseId String
-  
-  // Reseña
-  rating  Int     // 1-5 estrellas
-  comment String?
-  
-  // Estado
-  isApproved Boolean @default(false)
-  
-  // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String
+  courseId   String
+  rating     Int
+  comment    String?
+  isApproved Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("reviews")
 }

@@ -14,8 +14,8 @@ async function main() {
         name: 'basic',
         displayName: 'Plan Básico',
         description: 'Acceso completo a todos los cursos de desarrollo personal. Perfecto para comenzar tu transformación.',
-        monthlyPrice: 2500000, // $25,000 COP en centavos
-        quarterlyPrice: 6750000, // $67,500 COP (10% descuento trimestral)
+        monthlyPrice: 500000, // $5,000 COP en centavos
+        quarterlyPrice: 1350000, // $13,500 COP (10% descuento trimestral)
         currency: 'COP',
         features: [
           'Acceso completo a TODOS los cursos (30+ horas)',
@@ -25,7 +25,7 @@ async function main() {
           'Garantía de satisfacción de 7 días',
           'Soporte por email'
         ],
-        maxCourses: null, // ilimitado
+        maxCourses: -1, // ilimitado
         hasLiveWorkshops: false,
         hasSupport: true,
         hasCertificates: true,
@@ -45,8 +45,8 @@ async function main() {
         name: 'premium',
         displayName: 'Plan Premium',
         description: 'Todo del Plan Básico + talleres en vivo mensuales y sesiones de coaching grupal. Para una transformación acelerada.',
-        monthlyPrice: 8000000, // $80,000 COP en centavos
-        quarterlyPrice: 21600000, // $216,000 COP (10% descuento trimestral)
+        monthlyPrice: 4000000, // $40,000 COP en centavos
+        quarterlyPrice: 10800000, // $108,000 COP (10% descuento trimestral)
         currency: 'COP',
         features: [
           'Todo lo incluido en el Plan Básico',
@@ -58,7 +58,7 @@ async function main() {
           'Coaching grupal mensual',
           'Acceso anticipado a nuevos cursos'
         ],
-        maxCourses: null, // ilimitado
+        maxCourses: -1, // ilimitado
         hasLiveWorkshops: true,
         hasSupport: true,
         hasCertificates: true,
