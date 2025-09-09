@@ -6,110 +6,108 @@ async function main() {
   console.log('💎 Iniciando seed de planes de suscripción...')
 
   try {
+    // Check existing plans
+    const existingPlans = await prisma.plan.findMany()
+    console.log(`📊 Planes existentes: ${existingPlans.length}`)
+    
     // Plan Básico
-    const basicPlan = await prisma.plan.upsert({
-      where: { name: 'basic' },
-      update: {},
-      create: {
-        name: 'basic',
-        displayName: 'Plan Básico',
-        description: 'Acceso completo a todos los cursos de desarrollo personal. Perfecto para comenzar tu transformación.',
-        monthlyPrice: 500000, // $5,000 COP en centavos
-        quarterlyPrice: 1350000, // $13,500 COP (10% descuento trimestral)
-        currency: 'COP',
-        features: [
-          'Acceso completo a TODOS los cursos (30+ horas)',
-          'Nuevos cursos incluidos automáticamente',
-          'Progreso personalizado y certificados',
-          'Acceso móvil y descarga offline',
-          'Garantía de satisfacción de 7 días',
-          'Soporte por email'
-        ],
-        maxCourses: -1, // ilimitado
-        hasLiveWorkshops: false,
-        hasSupport: true,
-        hasCertificates: true,
-        hasCoaching: false,
-        isActive: true,
-        sortOrder: 1
-      }
-    })
-
-    console.log(`✅ Plan creado: ${basicPlan.displayName}`)
+    let basicPlan = await prisma.plan.findFirst({ where: { name: 'basic' } })
+    if (!basicPlan) {
+      basicPlan = await prisma.plan.create({
+        data: {
+          name: 'basic',
+          description: 'Acceso completo a todos los cursos de desarrollo personal. Perfecto para comenzar tu transformación.',
+          price: 25000, // $25,000 COP
+          currency: 'COP',
+          billingCycle: 'monthly',
+          features: [
+            'Acceso completo a TODOS los cursos (30+ horas)',
+            'Nuevos cursos incluidos automáticamente',
+            'Progreso personalizado y certificados',
+            'Acceso móvil y descarga offline',
+            'Garantía de satisfacción de 7 días',
+            'Soporte por email'
+          ],
+          maxCourses: -1, // ilimitado
+          hasLiveSupport: false,
+          hasGroupCoaching: false,
+          hasPrioritySupport: false,
+          isActive: true,
+          sortOrder: 1
+        }
+      })
+      console.log(`✅ Plan creado: ${basicPlan.name}`)
+    } else {
+      console.log(`📋 Plan básico ya existe: ${basicPlan.name}`)
+    }
 
     // Plan Premium
-    const premiumPlan = await prisma.plan.upsert({
-      where: { name: 'premium' },
-      update: {},
-      create: {
-        name: 'premium',
-        displayName: 'Plan Premium',
-        description: 'Todo del Plan Básico + talleres en vivo mensuales y sesiones de coaching grupal. Para una transformación acelerada.',
-        monthlyPrice: 4000000, // $40,000 COP en centavos
-        quarterlyPrice: 10800000, // $108,000 COP (10% descuento trimestral)
-        currency: 'COP',
-        features: [
-          'Todo lo incluido en el Plan Básico',
-          '2 talleres en vivo por mes',
-          'Q&A directo con expertos',
-          'Comunidad exclusiva Premium',
-          'Casos personalizados en talleres',
-          'Soporte prioritario',
-          'Coaching grupal mensual',
-          'Acceso anticipado a nuevos cursos'
-        ],
-        maxCourses: -1, // ilimitado
-        hasLiveWorkshops: true,
-        hasSupport: true,
-        hasCertificates: true,
-        hasCoaching: true,
-        isActive: true,
-        sortOrder: 2
-      }
-    })
-
-    console.log(`✅ Plan creado: ${premiumPlan.displayName}`)
+    let premiumPlan = await prisma.plan.findFirst({ where: { name: 'premium' } })
+    if (!premiumPlan) {
+      premiumPlan = await prisma.plan.create({
+        data: {
+          name: 'premium',
+          description: 'Todo del Plan Básico + talleres en vivo mensuales y sesiones de coaching grupal. Para una transformación acelerada.',
+          price: 80000, // $80,000 COP
+          currency: 'COP',
+          billingCycle: 'monthly',
+          features: [
+            'Todo lo incluido en el Plan Básico',
+            '2 talleres en vivo por mes',
+            'Q&A directo con expertos',
+            'Comunidad exclusiva Premium',
+            'Casos personalizados en talleres',
+            'Soporte prioritario',
+            'Coaching grupal mensual',
+            'Acceso anticipado a nuevos cursos'
+          ],
+          maxCourses: -1, // ilimitado
+          hasLiveSupport: true,
+          hasGroupCoaching: true,
+          hasPrioritySupport: true,
+          isActive: true,
+          sortOrder: 2
+        }
+      })
+      console.log(`✅ Plan creado: ${premiumPlan.name}`)
+    } else {
+      console.log(`📋 Plan premium ya existe: ${premiumPlan.name}`)
+    }
 
     // Plan Individual (para cursos únicos - opcional)
-    const individualPlan = await prisma.plan.upsert({
-      where: { name: 'individual' },
-      update: {},
-      create: {
-        name: 'individual',
-        displayName: 'Curso Individual',
-        description: 'Compra cursos por separado. Perfecto si solo te interesa un tema específico.',
-        monthlyPrice: 2000000, // $20,000 COP promedio por curso
-        quarterlyPrice: null, // no aplica para cursos individuales
-        currency: 'COP',
-        features: [
-          'Acceso permanente al curso seleccionado',
-          'Certificado de finalización',
-          'Soporte por email',
-          'Actualizaciones gratuitas del curso'
-        ],
-        maxCourses: 1,
-        hasLiveWorkshops: false,
-        hasSupport: true,
-        hasCertificates: true,
-        hasCoaching: false,
-        isActive: true,
-        sortOrder: 3
-      }
-    })
-
-    console.log(`✅ Plan creado: ${individualPlan.displayName}`)
+    let individualPlan = await prisma.plan.findFirst({ where: { name: 'individual' } })
+    if (!individualPlan) {
+      individualPlan = await prisma.plan.create({
+        data: {
+          name: 'individual',
+          description: 'Compra cursos por separado. Perfecto si solo te interesa un tema específico.',
+          price: 20000, // $20,000 COP promedio por curso
+          currency: 'COP',
+          billingCycle: 'one-time',
+          features: [
+            'Acceso permanente al curso seleccionado',
+            'Certificado de finalización',
+            'Soporte por email',
+            'Actualizaciones gratuitas del curso'
+          ],
+          maxCourses: 1,
+          hasLiveSupport: false,
+          hasGroupCoaching: false,
+          hasPrioritySupport: false,
+          isActive: true,
+          sortOrder: 3
+        }
+      })
+      console.log(`✅ Plan creado: ${individualPlan.name}`)
+    } else {
+      console.log(`📋 Plan individual ya existe: ${individualPlan.name}`)
+    }
 
     console.log('\n🎯 PLANES CREADOS EXITOSAMENTE:')
     console.log('=====================================')
-    console.log(`💎 ${basicPlan.displayName}: $${(basicPlan.monthlyPrice / 100).toLocaleString()}/mes`)
-    console.log(`   📊 Trimestral: $${(basicPlan.quarterlyPrice! / 100).toLocaleString()} (10% descuento)`)
-    console.log(`   💰 Ahorro anual: $${((basicPlan.monthlyPrice * 12 - basicPlan.quarterlyPrice! * 4) / 100).toLocaleString()}`)
-    
-    console.log(`\n👑 ${premiumPlan.displayName}: $${(premiumPlan.monthlyPrice / 100).toLocaleString()}/mes`)
-    console.log(`   📊 Trimestral: $${(premiumPlan.quarterlyPrice! / 100).toLocaleString()} (10% descuento)`)
-    console.log(`   💰 Ahorro anual: $${((premiumPlan.monthlyPrice * 12 - premiumPlan.quarterlyPrice! * 4) / 100).toLocaleString()}`)
-    
-    console.log(`\n🎯 ${individualPlan.displayName}: $${(individualPlan.monthlyPrice / 100).toLocaleString()}/curso`)
+    console.log(`💎 ${basicPlan.name}: $${basicPlan.price.toLocaleString()}/mes`)
+    console.log(`👑 ${premiumPlan.name}: $${premiumPlan.price.toLocaleString()}/mes`)
+    console.log(`🎯 ${individualPlan.name}: $${individualPlan.price.toLocaleString()}/curso`)
 
     // Verificar que los planes se crearon correctamente
     const allPlans = await prisma.plan.findMany({

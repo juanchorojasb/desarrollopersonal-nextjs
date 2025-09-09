@@ -105,10 +105,57 @@ const availablePlans: Plan[] = [
     ]
   },
   {
+    id: 'basic',
+    name: 'Básico',
+    description: 'Acceso completo a todos los cursos grabados',
+    price: 25000,
+    currency: 'COP',
+    billingPeriod: 'mes',
+    popular: false,
+    features: [
+      {
+        id: '1',
+        name: 'Acceso a todos los cursos',
+        description: '7 cursos especializados completos',
+        included: true
+      },
+      {
+        id: '2',
+        name: 'Videos HD sin límites',
+        description: '39 sesiones de contenido premium',
+        included: true
+      },
+      {
+        id: '3',
+        name: 'Progreso personalizado',
+        description: 'Seguimiento de tu avance',
+        included: true
+      },
+      {
+        id: '4',
+        name: 'Certificados',
+        description: 'Diplomas de finalización',
+        included: true
+      },
+      {
+        id: '5',
+        name: 'Acceso móvil',
+        description: 'Descarga offline disponible',
+        included: true
+      },
+      {
+        id: '6',
+        name: 'Talleres en vivo',
+        description: 'Sesiones exclusivas con expertos',
+        included: false
+      }
+    ]
+  },
+  {
     id: 'premium',
     name: 'Premium',
     description: 'Acceso completo para transformar tu vida',
-    price: 49000,
+    price: 80000,
     currency: 'COP',
     billingPeriod: 'mes',
     popular: true,
@@ -155,7 +202,7 @@ const availablePlans: Plan[] = [
     id: 'pro',
     name: 'Profesional',
     description: 'Para coaches y profesionales del desarrollo personal',
-    price: 99000,
+    price: 140000,
     currency: 'COP',
     billingPeriod: 'mes',
     popular: false,

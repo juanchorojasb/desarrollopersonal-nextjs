@@ -167,8 +167,8 @@ export async function POST(request: NextRequest) {
       const planMapping = {
         free: { name: 'free', description: 'Plan Gratuito', price: 0 },
         basic: { name: 'basic', description: 'Plan Básico', price: 2500000 },
-        premium: { name: 'premium', description: 'Plan Premium', price: 4000000 },
-        premiumPlus: { name: 'premiumPlus', description: 'Plan Premium Plus', price: 5000000 }
+        premium: { name: 'premium', description: 'Plan Premium', price: 8000000 },
+        personal: { name: 'personal', description: 'Plan Personal', price: 14000000 }
       }
       
       const planConfig = planMapping[planId as keyof typeof planMapping]
@@ -190,7 +190,8 @@ export async function POST(request: NextRequest) {
           features: planId === 'free' ? ['Curso externo en Thinkific'] : 
                    planId === 'basic' ? ['7 cursos en MediaDelivery', 'Acceso completo', 'Sin límites'] :
                    planId === 'premium' ? ['7 cursos en MediaDelivery', 'Talleres sabatinos', 'Foros'] :
-                   ['7 cursos en MediaDelivery', 'Talleres sabatinos', 'Foros', 'Sesión personal 1h/mes']
+                   planId === 'personal' ? ['7 cursos en MediaDelivery', 'Talleres sabatinos', 'Foros', 'Sesión personal 1h/mes'] :
+                   ['Funcionalidades básicas']
         }
       })
       console.log('✅ TEST: Plan creado:', plan.id)
