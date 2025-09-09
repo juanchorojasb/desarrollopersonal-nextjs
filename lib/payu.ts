@@ -6,6 +6,14 @@ export interface PayUConfig {
   accountId: string
   apiUrl: string
   webCheckoutUrl: string
+  // Multi-country configuration
+  accounts: {
+    [countryCode: string]: {
+      accountId: string
+      merchantId: string
+      apiKey: string
+    }
+  }
 }
 
 export interface PaymentData {
@@ -13,6 +21,7 @@ export interface PaymentData {
   planName: string
   amount: number
   currency: string
+  country: string
   billingCycle: 'monthly' | 'quarterly'
   userEmail: string
   userId: string
@@ -36,16 +45,80 @@ class PayUService {
       merchantId: process.env.PAYU_MERCHANT_ID || '',
       accountId: process.env.PAYU_ACCOUNT_ID || '',
       apiUrl: process.env.PAYU_API_URL || 'https://sandbox.api.payulatam.com/payments-api/4.0/service.cgi',
-      webCheckoutUrl: process.env.PAYU_WEB_CHECKOUT_URL || 'https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/'
+      webCheckoutUrl: process.env.PAYU_WEB_CHECKOUT_URL || 'https://sandbox.checkout.payulatam.com/ppp-web-gateway-payu/',
+      accounts: {
+        CO: {
+          accountId: process.env.PAYU_ACCOUNT_ID_CO || process.env.PAYU_ACCOUNT_ID || '',
+          merchantId: process.env.PAYU_MERCHANT_ID_CO || process.env.PAYU_MERCHANT_ID || '',
+          apiKey: process.env.PAYU_API_KEY_CO || process.env.PAYU_API_KEY || ''
+        },
+        EC: {
+          accountId: process.env.PAYU_ACCOUNT_ID_EC || process.env.PAYU_ACCOUNT_ID || '',
+          merchantId: process.env.PAYU_MERCHANT_ID_EC || process.env.PAYU_MERCHANT_ID || '',
+          apiKey: process.env.PAYU_API_KEY_EC || process.env.PAYU_API_KEY || ''
+        }
+      }
+    }
+  }
+
+  /**
+   * Get country configuration
+   */
+  getCountryConfig(country: string) {
+    return this.config.accounts[country] || this.config.accounts['CO']
+  }
+
+  /**
+   * Get currency conversion rates
+   */
+  getCurrencyRates() {
+    return {
+      COP: 1,
+      USD: 4100 // 1 USD = 4100 COP approximate
+    }
+  }
+
+  /**
+   * Convert price between currencies
+   */
+  convertCurrency(amount: number, fromCurrency: string, toCurrency: string): number {
+    const rates = this.getCurrencyRates()
+    const copAmount = fromCurrency === 'COP' ? amount : amount * rates.USD
+    
+    if (toCurrency === 'USD') {
+      return Math.round(copAmount / rates.USD * 100) / 100 // Round to 2 decimals
+    }
+    
+    return copAmount
+  }
+
+  /**
+   * Get plan pricing for country - Updated structure
+   */
+  getPlanPricing(planType: string, country: string) {
+    const basePrices = {
+      free: { COP: 0, USD: 0 },
+      basic: { COP: 25000, USD: 7.00 },
+      premium: { COP: 40000, USD: 10.00 },
+      premiumPlus: { COP: 50000, USD: 15.00 }
+    }
+
+    const currency = country === 'EC' ? 'USD' : 'COP'
+    const planPrice = basePrices[planType as keyof typeof basePrices]?.[currency] || basePrices.basic[currency]
+    
+    return {
+      currency,
+      monthly: planPrice,
+      quarterly: Math.round(planPrice * 3 * 0.85 * 100) / 100 // 15% descuento trimestral
     }
   }
 
   /**
    * Generar firma digital para PayU
    */
-  generateSignature(referenceCode: string, amount: number, currency: string): string {
-    const { apiKey, merchantId } = this.config
-    const signatureString = `${apiKey}~${merchantId}~${referenceCode}~${amount}~${currency}`
+  generateSignature(referenceCode: string, amount: number, currency: string, country: string = 'CO'): string {
+    const countryConfig = this.getCountryConfig(country)
+    const signatureString = `${countryConfig.apiKey}~${countryConfig.merchantId}~${referenceCode}~${amount}~${currency}`
     return CryptoJS.MD5(signatureString).toString()
   }
 
@@ -62,21 +135,36 @@ class PayUService {
    */
   createCheckoutUrl(paymentData: PaymentData): PayUResponse {
     try {
+      const countryConfig = this.getCountryConfig(paymentData.country)
       const referenceCode = this.generateReferenceCode(paymentData.userId, paymentData.planId)
-      const signature = this.generateSignature(referenceCode, paymentData.amount, paymentData.currency)
+      const signature = this.generateSignature(referenceCode, paymentData.amount, paymentData.currency, paymentData.country)
 
-      // En modo desarrollo/testing, usar mock PayU
+      console.log('🔍 PayU createCheckoutUrl - Config check:', {
+        NODE_ENV: process.env.NODE_ENV,
+        PAYU_USE_MOCK: process.env.PAYU_USE_MOCK,
+        useMock: process.env.NODE_ENV === 'development' || process.env.PAYU_USE_MOCK === 'true'
+      })
+
+      // En modo desarrollo/testing, usar mock PayU completo
       if (process.env.NODE_ENV === 'development' || process.env.PAYU_USE_MOCK === 'true') {
+        console.log('🧪 Using MOCK PayU mode - Creating direct success response')
+        
         const mockParams = new URLSearchParams({
-          merchantId: this.config.merchantId,
+          merchantId: countryConfig.merchantId,
+          accountId: countryConfig.accountId,
           amount: paymentData.amount.toString(),
+          currency: paymentData.currency,
+          country: paymentData.country,
           description: paymentData.description,
           referenceCode: referenceCode,
           responseUrl: `${process.env.NEXT_PUBLIC_APP_URL}/payment/response`,
           test: '1'
         })
 
-        const checkoutUrl = `${process.env.NEXT_PUBLIC_APP_URL}/payment/mock-payu?${mockParams.toString()}`
+        // En lugar de redirigir a una página externa, devolver directamente URL de success
+        const checkoutUrl = `${process.env.NEXT_PUBLIC_APP_URL}/payment/success?${mockParams.toString()}&state_pol=4&response_message_pol=APPROVED&signature=${signature}`
+
+        console.log('✅ MOCK PayU checkout URL generated:', checkoutUrl)
 
         return {
           success: true,
@@ -85,18 +173,24 @@ class PayUService {
         }
       }
 
+      // Calcular tax para Ecuador (si es necesario)
+      const tax = paymentData.country === 'EC' && paymentData.currency === 'USD' ? 
+        Math.round(paymentData.amount * 0.12 * 100) / 100 : 0 // 12% IVA en Ecuador
+      
+      const taxReturnBase = tax > 0 ? paymentData.amount - tax : 0
+
       // Parámetros para Web Checkout real
       const params = new URLSearchParams({
-        merchantId: this.config.merchantId,
-        accountId: this.config.accountId,
+        merchantId: countryConfig.merchantId,
+        accountId: countryConfig.accountId,
         description: paymentData.description,
         referenceCode: referenceCode,
         amount: paymentData.amount.toString(),
-        tax: '0',
-        taxReturnBase: '0',
+        tax: tax.toString(),
+        taxReturnBase: taxReturnBase.toString(),
         currency: paymentData.currency,
         signature: signature,
-test: process.env.NODE_ENV !== 'production' ? '1' : '0',
+        test: process.env.NODE_ENV !== 'production' ? '1' : '0',
         buyerEmail: paymentData.userEmail,
         buyerFullName: paymentData.userName,
         responseUrl: `${process.env.NEXT_PUBLIC_APP_URL}/payment/response`,
@@ -104,7 +198,8 @@ test: process.env.NODE_ENV !== 'production' ? '1' : '0',
         extra1: paymentData.userId, // Para identificar al usuario
         extra2: paymentData.planId, // Para identificar el plan
         extra3: paymentData.billingCycle, // Para identificar el ciclo de facturación
-        lng: 'es' // Idioma español
+        extra4: paymentData.country, // Para identificar el país
+        lng: paymentData.country === 'EC' ? 'es' : 'es' // Idioma español
       })
 
       const checkoutUrl = `${this.config.webCheckoutUrl}?${params.toString()}`

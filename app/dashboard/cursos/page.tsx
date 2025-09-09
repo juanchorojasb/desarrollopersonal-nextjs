@@ -13,9 +13,10 @@ import {
   CheckCircle
 } from 'lucide-react';
 
-// ✅ INTERFAZ CORREGIDA - Solo campos que EXISTEN en Prisma
+// ✅ INTERFAZ ACTUALIZADA para API de suscripciones
 interface Course {
   id: string;
+  slug: string | null;
   title: string;
   description: string | null;
   imageUrl: string | null;
@@ -26,11 +27,11 @@ interface Course {
   createdAt: string;
   updatedAt: string;
   modules: Module[];
-  enrollments: Enrollment[];
-  // Campos calculados por API
+  // Campos calculados por API de suscripciones
   totalLessons: number;
-  isEnrolled: boolean;
+  hasAccess: boolean;
   progressPercentage: number;
+  requiresSubscription: boolean;
 }
 
 interface Module {
@@ -55,25 +56,36 @@ interface Lesson {
   isActive: boolean;
 }
 
-interface Enrollment {
+interface Subscription {
   id: string;
-  userId: string;
-  courseId: string;
-  createdAt: string;
+  plan: {
+    id: string;
+    name: string;
+  };
+  status: string;
+  currentPeriodEnd: string | null;
 }
 
 export default function CursosPage() {
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   const [courses, setCourses] = useState<Course[]>([]);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchCourses();
-  }, []);
+    if (isLoaded && user) {
+      fetchCourses();
+    }
+  }, [isLoaded, user]);
 
   const fetchCourses = async () => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -89,7 +101,8 @@ export default function CursosPage() {
       }
 
       const data = await response.json();
-      setCourses(data);
+      setCourses(data.courses || []);
+      setSubscription(data.subscription || null);
     } catch (error) {
       console.error('Error fetching courses:', error);
       setError('Error al cargar los cursos. Intenta recargar la página.');
@@ -98,26 +111,9 @@ export default function CursosPage() {
     }
   };
 
-  const enrollInCourse = async (courseId: string) => {
-    try {
-      const response = await fetch('/api/courses/enroll', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ courseId }),
-      });
-
-      if (response.ok) {
-        // Refrescar cursos después de inscribirse
-        fetchCourses();
-      } else {
-        alert('Error al inscribirse en el curso');
-      }
-    } catch (error) {
-      console.error('Error enrolling in course:', error);
-      alert('Error al inscribirse en el curso');
-    }
+  const handleSubscriptionRequired = () => {
+    // Redirigir a la página de suscripción cuando se requiera
+    window.location.href = '/dashboard/suscripcion';
   };
 
   // Filtrar cursos por búsqueda
@@ -126,7 +122,8 @@ export default function CursosPage() {
     (course.description && course.description.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  if (loading) {
+  // Mostrar loading si Clerk está cargando o si estamos haciendo fetch
+  if (!isLoaded || loading) {
     return (
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-7xl mx-auto">
@@ -142,6 +139,26 @@ export default function CursosPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Si el usuario no está autenticado después de cargar
+  if (isLoaded && !user) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+            <div className="text-yellow-600 text-lg font-medium mb-2">Autenticación requerida</div>
+            <div className="text-yellow-700 mb-4">Por favor inicia sesión para ver los cursos</div>
+            <button
+              onClick={() => window.location.href = '/sign-in'}
+              className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
+            >
+              Iniciar Sesión
+            </button>
           </div>
         </div>
       </div>
@@ -212,9 +229,9 @@ export default function CursosPage() {
             <div className="flex items-center">
               <CheckCircle className="h-8 w-8 text-green-600" />
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Inscritos</p>
+                <p className="text-sm font-medium text-gray-600">Con Acceso</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {courses.filter(course => course.isEnrolled).length}
+                  {courses.filter(course => course.hasAccess).length}
                 </p>
               </div>
             </div>
@@ -226,7 +243,7 @@ export default function CursosPage() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Disponibles</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {courses.filter(course => !course.isEnrolled && course.isActive).length}
+                  {courses.filter(course => !course.hasAccess && course.isActive).length}
                 </p>
               </div>
             </div>
@@ -254,10 +271,10 @@ export default function CursosPage() {
                 
                 {/* Badge de estado */}
                 <div className="absolute top-4 left-4">
-                  {course.isEnrolled ? (
+                  {course.hasAccess ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                       <CheckCircle className="h-3 w-3 mr-1" />
-                      Inscrito
+                      Acceso
                     </span>
                   ) : course.isFree ? (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -293,8 +310,8 @@ export default function CursosPage() {
                   </div>
                 </div>
 
-                {/* Progreso (solo si está inscrito) */}
-                {course.isEnrolled && (
+                {/* Progreso (solo si tiene acceso) */}
+                {course.hasAccess && (
                   <div className="mb-4">
                     <div className="flex justify-between text-sm text-gray-600 mb-1">
                       <span>Progreso</span>
@@ -315,23 +332,32 @@ export default function CursosPage() {
                     {course.modules.length} módulos
                   </div>
 
-                  {course.isEnrolled ? (
+                  {course.hasAccess ? (
                     <Link
-                      href={`/dashboard/cursos/${course.id}`}
+                      href={`/dashboard/cursos/${course.slug || course.id}`}
                       className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
                     >
                       <Play className="h-4 w-4 mr-1" />
                       Ver Curso
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Link>
-                  ) : (
+                  ) : course.requiresSubscription ? (
                     <button
-                      onClick={() => enrollInCourse(course.id)}
-                      className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                      onClick={handleSubscriptionRequired}
+                      className="inline-flex items-center px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-lg hover:bg-yellow-700 transition-colors"
                     >
-                      Inscribirse
+                      Suscribirse
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </button>
+                  ) : (
+                    <Link
+                      href={`/dashboard/cursos/${course.slug || course.id}`}
+                      className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                      <Play className="h-4 w-4 mr-1" />
+                      Ver Gratis
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Link>
                   )}
                 </div>
               </div>

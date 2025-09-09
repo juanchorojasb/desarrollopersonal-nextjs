@@ -22,10 +22,12 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relaciones
-  subscriptions    Subscription[]
-  qrPayments       QRPayment[]
-  enrollments      Enrollment[]
-  lessonProgress   LessonProgress[]
+  subscriptions         Subscription[]
+  paymentTransactions   PaymentTransaction[]
+  qrPayments           QRPayment[]
+  enrollments          Enrollment[]
+  lessonProgress       LessonProgress[]
+  workshopRegistrations WorkshopRegistration[]
 
   @@map("users")
 }
@@ -34,7 +36,7 @@ model User {
 model Plan {
   id          String @id @default(cuid())
   name        String
-  description String?
+  description String? @db.Text
   price       Int    // Precio en centavos (25000 = $25.000)
   currency    String @default("COP")
   
@@ -83,8 +85,54 @@ model Subscription {
   // Relaciones
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   plan Plan @relation(fields: [planId], references: [id])
+  paymentTransactions PaymentTransaction[]
 
   @@map("subscriptions")
+}
+
+// 💰 MODELO DE TRANSACCIONES PAYU
+model PaymentTransaction {
+  id              String   @id @default(cuid())
+  userId          String
+  subscriptionId  String?  // Referencia a la suscripción
+  
+  // Información del pago PayU
+  referenceCode   String   @unique
+  transactionId   String?
+  amount          Int      // Monto en centavos
+  currency        String   // "COP", "USD"
+  country         String   // "CO", "EC"
+  
+  // Estado de la transacción
+  status          String   // "PENDING", "APPROVED", "DECLINED", "ERROR"
+  paymentMethod   String?  // Método de pago usado
+  
+  // Datos PayU
+  payuOrderId     String?
+  payuTransactionId String?
+  signature       String?
+  
+  // Metadata del pago
+  description     String?  @db.Text
+  extra1          String?  // userId
+  extra2          String?  // planId
+  extra3          String?  // billingCycle
+  
+  // Respuestas PayU
+  responseCode    String?
+  responseMessage String?
+  
+  // Timestamps
+  processedAt     DateTime?
+  confirmedAt     DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relaciones
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  @@map("payment_transactions")
 }
 
 // 💰 MODELO DE PAGOS QR
@@ -126,7 +174,8 @@ model QRPayment {
 model Course {
   id          String  @id @default(cuid())
   title       String
-  description String?
+  slug        String? @unique // URL slug para acceso directo
+  description String? @db.Text
   imageUrl    String?
   
   // Configuración del curso
@@ -151,7 +200,7 @@ model Module {
   id        String  @id @default(cuid())
   courseId  String
   title     String
-  description String?
+  description String? @db.Text
   
   // Configuración
   sortOrder Int     @default(0)
@@ -173,10 +222,11 @@ model Lesson {
   id       String  @id @default(cuid())
   moduleId String
   title    String
-  content  String? // Contenido de texto
+  content  String? @db.Text // Contenido de texto
   
-  // Video
-  videoUrl      String? // URL del video en Bunny.net
+  // Video MediaDelivery
+  videoId       String? // ID del video en MediaDelivery
+  videoUrl      String? // URL completa del iframe
   videoDuration Int?    // Duración en segundos
   thumbnailUrl  String?
   
@@ -206,13 +256,14 @@ model Enrollment {
   status      String   @default("ACTIVE") // "ACTIVE", "COMPLETED", "CANCELLED"
   progress    Float    @default(0) // Porcentaje de progreso (0-100)
   completedAt DateTime?
+  enrolledAt  DateTime @default(now()) // Fecha de inscripción
   
   // Metadata
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relaciones
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   // Índice único para evitar inscripciones duplicadas
@@ -242,6 +293,57 @@ model LessonProgress {
   // Índice único para evitar duplicados
   @@unique([userId, lessonId])
   @@map("lesson_progress")
+}
+
+// 🗓️ MODELO DE TALLERES EN VIVO
+model LiveWorkshop {
+  id          String @id @default(cuid())
+  title       String
+  description String? @db.Text
+  
+  // Programación
+  scheduledAt DateTime
+  duration    Int      // Duración en minutos
+  maxStudents Int      @default(50)
+  
+  // Estado
+  status      String   @default("SCHEDULED") // "SCHEDULED", "LIVE", "COMPLETED", "CANCELLED"
+  meetingUrl  String?  // URL de la reunión (Zoom, Meet, etc.)
+  
+  // Restricción de plan
+  requiredPlan String  @default("PREMIUM") // "BASIC", "PREMIUM", "PREMIUM_PLUS"
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  registrations WorkshopRegistration[]
+
+  @@map("live_workshops")
+}
+
+// 📝 MODELO DE INSCRIPCIONES A TALLERES
+model WorkshopRegistration {
+  id          String @id @default(cuid())
+  userId      String
+  workshopId  String
+  
+  // Estado
+  status      String   @default("REGISTERED") // "REGISTERED", "ATTENDED", "MISSED", "CANCELLED"
+  registeredAt DateTime @default(now())
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  user     User         @relation(fields: [userId], references: [clerkId], onDelete: Cascade)
+  workshop LiveWorkshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+
+  // Índice único
+  @@unique([userId, workshopId])
+  @@map("workshop_registrations")
 }
 
 // 🏆 MODELO DE CERTIFICADOS (OPCIONAL)

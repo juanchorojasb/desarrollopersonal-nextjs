@@ -9,13 +9,23 @@ import {
   User, 
   Settings,
   HelpCircle,
-  LogOut 
+  LogOut,
+  Crown,
+  Calendar,
+  CreditCard,
+  Receipt,
+  Gift
 } from 'lucide-react';
 import { useClerk } from '@clerk/nextjs';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Cursos', href: '/dashboard/cursos', icon: BookOpen },
+  { name: 'Curso Gratuito', href: '/dashboard/curso-gratuito', icon: Gift },
+  { name: 'Talleres', href: '/dashboard/talleres', icon: Calendar },
+  { name: 'Mi Plan', href: '/dashboard/mi-plan', icon: Crown },
+  { name: 'Suscripción', href: '/dashboard/suscripcion', icon: CreditCard },
+  { name: 'Facturas', href: '/dashboard/facturas', icon: Receipt },
   { name: 'Videos', href: '/videos', icon: Play },
   { name: 'Perfil', href: '/dashboard/perfil', icon: User },
   { name: 'Configuración', href: '/dashboard/configuracion', icon: Settings },

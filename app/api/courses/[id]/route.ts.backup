@@ -8,21 +8,16 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id: courseIdentifier } = await context.params;
+    const { id: courseId } = await context.params;
 
     // Verificar si es para dashboard (incluir datos de progreso)
     const url = new URL(request.url);
     const isDashboard = url.searchParams.get('dashboard') === 'true';
 
-    // Buscar curso por ID o slug
-    const whereClause = courseIdentifier.length === 25 && courseIdentifier.startsWith('c') 
-      ? { id: courseIdentifier } 
-      : { slug: courseIdentifier };
-
     if (isDashboard) {
       // Para dashboard: acceso completo temporal
       const course = await prisma.course.findUnique({
-        where: whereClause,
+        where: { id: courseId },
         include: {
           modules: {
             include: {
@@ -57,7 +52,7 @@ export async function GET(
     } else {
       // Para página pública: datos básicos
       const course = await prisma.course.findUnique({
-        where: whereClause,
+        where: { id: courseId },
         include: {
           modules: {
             include: {

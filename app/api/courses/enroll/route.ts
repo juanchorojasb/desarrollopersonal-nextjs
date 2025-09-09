@@ -7,7 +7,7 @@ const prisma = new PrismaClient()
 export async function POST(request: NextRequest) {
   try {
     // 🔐 Verificar autenticación
-    const { userId: clerkUserId } = auth()
+    const { userId: clerkUserId } = await auth()
     
     if (!clerkUserId) {
       return NextResponse.json(
@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
 // 📊 GET: Obtener enrollments del usuario
 export async function GET(request: NextRequest) {
   try {
-    const { userId: clerkUserId } = auth()
+    const { userId: clerkUserId } = await auth()
     
     if (!clerkUserId) {
       return NextResponse.json(

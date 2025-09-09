@@ -10,7 +10,7 @@ export async function GET(
 ) {
   try {
     // Verificar autenticación
-    const { userId: clerkUserId } = auth()
+    const { userId: clerkUserId } = await auth()
     
     if (!clerkUserId) {
       return NextResponse.json(

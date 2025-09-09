@@ -1,0 +1,23 @@
+[0;1;32m●[0m nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (]8;;file://srv909554/usr/lib/systemd/system/nginx.service/usr/lib/systemd/system/nginx.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+     Active: [0;1;32mactive (running)[0m since Tue 2025-08-26 06:35:13 UTC; 2 weeks 0 days ago
+       Docs: ]8;;man:nginx(8)man:nginx(8)]8;;
+   Main PID: 2825616 (nginx)
+      Tasks: 3 (limit: 9485)
+     Memory: 9.8M (peak: 17.7M)
+        CPU: 1min 18.928s
+     CGroup: /system.slice/nginx.service
+             ├─[0;38;5;245m1966580 "nginx: worker process"[0m
+             ├─[0;38;5;245m1966581 "nginx: worker process"[0m
+             └─[0;38;5;245m2825616 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"[0m
+
+Sep 06 20:54:38 srv909554 nginx[1914749]: 2025/09/06 20:54:38 [warn] 1914749#1914749: conflicting server name "www.desarrollopersonal.uno" on 0.0.0.0:80, ignored
+Sep 06 20:54:38 srv909554 nginx[1914749]: 2025/09/06 20:54:38 [notice] 1914749#1914749: signal process started
+Sep 06 20:54:38 srv909554 systemd[1]: Reloaded nginx.service - A high performance web server and a reverse proxy server.
+Sep 06 20:56:39 srv909554 systemd[1]: Reloading nginx.service - A high performance web server and a reverse proxy server...
+Sep 06 20:56:39 srv909554 nginx[1915033]: 2025/09/06 20:56:39 [notice] 1915033#1915033: signal process started
+Sep 06 20:56:39 srv909554 systemd[1]: Reloaded nginx.service - A high performance web server and a reverse proxy server.
+Sep 06 21:01:23 srv909554 systemd[1]: Reloading nginx.service - A high performance web server and a reverse proxy server...
+Sep 06 21:01:23 srv909554 nginx[1916194]: 2025/09/06 21:01:23 [warn] 1916194#1916194: protocol options redefined for 0.0.0.0:443 in /etc/nginx/sites-enabled/z-duque-simple.disabled:8
+Sep 06 21:01:23 srv909554 nginx[1916194]: 2025/09/06 21:01:23 [notice] 1916194#1916194: signal process started
+Sep 06 21:01:23 srv909554 systemd[1]: Reloaded nginx.service - A high performance web server and a reverse proxy server.
