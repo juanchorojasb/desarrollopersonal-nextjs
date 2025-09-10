@@ -47,7 +47,7 @@ async function main() {
                     type: 'video',
                     videoDuration: 900, // 15 minutos
                     isPreview: true,
-                    videoUrl: 'https://desarrollopersonal.b-cdn.net/ie-intro.mp4',
+                    videoUrl: 'https://iframe.mediadelivery.net/play/476857/sample-video-1',
                     content: 'En esta lección exploraremos qué significa realmente la inteligencia emocional y por qué es tan importante en nuestras vidas...'
                   },
                   {
@@ -57,7 +57,7 @@ async function main() {
                     type: 'video',
                     videoDuration: 1200, // 20 minutos
                     isPreview: true,
-                    videoUrl: 'https://desarrollopersonal.b-cdn.net/ie-pilares.mp4',
+                    videoUrl: 'https://iframe.mediadelivery.net/play/476857/sample-video-2',
                     content: 'Los cuatro pilares de la inteligencia emocional son la base de todo crecimiento personal...'
                   },
                   {

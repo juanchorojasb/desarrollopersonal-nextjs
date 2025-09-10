@@ -68,6 +68,10 @@ export default function CourseVideoPlayer({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [showSettings, setShowSettings] = useState(false);
   
+  // Check if this is a MediaDelivery video
+  const isMediaDeliveryVideo = lesson.videoUrl.includes('iframe.mediadelivery.net') || 
+                               lesson.videoUrl.includes('476857');
+  
   // Estados de funcionalidades
   const [showNotes, setShowNotes] = useState(false);
   const [newNote, setNewNote] = useState('');
@@ -245,18 +249,29 @@ export default function CourseVideoPlayer({
         onMouseLeave={() => isPlaying && setShowControls(false)}
         onClick={togglePlay}
       >
-        <video
-          ref={videoRef}
-          src={lesson.videoUrl}
-          className="w-full h-full"
-          onTimeUpdate={handleTimeUpdate}
-          onLoadedMetadata={handleLoadedMetadata}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-        />
+        {isMediaDeliveryVideo ? (
+          <iframe
+            src={lesson.videoUrl}
+            className="w-full h-full"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title={lesson.title}
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            src={lesson.videoUrl}
+            className="w-full h-full"
+            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={handleLoadedMetadata}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+          />
+        )}
 
-        {/* Loading/Play overlay */}
-        {!isPlaying && (
+        {/* Loading/Play overlay - only for regular videos */}
+        {!isMediaDeliveryVideo && !isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
             <button 
               onClick={togglePlay}
@@ -267,10 +282,11 @@ export default function CourseVideoPlayer({
           </div>
         )}
 
-        {/* Controls overlay */}
-        <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity ${
-          showControls ? 'opacity-100' : 'opacity-0'
-        }`}>
+        {/* Controls overlay - only for regular videos */}
+        {!isMediaDeliveryVideo && (
+          <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity ${
+            showControls ? 'opacity-100' : 'opacity-0'
+          }`}>
           
           {/* Navigation arrows */}
           {hasPrevious && (
@@ -441,6 +457,7 @@ export default function CourseVideoPlayer({
             </div>
           </div>
         </div>
+        )}
       </div>
 
       {/* Notes panel */}
