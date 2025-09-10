@@ -1,57 +1,73 @@
 export default function PricingPage() {
   const plans = [
     {
-      name: "Básico",
+      name: "Plan Gratuito",
+      planId: "free",
       price: "Gratis",
       period: "",
       popular: false,
       description: "Perfecto para comenzar tu viaje de desarrollo personal",
       features: [
-        "Acceso a 3 cursos básicos",
-        "Contenido introductorio",
-        "Comunidad básica",
+        "Acceso limitado al dashboard",
+        "Contenido básico",
+        "Vista previa de cursos",
         "Soporte por email"
       ],
       buttonText: "Comenzar Gratis",
       buttonStyle: "border border-gray-300 text-gray-700 hover:border-gray-400"
     },
     {
-      name: "Premium",
-      price: "€29.99",
+      name: "Plan Básico",
+      planId: "basic",
+      price: "€19.99",
       period: "/mes",
       popular: true,
-      description: "La opción más popular para un crecimiento integral",
+      description: "La opción más popular para acceder a todos los cursos",
       features: [
-        "Acceso ilimitado a todos los cursos",
-        "Talleres en vivo semanales",
-        "Sesiones 1:1 mensuales",
-        "Soporte prioritario 24/7",
-        "Certificados de finalización",
-        "Comunidad privada VIP",
-        "Descarga de materiales",
-        "Acceso temprano a nuevo contenido"
+        "Acceso completo a todos los cursos",
+        "Progreso y estadísticas detalladas",
+        "Certificados básicos",
+        "Soporte por email",
+        "Descarga de materiales"
       ],
       buttonText: "Comenzar Ahora",
       buttonStyle: "bg-blue-600 text-white hover:bg-blue-700"
     },
     {
-      name: "Pro",
+      name: "Plan Completo",
+      planId: "complete",
+      price: "€39.99",
+      period: "/mes",
+      popular: false,
+      description: "Experiencia completa con comunidad y talleres",
+      features: [
+        "Todo del Plan Básico",
+        "Talleres en vivo",
+        "Comunidad premium",
+        "Certificados avanzados",
+        "Soporte prioritario",
+        "Acceso temprano a contenido"
+      ],
+      buttonText: "Elegir Plan",
+      buttonStyle: "bg-purple-600 text-white hover:bg-purple-700"
+    },
+    {
+      name: "Plan Personal",
+      planId: "personal",
       price: "€79.99",
       period: "/mes",
       popular: false,
-      description: "Para profesionales que buscan el máximo nivel",
+      description: "Acompañamiento personalizado para tu crecimiento",
       features: [
-        "Todo de Premium incluido",
-        "Sesiones 1:1 semanales",
+        "Todo del Plan Completo",
+        "Acompañamiento personalizado",
+        "Sesiones 1-a-1",
+        "Contenido exclusivo",
         "Coaching personalizado",
-        "Plan de desarrollo personalizado",
-        "Acceso a mentores expertos",
-        "Revisión de progreso mensual",
-        "Contenido exclusivo Pro",
-        "Prioridad en eventos especiales"
+        "Acceso a mentores expertos"
       ],
       buttonText: "Contactar Ventas",
-      buttonStyle: "bg-purple-600 text-white hover:bg-purple-700"
+      buttonStyle: "bg-yellow-600 text-white hover:bg-yellow-700"
     }
   ]
 
@@ -84,7 +100,7 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid lg:grid-cols-4 gap-6 mb-16">
           {plans.map((plan) => (
             <div 
               key={plan.name}

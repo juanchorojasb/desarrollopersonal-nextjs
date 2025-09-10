@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
+import PlanGate from '@/components/auth/PlanGate';
+import { useUserPlan, useHasAccess } from '@/lib/plans-client';
 import { 
   BookOpen, 
   Users, 
@@ -31,7 +33,9 @@ interface Course {
 }
 
 export default function CursosPage() {
-const { user } = useUser();
+  const { user } = useUser();
+  const userPlan = useUserPlan();
+  const hasBasicAccess = useHasAccess('basic');
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -124,6 +128,26 @@ const { user } = useUser();
           </div>
         </div>
       </div>
+
+      {/* Plan Access Notice */}
+      {!hasBasicAccess && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold">¡Accede a todos los cursos!</h3>
+                <p className="text-sm opacity-90">Con el Plan Básico tendrás acceso completo a nuestro catálogo de cursos.</p>
+              </div>
+              <Link
+                href="/pricing"
+                className="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+              >
+                Ver Planes
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -263,7 +287,7 @@ const { user } = useUser();
                       Ver Curso
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </Link>
-                  ) : (
+                  ) : hasBasicAccess ? (
                     <button
                       onClick={() => enrollInCourse(course.id)}
                       className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
@@ -271,6 +295,14 @@ const { user } = useUser();
                       Inscribirse
                       <ChevronRight className="h-4 w-4 ml-1" />
                     </button>
+                  ) : (
+                    <Link
+                      href="/pricing"
+                      className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-600 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors"
+                    >
+                      Actualizar Plan
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Link>
                   )}
                 </div>
               </div>

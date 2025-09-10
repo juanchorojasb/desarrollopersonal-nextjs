@@ -136,6 +136,12 @@ const communityNavItems: NavItem[] = [
     href: '/dashboard/foros',
     icon: MessageSquare,
     description: 'Discusiones y Q&A'
+  },
+  {
+    label: 'Acompañamiento',
+    href: '/dashboard/acompanamiento',
+    icon: Star,
+    description: 'Coaching personalizado'
   }
 ];
 
