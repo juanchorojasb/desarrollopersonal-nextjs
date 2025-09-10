@@ -24,7 +24,7 @@ export interface CourseModule {
   id: string;
   title: string;
   description: string;
-  order: number;
+  position: number;
   courseId: string;
   lessons: Lesson[];
   createdAt: Date;
@@ -37,7 +37,7 @@ export interface Lesson {
   description: string;
   videoUrl: string;
   duration: number;
-  order: number;
+  position: number;
   moduleId: string;
   progress: LessonProgress[];
   createdAt: Date;

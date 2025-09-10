@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@clerk/nextjs';
 import { 
   Play, 
   Clock, 
@@ -23,190 +24,101 @@ import {
   ChevronRight
 } from 'lucide-react';
 
-interface Course {
+import { Course } from '@/types/course';
+
+interface CourseWithModules {
   id: string;
   title: string;
   description: string;
-  thumbnail?: string;
-  trailerVideo?: string;
-  level: 'beginner' | 'intermediate' | 'advanced';
   category: string;
-  price: number;
+  level: string;
   duration?: number;
-  studentsCount: number;
   instructor?: string;
-  rating?: number;
-  reviewsCount?: number;
+  price: number;
+  rating: number;
+  reviewsCount: number;
+  studentsCount: number;
   whatYouLearn: string[];
   requirements: string[];
+  isEnrolled: boolean;
+  progressPercentage: number;
+  totalLessons: number;
+  completedLessons: number;
   modules: {
     id: string;
     title: string;
-    description?: string;
-    duration?: number;
+    description: string;
+    position: number;
+    courseId: string;
     lessons: {
       id: string;
       title: string;
-      description?: string;
-      type: 'video' | 'text' | 'quiz';
-      duration?: number;
-      isPreview: boolean;
-      isCompleted?: boolean;
-      videoUrl?: string;
+      description: string;
+      videoUrl: string;
+      duration: number;
+      position: number;
+      moduleId: string;
+      progress: {
+        id: string;
+        isCompleted: boolean;
+        watchTime: number;
+        watchPercentage: number;
+      }[];
     }[];
   }[];
-  enrollment?: {
-    id: string;
-    progress: number;
-    status: string;
-  };
 }
 
-const MOCK_COURSE: Course = {
-  id: "1",
-  title: "Fundamentos de Inteligencia Emocional",
-  description: "Un curso completo que te enseñará a dominar tus emociones y mejorar significativamente tus relaciones interpersonales. Aprenderás técnicas científicamente probadas para gestionar el estrés, aumentar tu autoconciencia y desarrollar habilidades sociales que transformarán tu vida personal y profesional.",
-  thumbnail: "/api/placeholder/800/400",
-  trailerVideo: "https://desarrollopersonal.b-cdn.net/trailer-ie.mp4",
-  level: "beginner",
-  category: "Desarrollo Personal",
-  price: 97,
-  duration: 480, // 8 horas
-  studentsCount: 1247,
-  instructor: "Dra. María González",
-  rating: 4.8,
-  reviewsCount: 156,
-  whatYouLearn: [
-    "Identificar y gestionar tus emociones de manera efectiva",
-    "Desarrollar mayor autoconciencia emocional",
-    "Mejorar tus relaciones interpersonales",
-    "Aplicar técnicas de regulación emocional en situaciones difíciles",
-    "Construir resiliencia emocional para superar adversidades",
-    "Comunicarte de manera más empática y asertiva"
-  ],
-  requirements: [
-    "Ganas de aprender y crecer personalmente",
-    "Compromiso para practicar los ejercicios propuestos",
-    "Acceso a internet para ver los videos",
-    "Libreta para tomar notas (recomendado)"
-  ],
-  modules: [
-    {
-      id: "m1",
-      title: "Introducción a la Inteligencia Emocional",
-      description: "Fundamentos básicos y conceptos clave",
-      duration: 90,
-      lessons: [
-        {
-          id: "l1",
-          title: "¿Qué es la Inteligencia Emocional?",
-          description: "Definición, historia y importancia en la vida moderna",
-          type: "video",
-          duration: 15,
-          isPreview: true,
-          videoUrl: "https://desarrollopersonal.b-cdn.net/lesson1.mp4"
-        },
-        {
-          id: "l2", 
-          title: "Los 4 Pilares Fundamentales",
-          description: "Autoconciencia, autorregulación, empatía y habilidades sociales",
-          type: "video",
-          duration: 20,
-          isPreview: true,
-          videoUrl: "https://desarrollopersonal.b-cdn.net/lesson2.mp4"
-        },
-        {
-          id: "l3",
-          title: "Test de Evaluación Inicial",
-          description: "Evalúa tu nivel actual de inteligencia emocional",
-          type: "quiz",
-          duration: 10,
-          isPreview: false
-        }
-      ]
-    },
-    {
-      id: "m2",
-      title: "Autoconciencia Emocional",
-      description: "Aprende a identificar y comprender tus emociones",
-      duration: 120,
-      lessons: [
-        {
-          id: "l4",
-          title: "Identificando tus Emociones",
-          description: "Técnicas para reconocer emociones en tiempo real",
-          type: "video",
-          duration: 25,
-          isPreview: false,
-          videoUrl: "https://desarrollopersonal.b-cdn.net/lesson4.mp4"
-        },
-        {
-          id: "l5",
-          title: "El Diario Emocional",
-          description: "Herramienta práctica para el seguimiento emocional",
-          type: "video",
-          duration: 18,
-          isPreview: false,
-          videoUrl: "https://desarrollopersonal.b-cdn.net/lesson5.mp4"
-        },
-        {
-          id: "l6",
-          title: "Ejercicios de Mindfulness",
-          description: "Prácticas para aumentar la conciencia presente",
-          type: "video",
-          duration: 22,
-          isPreview: false,
-          videoUrl: "https://desarrollopersonal.b-cdn.net/lesson6.mp4"
-        }
-      ]
-    },
-    {
-      id: "m3",
-      title: "Autorregulación Emocional",
-      description: "Técnicas para gestionar y controlar tus emociones",
-      duration: 150,
-      lessons: [
-        {
-          id: "l7",
-          title: "Técnicas de Respiración",
-          description: "Métodos probados para calmar el sistema nervioso",
-          type: "video",
-          duration: 20,
-          isPreview: false
-        },
-        {
-          id: "l8",
-          title: "Reestructuración Cognitiva",
-          description: "Cambia patrones de pensamiento negativos",
-          type: "video",
-          duration: 28,
-          isPreview: false
-        }
-      ]
-    }
-  ],
-  enrollment: {
-    id: "e1",
-    progress: 65,
-    status: "active"
-  }
-};
 
 export default function CursoDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [course, setCourse] = useState<Course | null>(null);
+  const { getToken } = useAuth();
+  const [course, setCourse] = useState<CourseWithModules | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'reviews'>('overview');
-  const [expandedModules, setExpandedModules] = useState<string[]>(['m1']);
+  const [expandedModules, setExpandedModules] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simular carga de datos
-    setTimeout(() => {
-      setCourse(MOCK_COURSE);
-      setLoading(false);
-    }, 1000);
+    fetchCourseData();
   }, [params.id]);
+
+  const fetchCourseData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const token = await getToken();
+      const response = await fetch(`/api/courses/${params.id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+      
+      if (!response.ok) {
+        if (response.status === 403) {
+          throw new Error('No estás inscrito en este curso');
+        }
+        if (response.status === 404) {
+          throw new Error('Curso no encontrado');
+        }
+        throw new Error('Error al cargar el curso');
+      }
+
+      const data = await response.json();
+      setCourse(data);
+      
+      // Expandir el primer módulo por defecto
+      if (data.modules && data.modules.length > 0) {
+        setExpandedModules([data.modules[0].id]);
+      }
+    } catch (error) {
+      console.error('Error fetching course:', error);
+      setError(error instanceof Error ? error.message : 'Error desconocido');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleModule = (moduleId: string) => {
     setExpandedModules(prev => 
@@ -235,14 +147,17 @@ export default function CursoDetailPage() {
     }
   };
 
+  const handleLessonClick = (lesson: any, moduleSlug: string) => {
+    // Navigate to lesson page using the course ID as slug for now
+    router.push(`/dashboard/cursos/${course?.id}/sesion/${lesson.id}`);
+  };
+
   const getTotalLessons = () => {
-    return course?.modules.reduce((total, courseModule) => total + courseModule.lessons.length, 0) || 0;
+    return course?.totalLessons || 0;
   };
 
   const getCompletedLessons = () => {
-    return course?.modules.reduce((total, courseModule) => 
-      total + courseModule.lessons.filter(lesson => lesson.isCompleted).length, 0
-    ) || 0;
+    return course?.completedLessons || 0;
   };
 
   if (loading) {
@@ -253,22 +168,45 @@ export default function CursoDetailPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Error</h2>
+        <p className="text-gray-600 mb-4">{error}</p>
+        <div className="space-x-4">
+          <button 
+            onClick={() => fetchCourseData()}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Reintentar
+          </button>
+          <button 
+            onClick={() => router.push('/dashboard/cursos')}
+            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+          >
+            Volver a Cursos
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!course) {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Curso no encontrado</h2>
         <p className="text-gray-600 mb-4">El curso que buscas no existe o ha sido eliminado.</p>
         <button 
-          onClick={() => router.back()}
+          onClick={() => router.push('/dashboard/cursos')}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Volver
+          Volver a Cursos
         </button>
       </div>
     );
   }
 
-  const isEnrolled = !!course.enrollment;
+  const isEnrolled = course.isEnrolled;
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
@@ -332,16 +270,16 @@ export default function CursoDetailPage() {
             </div>
 
             {/* Progreso si está inscrito */}
-            {isEnrolled && course.enrollment && (
+            {isEnrolled && (
               <div className="mb-6">
                 <div className="flex justify-between text-sm mb-2">
                   <span>Tu progreso</span>
-                  <span>{Math.round(course.enrollment.progress)}% completado</span>
+                  <span>{Math.round(course.progressPercentage)}% completado</span>
                 </div>
                 <div className="w-full bg-white/20 rounded-full h-3">
                   <div 
                     className="bg-white h-3 rounded-full transition-all"
-                    style={{ width: `${course.enrollment.progress}%` }}
+                    style={{ width: `${course.progressPercentage}%` }}
                   ></div>
                 </div>
                 <p className="text-sm text-white/80 mt-2">
@@ -506,7 +444,7 @@ export default function CursoDetailPage() {
                       <div>
                         <h3 className="font-semibold text-gray-900">{courseModule.title}</h3>
                         <p className="text-sm text-gray-600 mt-1">
-                          {courseModule.lessons.length} lecciones • {formatDuration(courseModule.duration)}
+                          {courseModule.lessons.length} lecciones • {formatDuration(courseModule.lessons.reduce((acc, lesson) => acc + lesson.duration, 0))}
                         </p>
                       </div>
                       {expandedModules.includes(courseModule.id) ? (
@@ -519,16 +457,14 @@ export default function CursoDetailPage() {
                     {expandedModules.includes(courseModule.id) && (
                       <div className="border-t border-gray-200">
                         {courseModule.lessons.map((lesson) => (
-                          <div key={lesson.id} className="px-6 py-3 border-b border-gray-100 last:border-b-0 flex items-center justify-between hover:bg-gray-50">
+                          <div 
+                            key={lesson.id} 
+                            onClick={() => isEnrolled && handleLessonClick(lesson, courseModule.title)}
+                            className={`px-6 py-3 border-b border-gray-100 last:border-b-0 flex items-center justify-between hover:bg-gray-50 ${isEnrolled ? 'cursor-pointer' : ''}`}
+                          >
                             <div className="flex items-center">
                               <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
-                                {lesson.type === 'video' ? (
-                                  <PlayCircle className="w-4 h-4 text-gray-600" />
-                                ) : lesson.type === 'quiz' ? (
-                                  <FileText className="w-4 h-4 text-gray-600" />
-                                ) : (
-                                  <BookOpen className="w-4 h-4 text-gray-600" />
-                                )}
+                                <PlayCircle className="w-4 h-4 text-gray-600" />
                               </div>
                               <div>
                                 <h4 className="font-medium text-gray-900">{lesson.title}</h4>
@@ -539,20 +475,15 @@ export default function CursoDetailPage() {
                             </div>
                             
                             <div className="flex items-center gap-3">
-                              {lesson.isCompleted && (
+                              {lesson.progress.length > 0 && lesson.progress[0].isCompleted && (
                                 <CheckCircle className="w-5 h-5 text-green-600" />
                               )}
-                              {!lesson.isPreview && !isEnrolled && (
+                              {!isEnrolled && (
                                 <Lock className="w-4 h-4 text-gray-400" />
                               )}
                               <span className="text-sm text-gray-600">
-                                {formatDuration(lesson.duration)}
+                                {formatDuration(lesson.duration / 60)}
                               </span>
-                              {lesson.isPreview && (
-                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                                  Gratis
-                                </span>
-                              )}
                             </div>
                           </div>
                         ))}
@@ -590,12 +521,12 @@ export default function CursoDetailPage() {
                   <div className="space-y-3">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Progreso del curso</span>
-                      <span className="font-semibold">{Math.round(course.enrollment!.progress)}%</span>
+                      <span className="font-semibold">{Math.round(course.progressPercentage)}%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div 
                         className="bg-blue-600 h-2 rounded-full transition-all"
-                        style={{ width: `${course.enrollment!.progress}%` }}
+                        style={{ width: `${course.progressPercentage}%` }}
                       ></div>
                     </div>
                   </div>
