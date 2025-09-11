@@ -1,0 +1,55 @@
+// Función para obtener usuarios con estadísticas
+export async function getUsersWithStats(page = 1, limit = 20, search = '', subscriptionFilter?: string) {
+  try {
+    const skip = (page - 1) * limit;
+    
+    let where: any = {};
+    
+    if (search) {
+      where.OR = [
+        { firstName: { contains: search, mode: 'insensitive' as const } },
+        { lastName: { contains: search, mode: 'insensitive' as const } },
+        { email: { contains: search, mode: 'insensitive' as const } }
+      ];
+    }
+    
+    if (subscriptionFilter) {
+      where.subscriptionStatus = subscriptionFilter;
+    }
+    
+    const users = await prisma.user.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        enrollments: true,
+        certificates: true
+      }
+    });
+    
+    const total = await prisma.user.count({ where });
+    
+    return {
+      users: users.map(user => ({
+        ...user,
+        plan: user.subscriptionStatus,
+        isActive: true, // Por defecto activo
+        coursesCompleted: user.certificates.length,
+        lastLogin: user.lastActivity
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit)
+      }
+    };
+  } catch (error) {
+    console.error('Error getting users with stats:', error);
+    return {
+      users: [],
+      pagination: { page: 1, limit, total: 0, pages: 0 }
+    };
+  }
+}
