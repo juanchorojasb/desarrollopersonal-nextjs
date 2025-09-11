@@ -1,12 +1,76 @@
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 
-export default async function CheckoutPage() {
+interface Plan {
+  id: string
+  name: string
+  price: string
+  priceUSD: string
+  features: string[]
+}
+
+const plans: Record<string, Plan> = {
+  basic: {
+    id: 'basic',
+    name: 'Plan Básico',
+    price: '25,000 COP',
+    priceUSD: '5 USD',
+    features: [
+      'Acceso completo a todos los cursos',
+      'Progreso y estadísticas detalladas',
+      'Certificados básicos',
+      'Soporte por email',
+      'Descarga de materiales'
+    ]
+  },
+  complete: {
+    id: 'complete',
+    name: 'Plan Completo',
+    price: '50,000 COP',
+    priceUSD: '10 USD',
+    features: [
+      'Todo del Plan Básico',
+      'Talleres en vivo',
+      'Comunidad premium',
+      'Certificados avanzados',
+      'Soporte prioritario',
+      'Acceso temprano a contenido'
+    ]
+  },
+  personal: {
+    id: 'personal',
+    name: 'Plan Personal',
+    price: '40,000 COP',
+    priceUSD: '8 USD',
+    features: [
+      'Todo del Plan Completo',
+      'Acompañamiento personalizado',
+      'Sesiones 1-a-1',
+      'Contenido exclusivo',
+      'Coaching personalizado',
+      'Acceso a mentores expertos'
+    ]
+  }
+}
+
+export default async function CheckoutPage({
+  searchParams
+}: {
+  searchParams: Promise<{ plan?: string; promo?: string }>
+}) {
   const user = await currentUser()
   
   if (!user) {
     redirect('/sign-in')
   }
+
+  const params = await searchParams
+  const planId = params.plan || 'basic'
+  const promoCode = params.promo
+  const selectedPlan = plans[planId] || plans.basic
+  
+  const isPromoValid = promoCode?.toLowerCase() === 'prueba'
+  const hasDiscount = isPromoValid
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
@@ -193,7 +257,7 @@ export default async function CheckoutPage() {
                 type="submit"
                 className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Completar Pago - €29.99
+                {hasDiscount ? 'Activar Plan - Gratis' : `Completar Pago - ${selectedPlan.priceUSD}`}
               </button>
             </form>
           </div>
@@ -205,32 +269,21 @@ export default async function CheckoutPage() {
             {/* Plan Seleccionado */}
             <div className="border border-gray-200 rounded-lg p-4 mb-6">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium text-gray-900">Plan Premium</h3>
-                <span className="text-lg font-semibold text-gray-900">€29.99</span>
+                <h3 className="font-medium text-gray-900">{selectedPlan.name}</h3>
+                <div className="text-right">
+                  <span className="text-lg font-semibold text-gray-900">{selectedPlan.price}</span>
+                  <div className="text-sm text-gray-600">{selectedPlan.priceUSD}</div>
+                </div>
               </div>
               <p className="text-sm text-gray-600 mb-4">Facturación mensual</p>
               
               <ul className="space-y-2 text-sm">
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Acceso ilimitado a todos los cursos
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Talleres en vivo semanales
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Soporte prioritario
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Certificados de finalización
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Comunidad privada de miembros
-                </li>
+                {selectedPlan.features.map((feature, index) => (
+                  <li key={index} className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    {feature}
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -238,18 +291,43 @@ export default async function CheckoutPage() {
             <div className="space-y-3 mb-6">
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="text-gray-900">€29.99</span>
+                <div className="text-right">
+                  <span className="text-gray-900">{selectedPlan.price}</span>
+                  <div className="text-sm text-gray-600">{selectedPlan.priceUSD}</div>
+                </div>
               </div>
+              {hasDiscount && (
+                <div className="flex items-center justify-between text-green-600">
+                  <span className="font-medium">Descuento (1 mes gratis)</span>
+                  <div className="text-right font-medium">
+                    <span>-{selectedPlan.price}</span>
+                    <div className="text-sm">-{selectedPlan.priceUSD}</div>
+                  </div>
+                </div>
+              )}
               <div className="flex items-center justify-between">
-                <span className="text-gray-600">IVA (21%)</span>
-                <span className="text-gray-900">€6.30</span>
+                <span className="text-gray-600">IVA (19%)</span>
+                <div className="text-right">
+                  <span className="text-gray-900">Incluido</span>
+                  <div className="text-sm text-gray-600">Incluido</div>
+                </div>
               </div>
               <div className="border-t border-gray-200 pt-3">
                 <div className="flex items-center justify-between font-semibold text-lg">
                   <span className="text-gray-900">Total</span>
-                  <span className="text-gray-900">€36.29</span>
+                  <div className="text-right">
+                    <span className="text-gray-900">{hasDiscount ? 'Gratis' : selectedPlan.price}</span>
+                    <div className="text-sm text-gray-600">{hasDiscount ? 'Free' : selectedPlan.priceUSD}</div>
+                  </div>
                 </div>
               </div>
+              {hasDiscount && (
+                <div className="bg-green-50 rounded-lg p-3 mt-3">
+                  <div className="text-green-800 text-sm font-medium text-center">
+                    ✓ Código promocional aplicado: Primer mes gratis
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Información Adicional */}

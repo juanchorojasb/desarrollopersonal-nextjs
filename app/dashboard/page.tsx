@@ -1,16 +1,39 @@
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { getUserPlan } from '@/lib/plans'
 
-export default async function DashboardPage() {
+export default async function DashboardPage({ searchParams }: { 
+  searchParams: Promise<{ welcome?: string, plan?: string }> 
+}) {
   const user = await currentUser()
   
   if (!user) {
     redirect('/sign-in')
   }
 
+  const currentPlan = getUserPlan(user)
+  const { welcome, plan } = await searchParams
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Message for Promo Users */}
+        {welcome === 'true' && plan && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex items-center">
+              <div className="text-green-500 text-2xl mr-3">🎉</div>
+              <div>
+                <h2 className="text-lg font-semibold text-green-800">
+                  ¡Bienvenido a tu plan {plan}!
+                </h2>
+                <p className="text-green-700">
+                  Tu plan está activo por 1 mes. ¡Disfruta de todo el contenido disponible!
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">

@@ -1,4 +1,70 @@
+'use client'
+
+import Link from 'next/link'
+import { useState } from 'react'
+
 export default function PricingPage() {
+  const [promoCode, setPromoCode] = useState('')
+  const [promoApplied, setPromoApplied] = useState(false)
+  const [promoError, setPromoError] = useState('')
+
+  const handlePromoCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const code = e.target.value
+    setPromoCode(code)
+    
+    if (code.toLowerCase() === 'prueba') {
+      setPromoApplied(true)
+      setPromoError('')
+    } else if (code === '') {
+      setPromoApplied(false)
+      setPromoError('')
+    } else {
+      setPromoApplied(false)
+      setPromoError('Código promocional inválido')
+    }
+  }
+
+  const handlePlanSelect = async (planId: string) => {
+    if (planId === 'free') {
+      window.location.href = '/sign-up'
+      return
+    }
+    
+    if (promoApplied && promoCode.toLowerCase() === 'prueba') {
+      try {
+        const response = await fetch('/api/promo/apply', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            promoCode: promoCode,
+            selectedPlan: planId
+          })
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          window.location.href = `/dashboard?welcome=true&plan=${planId}`
+          return
+        } else {
+          setPromoError(data.error || 'Error aplicando código promocional')
+          return
+        }
+      } catch (error) {
+        setPromoError('Error de conexión')
+        return
+      }
+    }
+    
+    if (planId === 'personal') {
+      window.location.href = '/contact'
+      return
+    }
+    
+    window.location.href = `/payment/checkout?plan=${planId}`
+  }
   const plans = [
     {
       name: "Plan Gratuito",
@@ -19,7 +85,8 @@ export default function PricingPage() {
     {
       name: "Plan Básico",
       planId: "basic",
-      price: "€19.99",
+      price: "15,000 COP",
+      priceUSD: "3 USD",
       period: "/mes",
       popular: true,
       description: "La opción más popular para acceder a todos los cursos",
@@ -36,7 +103,8 @@ export default function PricingPage() {
     {
       name: "Plan Completo",
       planId: "complete",
-      price: "€39.99",
+      price: "30,000 COP",
+      priceUSD: "6 USD",
       period: "/mes",
       popular: false,
       description: "Experiencia completa con comunidad y talleres",
@@ -54,7 +122,8 @@ export default function PricingPage() {
     {
       name: "Plan Personal",
       planId: "personal",
-      price: "€79.99",
+      price: "40,000 COP",
+      priceUSD: "8 USD",
       period: "/mes",
       popular: false,
       description: "Acompañamiento personalizado para tu crecimiento",
@@ -86,7 +155,7 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Toggle */}
-        <div className="flex justify-center mb-12">
+        <div className="flex justify-center mb-8">
           <div className="bg-white rounded-lg p-1 border border-gray-200">
             <div className="flex">
               <button className="px-6 py-2 text-sm font-medium bg-blue-600 text-white rounded-md">
@@ -95,6 +164,34 @@ export default function PricingPage() {
               <button className="px-6 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
                 Anual (2 meses gratis)
               </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Código Promocional */}
+        <div className="flex justify-center mb-12">
+          <div className="bg-white rounded-lg p-6 border border-gray-200 max-w-md w-full">
+            <h3 className="text-lg font-medium text-gray-900 mb-3 text-center">
+              ¿Tienes un código promocional?
+            </h3>
+            <div className="space-y-3">
+              <input
+                type="text"
+                value={promoCode}
+                onChange={handlePromoCodeChange}
+                placeholder="Ingresa tu código"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {promoApplied && (
+                <div className="text-green-600 text-sm text-center font-medium">
+                  ✓ ¡Código aplicado! Obtienes 1 mes gratis
+                </div>
+              )}
+              {promoError && (
+                <div className="text-red-600 text-sm text-center">
+                  {promoError}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -123,6 +220,11 @@ export default function PricingPage() {
                 <p className="text-gray-600 mb-4">{plan.description}</p>
                 <div className="mb-4">
                   <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
+                  {plan.priceUSD && (
+                    <div className="text-2xl font-semibold text-gray-700">
+                      {plan.priceUSD}
+                    </div>
+                  )}
                   {plan.period && <span className="text-gray-600">{plan.period}</span>}
                 </div>
               </div>
@@ -138,7 +240,10 @@ export default function PricingPage() {
                 ))}
               </ul>
 
-              <button className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${plan.buttonStyle}`}>
+              <button 
+                onClick={() => handlePlanSelect(plan.planId)}
+                className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${plan.buttonStyle}`}
+              >
                 {plan.buttonText}
               </button>
             </div>

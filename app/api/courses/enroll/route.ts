@@ -23,6 +23,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Course ID es requerido' }, { status: 400 });
     }
 
+    // Get or create user
+    const user = await prisma.user.upsert({
+      where: { clerkId: userId },
+      update: {},
+      create: {
+        clerkId: userId,
+        email: 'user@example.com', // This should come from Clerk
+      }
+    });
+
     // Verificar si el curso existe
     const course = await prisma.course.findUnique({
       where: { id: courseId }
@@ -36,7 +46,7 @@ export async function POST(request: NextRequest) {
     const existingEnrollment = await prisma.enrollment.findUnique({
       where: {
         userId_courseId: {
-          userId,
+          userId: user.id,
           courseId
         }
       }
@@ -49,7 +59,7 @@ export async function POST(request: NextRequest) {
     // Crear inscripción
     const enrollment = await prisma.enrollment.create({
       data: {
-        userId,
+        userId: user.id,
         courseId,
         enrolledAt: new Date()
       },

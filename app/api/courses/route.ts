@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { PrismaClient } from '@prisma/client';
+import { getUserPlan, hasAccess, Plan } from '@/lib/plans';
 
 const prisma = new PrismaClient();
 
@@ -13,15 +14,43 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
+    // Get user from Clerk to check plan
+    const client = await clerkClient()
+    const clerkUser = await client.users.getUser(userId);
+    const userPlan = getUserPlan(clerkUser);
+
+    // Get or create user in database
+    const user = await prisma.user.upsert({
+      where: { clerkId: userId },
+      update: {},
+      create: {
+        clerkId: userId,
+        email: clerkUser.emailAddresses[0]?.emailAddress || 'user@example.com',
+        firstName: clerkUser.firstName || undefined,
+        lastName: clerkUser.lastName || undefined,
+        imageUrl: clerkUser.imageUrl || undefined,
+      }
+    });
+
     const courses = await prisma.course.findMany({
+      where: {
+        status: 'published' // Only show published courses
+      },
       include: {
         modules: {
           include: {
-            lessons: true
-          }
+            lessons: {
+              include: {
+                progress: {
+                  where: { userId: user.id }
+                }
+              }
+            }
+          },
+          orderBy: { position: 'asc' }
         },
         enrollments: {
-          where: { userId }
+          where: { userId: user.id }
         }
       },
       orderBy: { createdAt: 'desc' }
@@ -30,13 +59,35 @@ export async function GET(request: Request) {
     // Calcular progreso para cada curso
     const coursesWithProgress = courses.map(course => {
       const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
+      const completedLessons = course.modules.reduce((acc, module) => 
+        acc + module.lessons.filter(lesson => 
+          lesson.progress.length > 0 && lesson.progress[0].isCompleted
+        ).length, 0
+      );
+      
+      // Check if user has access based on plan
+      const hasAccessToCourse = hasAccess(userPlan, 'basic'); // Basic plan or higher for course access
       const isEnrolled = course.enrollments.length > 0;
+      const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
       
       return {
-        ...course,
+        id: course.id,
+        title: course.title,
+        description: course.description,
+        thumbnail: course.thumbnail,
+        category: course.category,
+        level: course.level,
+        duration: course.duration || 0,
+        instructorName: course.instructor || 'Instructor',
+        price: course.price,
+        rating: 4.5, // Default rating
+        studentsCount: course.studentsCount,
         totalLessons,
+        completedLessons,
         isEnrolled,
-        progressPercentage: 0 // Se calculará con el progreso real del usuario
+        hasAccess: hasAccessToCourse,
+        userPlan,
+        progressPercentage
       };
     });
 

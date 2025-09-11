@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { PrismaClient } from '@prisma/client';
+import { getUserPlan, hasAccess } from '@/lib/plans';
 
 const prisma = new PrismaClient();
 
@@ -23,6 +24,24 @@ export async function GET(
       return NextResponse.json({ error: 'ID de curso inválido' }, { status: 400 });
     }
 
+    // Get user from Clerk to check plan
+    const client = await clerkClient()
+    const clerkUser = await client.users.getUser(userId);
+    const userPlan = getUserPlan(clerkUser);
+
+    // Get or create user in database
+    const user = await prisma.user.upsert({
+      where: { clerkId: userId },
+      update: {},
+      create: {
+        clerkId: userId,
+        email: clerkUser.emailAddresses[0]?.emailAddress || 'user@example.com',
+        firstName: clerkUser.firstName || undefined,
+        lastName: clerkUser.lastName || undefined,
+        imageUrl: clerkUser.imageUrl || undefined,
+      }
+    });
+
     // Obtener curso con módulos y lecciones
     const course = await prisma.course.findUnique({
       where: { id: courseId },
@@ -32,15 +51,15 @@ export async function GET(
             lessons: {
               include: {
                 progress: {
-                  where: { userId }
+                  where: { userId: user.id }
                 }
               }
             }
           },
-          orderBy: { id: 'asc' }
+          orderBy: { position: 'asc' }
         },
         enrollments: {
-          where: { userId }
+          where: { userId: user.id }
         }
       }
     });
@@ -49,11 +68,16 @@ export async function GET(
       return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 });
     }
 
-    // Verificar si el usuario está inscrito
+    // Verificar acceso basado en plan
+    const hasAccessToCourse = hasAccess(userPlan, 'basic'); // Basic plan or higher for course access
     const isEnrolled = course.enrollments.length > 0;
     
-    if (!isEnrolled) {
-      return NextResponse.json({ error: 'No estás inscrito en este curso' }, { status: 403 });
+    if (!hasAccessToCourse) {
+      return NextResponse.json({ 
+        error: 'Tu plan actual no incluye acceso a cursos', 
+        userPlan,
+        requiredPlan: 'basic'
+      }, { status: 403 });
     }
 
     // Calcular progreso del curso
@@ -66,11 +90,36 @@ export async function GET(
 
     // Preparar respuesta
     const courseWithProgress = {
-      ...course,
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      category: course.category,
+      level: course.level,
+      duration: course.duration,
+      instructor: course.instructor,
+      price: course.price,
+      rating: 4.5, // Default rating
+      reviewsCount: 12, // Default reviews count
+      studentsCount: course.studentsCount,
+      whatYouLearn: [
+        "Desarrollar técnicas de estudio efectivas y científicamente probadas",
+        "Crear rutinas de estudio que maximicen tu retención y comprensión",
+        "Dominar métodos avanzados de memorización y asociación",
+        "Gestionar tu tiempo de estudio de manera productiva",
+        "Mantener la motivación y consistencia en tu aprendizaje"
+      ],
+      requirements: [
+        "Dispositivo con acceso a internet",
+        "Compromiso con la práctica de las técnicas enseñadas",
+        "Dedicación de al menos 30 minutos diarios al estudio"
+      ],
       progressPercentage,
       totalLessons,
       completedLessons,
-      isEnrolled
+      isEnrolled,
+      hasAccess: hasAccessToCourse,
+      userPlan,
+      modules: course.modules
     };
 
     return NextResponse.json(courseWithProgress);

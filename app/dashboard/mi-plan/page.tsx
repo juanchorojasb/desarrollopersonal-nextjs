@@ -1,5 +1,7 @@
 import { currentUser } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import { getUserPlan, PLANS } from '@/lib/plans'
+import PlanChangeComponent from './plan-change-component'
 
 export default async function MiPlanPage() {
   const user = await currentUser()
@@ -7,6 +9,9 @@ export default async function MiPlanPage() {
   if (!user) {
     redirect('/sign-in')
   }
+
+  const currentPlan = getUserPlan(user)
+  const planConfig = PLANS[currentPlan]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
@@ -30,37 +35,44 @@ export default async function MiPlanPage() {
           
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Plan Premium</h3>
-              <p className="text-gray-600 mb-4">Acceso completo a todos los cursos y talleres</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">{planConfig.displayName}</h3>
+              <p className="text-gray-600 mb-4">
+                {currentPlan === 'free' ? 'Acceso básico a contenido gratuito' : 
+                 currentPlan === 'basic' ? 'Acceso completo a todos los cursos' :
+                 currentPlan === 'complete' ? 'Experiencia completa con comunidad y talleres' :
+                 'Acompañamiento personalizado para tu crecimiento'}
+              </p>
               
               <ul className="space-y-2 text-sm">
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Acceso ilimitado a cursos
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Talleres en vivo
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Soporte prioritario
-                </li>
-                <li className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  Certificados de finalización
-                </li>
+                {planConfig.features.map((feature, index) => (
+                  <li key={index} className="flex items-center">
+                    <span className="text-green-500 mr-2">✓</span>
+                    {feature}
+                  </li>
+                ))}
               </ul>
             </div>
             
             <div>
               <div className="bg-gray-50 rounded-lg p-4">
-                <div className="text-2xl font-bold text-gray-900">€29.99</div>
-                <div className="text-sm text-gray-600">por mes</div>
-                <div className="mt-4 text-sm text-gray-600">
-                  <p>Próxima facturación: 15 de octubre, 2024</p>
-                  <p>Método de pago: •••• 4242</p>
+                <div className="text-2xl font-bold text-gray-900">
+                  {currentPlan === 'free' ? 'Gratis' :
+                   currentPlan === 'basic' ? '15,000 COP' :
+                   currentPlan === 'complete' ? '30,000 COP' :
+                   '40,000 COP'}
                 </div>
+                <div className="text-sm text-gray-600">
+                  {currentPlan === 'free' ? '' :
+                   currentPlan === 'basic' ? '3 USD por mes' :
+                   currentPlan === 'complete' ? '6 USD por mes' :
+                   '8 USD por mes'}
+                </div>
+                {currentPlan !== 'free' && (
+                  <div className="mt-4 text-sm text-gray-600">
+                    <p>Próxima facturación: 15 de octubre, 2024</p>
+                    <p>Método de pago: •••• 4242</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -99,6 +111,9 @@ export default async function MiPlanPage() {
             </div>
           </div>
         </div>
+
+        {/* Plan Change Component for Testing */}
+        <PlanChangeComponent currentPlan={currentPlan} />
 
         {/* Acciones */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
