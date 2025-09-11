@@ -282,36 +282,36 @@ export default function CourseVideoPlayer({
           </div>
         )}
 
+        {/* Navigation arrows - show for ALL videos, including MediaDelivery */}
+        {hasPrevious && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onPrevious?.();
+            }}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-3 rounded-full transition-all z-20 shadow-lg"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+        )}
+        
+        {hasNext && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onNext?.();
+            }}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-70 hover:bg-opacity-90 text-white p-3 rounded-full transition-all z-20 shadow-lg"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        )}
+
         {/* Controls overlay - only for regular videos */}
         {!isMediaDeliveryVideo && (
           <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity ${
             showControls ? 'opacity-100' : 'opacity-0'
           }`}>
-          
-          {/* Navigation arrows */}
-          {hasPrevious && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onPrevious?.();
-              }}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full transition-all"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-          )}
-          
-          {hasNext && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onNext?.();
-              }}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-75 text-white p-3 rounded-full transition-all"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          )}
 
           {/* Bottom controls */}
           <div className="absolute bottom-0 left-0 right-0 p-4">
@@ -526,18 +526,34 @@ export default function CourseVideoPlayer({
         </div>
       )}
 
-      {/* Progress indicator */}
+      {/* Progress indicator and completion controls */}
       <div className="bg-gray-900 px-6 py-3">
-        <div className="flex justify-between items-center text-sm text-gray-300">
+        <div className="flex justify-between items-center text-sm text-gray-300 mb-2">
           <span>Progreso de la lección</span>
           <span>{Math.round(watchedPercentage)}%</span>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+        <div className="w-full bg-gray-700 rounded-full h-2 mb-3">
           <div 
             className="bg-blue-600 h-2 rounded-full transition-all"
             style={{ width: `${watchedPercentage}%` }}
           ></div>
         </div>
+        
+        {/* For MediaDelivery videos, add manual completion button */}
+        {isMediaDeliveryVideo && !lesson.isCompleted && (
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-gray-400">¿Terminaste de ver el video?</span>
+            <button
+              onClick={() => {
+                setWatchedPercentage(100);
+                onComplete?.();
+              }}
+              className="bg-green-600 hover:bg-green-700 text-white text-xs px-3 py-1 rounded transition-colors"
+            >
+              Marcar como completado
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

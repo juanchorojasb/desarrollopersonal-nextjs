@@ -152,6 +152,17 @@ export default function CursoDetailPage() {
     router.push(`/dashboard/cursos/${course?.id}/sesion/${lesson.id}`);
   };
 
+  const startCourse = () => {
+    if (course && course.modules && course.modules.length > 0) {
+      // Find the first lesson in the first module
+      const firstModule = course.modules[0];
+      if (firstModule.lessons && firstModule.lessons.length > 0) {
+        const firstLesson = firstModule.lessons[0];
+        router.push(`/dashboard/cursos/${course.id}/sesion/${firstLesson.id}`);
+      }
+    }
+  };
+
   const getTotalLessons = () => {
     return course?.totalLessons || 0;
   };
@@ -291,7 +302,10 @@ export default function CursoDetailPage() {
             {/* CTA */}
             <div className="flex items-center gap-4">
               {isEnrolled ? (
-                <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center">
+                <button 
+                  onClick={startCourse}
+                  className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center"
+                >
                   <Play className="w-5 h-5 mr-2" />
                   Continuar Curso
                 </button>
@@ -531,7 +545,10 @@ export default function CursoDetailPage() {
                     </div>
                   </div>
                   
-                  <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={startCourse}
+                    className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center"
+                  >
                     <Play className="w-5 h-5 mr-2" />
                     Continuar Aprendiendo
                   </button>
