@@ -1,5 +1,3 @@
-import { currentUser } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -25,21 +23,14 @@ async function getBasicStats() {
   }
 }
 
-export default async function SimpleAdminPage() {
-  const user = await currentUser();
-  
-  // Solo verificar si el usuario está logueado y es admin
-  if (!user || user.publicMetadata?.role !== 'admin') {
-    redirect('/dashboard');
-  }
-  
+export default async function AdminDashboard() {
   const stats = await getBasicStats();
   
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Panel de Administración Simple</h1>
+      <h1 className="text-2xl font-bold mb-6">Dashboard de Administración</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-gray-700">Total Usuarios</h3>
           <p className="text-3xl font-bold text-blue-600">{stats.totalUsers}</p>
@@ -52,7 +43,17 @@ export default async function SimpleAdminPage() {
         
         <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold text-gray-700">Total Inscripciones</h3>
-          <p className="text-3xl font-bold text-purple-600">{stats.totalEnrollments}</p>
+          <p className="text-3xl font-bold text-orange-600">{stats.totalEnrollments}</p>
+        </div>
+      </div>
+      
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Resumen del Sistema</h2>
+        <div className="text-gray-600">
+          <p>Plataforma de desarrollo personal funcionando correctamente.</p>
+          <p className="mt-2">
+            Tienes {stats.totalUsers} usuario(s) registrado(s) con acceso a {stats.totalCourses} curso(s).
+          </p>
         </div>
       </div>
     </div>
