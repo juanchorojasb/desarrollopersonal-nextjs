@@ -432,3 +432,77 @@ model ForumReaction {
   @@unique([userId, replyId])
   @@map("forum_reactions")
 }
+
+// Modelos para administración
+model AdminLog {
+  id        String @id @default(cuid())
+  
+  // Información del admin
+  adminId   String
+  adminEmail String
+  
+  // Detalles de la acción
+  action    String // create_user, update_user, delete_course, etc.
+  resource  String // user, course, forum_post, etc.
+  resourceId String?
+  
+  // Datos adicionales
+  metadata  String? @db.Text // JSON con datos adicionales
+  ipAddress String?
+  userAgent String? @db.Text
+  
+  // Resultado
+  success   Boolean @default(true)
+  errorMessage String? @db.Text
+  
+  createdAt DateTime @default(now())
+  
+  @@map("admin_logs")
+}
+
+model SystemConfig {
+  id      String @id @default(cuid())
+  key     String @unique
+  value   String @db.Text
+  type    String @default("string") // string, number, boolean, json
+  
+  // Metadatos
+  description String?
+  isPublic    Boolean @default(false) // Si puede ser leído por usuarios no-admin
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("system_config")
+}
+
+model PromoCode {
+  id          String @id @default(cuid())
+  code        String @unique
+  
+  // Configuración del descuento
+  discountType String // percentage, fixed_amount
+  discountValue Float
+  
+  // Límites
+  maxUses     Int?
+  usedCount   Int @default(0)
+  validFrom   DateTime
+  validUntil  DateTime
+  
+  // Restricciones
+  applicablePlans String? @db.Text // JSON array de planes aplicables
+  minPurchase     Float?
+  
+  // Estado
+  isActive    Boolean @default(true)
+  
+  // Metadatos
+  description String?
+  createdBy   String? // Admin ID que lo creó
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("promo_codes")
+}

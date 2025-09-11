@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SignOutButton, useUser } from '@clerk/nextjs';
 import { useUserPlan } from '@/lib/plans-client';
+import { useEffect, useState as useAdminState } from 'react';
 import {
   Home,
   BookOpen,
@@ -27,6 +28,10 @@ import {
   CheckCircle,
   Star,
   Bookmark,
+  Shield,
+  BarChart3,
+  UserCheck,
+  FileText,
   LucideIcon
 } from 'lucide-react';
 
@@ -56,12 +61,6 @@ const mainNavItems: NavItem[] = [
     icon: BookOpen,
     description: 'Explora y gestiona tus cursos',
     badge: 'NUEVO'
-  },
-  {
-    label: 'Comunidad',
-    href: '/dashboard/comunidad',
-    icon: Users,
-    description: 'Conecta con otros estudiantes'
   }
 ];
 
@@ -127,28 +126,40 @@ const progressNavItems: NavItem[] = [
 
 const communityNavItems: NavItem[] = [
   {
-    label: 'Comunidad',
-    href: '/dashboard/comunidad',
-    icon: Users,
-    description: 'Conecta con otros estudiantes'
-  },
-  {
-    label: 'Talleres',
-    href: '/dashboard/talleres',
-    icon: Calendar,
-    description: 'Sesiones en vivo programadas'
-  },
-  {
     label: 'Foros',
-    href: '/dashboard/foros',
+    href: '/dashboard/comunidad/foros',
     icon: MessageSquare,
     description: 'Discusiones y Q&A'
   },
   {
-    label: 'Acompañamiento',
-    href: '/dashboard/acompanamiento',
-    icon: Star,
-    description: 'Coaching personalizado'
+    label: 'Desarrollo Personal',
+    href: '/dashboard/comunidad/desarrollo-personal',
+    icon: Target,
+    description: 'Crecimiento y desarrollo'
+  },
+  {
+    label: 'Salud Mental',
+    href: '/dashboard/comunidad/salud-mental',
+    icon: Brain,
+    description: 'Bienestar psicológico'
+  },
+  {
+    label: 'Hábitos y Rutinas',
+    href: '/dashboard/comunidad/habitos-rutinas',
+    icon: CheckCircle,
+    description: 'Construcción de hábitos'
+  },
+  {
+    label: 'Técnicas de Estudio',
+    href: '/dashboard/comunidad/tecnicas-estudio',
+    icon: BookOpen,
+    description: 'Métodos de aprendizaje'
+  },
+  {
+    label: 'Casos de Éxito',
+    href: '/dashboard/comunidad/casos-exito',
+    icon: Trophy,
+    description: 'Historias inspiradoras'
   }
 ];
 
@@ -164,6 +175,39 @@ const wellnessNavItems: NavItem[] = [
     href: '/dashboard/mindfulness',
     icon: Heart,
     description: 'Meditación y relajación'
+  }
+];
+
+const adminNavItems: NavItem[] = [
+  {
+    label: 'Panel Principal',
+    href: '/dashboard/admin',
+    icon: BarChart3,
+    description: 'Vista general del sistema'
+  },
+  {
+    label: 'Gestión de Usuarios',
+    href: '/dashboard/admin/usuarios',
+    icon: UserCheck,
+    description: 'Administrar usuarios y suscripciones'
+  },
+  {
+    label: 'Contenido',
+    href: '/dashboard/admin/contenido',
+    icon: BookOpen,
+    description: 'Gestionar cursos y comunidad'
+  },
+  {
+    label: 'Estadísticas',
+    href: '/dashboard/admin/estadisticas',
+    icon: TrendingUp,
+    description: 'Reportes y métricas'
+  },
+  {
+    label: 'Configuración',
+    href: '/dashboard/admin/configuracion',
+    icon: Settings,
+    description: 'Configuración del sistema'
   }
 ];
 
@@ -187,6 +231,16 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const { user } = useUser();
   const userPlan = useUserPlan();
   const [expandedSections, setExpandedSections] = useState<string[]>(['cursos']);
+  const [isAdmin, setIsAdmin] = useAdminState(false);
+
+  // Check if user is admin
+  useEffect(() => {
+    if (user?.publicMetadata?.role === 'admin') {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  }, [user]);
 
   const toggleSection = (section: string) => {
     if (isCollapsed) return;
@@ -394,13 +448,15 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             icon={TrendingUp}
           />
 
-          {/* Community Section */}
-          <Section 
-            title="Comunidad" 
-            items={communityNavItems} 
-            sectionKey="comunidad"
-            icon={Users}
-          />
+          {/* Community Section - Only for complete and personal plans */}
+          {(userPlan === 'complete' || userPlan === 'personal') && (
+            <Section 
+              title="Comunidad" 
+              items={communityNavItems} 
+              sectionKey="comunidad"
+              icon={Users}
+            />
+          )}
 
           {/* Wellness Section */}
           <Section 
@@ -409,6 +465,19 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             sectionKey="bienestar"
             icon={Heart}
           />
+
+          {/* Admin Section - Only visible for admin users */}
+          {isAdmin && (
+            <>
+              <div className="border-t border-blue-500/20 my-4" />
+              <Section 
+                title="Administración" 
+                items={adminNavItems} 
+                sectionKey="admin"
+                icon={Shield}
+              />
+            </>
+          )}
 
           {/* Divider */}
           <div className="border-t border-blue-500/20 my-4" />
