@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SignOutButton, useUser } from '@clerk/nextjs';
+import { useUserPlan } from '@/lib/plans-client';
 import {
   Home,
   BookOpen,
@@ -55,6 +56,12 @@ const mainNavItems: NavItem[] = [
     icon: BookOpen,
     description: 'Explora y gestiona tus cursos',
     badge: 'NUEVO'
+  },
+  {
+    label: 'Comunidad',
+    href: '/dashboard/comunidad',
+    icon: Users,
+    description: 'Conecta con otros estudiantes'
   }
 ];
 
@@ -178,6 +185,7 @@ const bottomNavItems: NavItem[] = [
 export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
   const { user } = useUser();
+  const userPlan = useUserPlan();
   const [expandedSections, setExpandedSections] = useState<string[]>(['cursos']);
 
   const toggleSection = (section: string) => {
