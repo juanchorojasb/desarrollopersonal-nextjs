@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import UserPlanUpdater from './UserPlanUpdater';
 
 const prisma = new PrismaClient();
 
@@ -49,6 +50,9 @@ export default async function UsuariosAdminPage() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Fecha Registro
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                Acciones
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -77,6 +81,13 @@ export default async function UsuariosAdminPage() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {new Date(user.createdAt).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                  <UserPlanUpdater
+                    userId={user.id}
+                    currentPlan={user.subscriptionStatus}
+                    userName={`${user.firstName} ${user.lastName}`}
+                  />
                 </td>
               </tr>
             ))}
