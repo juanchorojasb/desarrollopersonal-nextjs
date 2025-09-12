@@ -30,6 +30,15 @@ export default async function AdminLayout({
             </Link>
             <Link href="/dashboard/admin/cursos" className="block px-6 py-3 text-gray-700 hover:bg-gray-100">
             <Link href="/dashboard/admin/estadisticas" className="block px-6 py-3 text-gray-700 hover:bg-gray-100">
+            <Link href="/dashboard/admin/analytics" className="block px-6 py-3 text-gray-700 hover:bg-gray-100">
+            <Link href="/dashboard/admin/promociones" className="block px-6 py-3 text-gray-700 hover:bg-gray-100">
+            <Link href="/dashboard/admin/sistema" className="block px-6 py-3 text-gray-700 hover:bg-gray-100">
+              Sistema
+            </Link>
+              Promociones
+            </Link>
+              Analytics
+            </Link>
               Estadísticas
             </Link>
               Cursos

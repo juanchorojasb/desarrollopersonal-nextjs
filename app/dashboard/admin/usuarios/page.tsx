@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import EmailNotifier from "./EmailNotifier";
 import UserPlanUpdater from './UserPlanUpdater';
 
 const prisma = new PrismaClient();
@@ -83,11 +84,11 @@ export default async function UsuariosAdminPage() {
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  <UserPlanUpdater
+                  <div className="flex items-center"><UserPlanUpdater
                     userId={user.id}
                     currentPlan={user.subscriptionStatus}
                     userName={`${user.firstName} ${user.lastName}`}
-                  />
+                  /><EmailNotifier userEmail={user.email} userName={`${user.firstName} ${user.lastName}`} /></div>
                 </td>
               </tr>
             ))}
