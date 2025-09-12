@@ -33,6 +33,9 @@ export default async function AdminLayout({
             <Link href="/dashboard/admin/analytics" className="block px-6 py-3 text-gray-700 hover:bg-gray-100">
             <Link href="/dashboard/admin/promociones" className="block px-6 py-3 text-gray-700 hover:bg-gray-100">
             <Link href="/dashboard/admin/sistema" className="block px-6 py-3 text-gray-700 hover:bg-gray-100">
+            <Link href="/dashboard/admin/notificaciones" className="block px-6 py-3 text-gray-700 hover:bg-gray-100">
+              Notificaciones
+            </Link>
               Sistema
             </Link>
               Promociones
