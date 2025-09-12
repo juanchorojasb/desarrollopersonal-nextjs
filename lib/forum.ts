@@ -2,373 +2,259 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export type ForumCategoryWithStats = {
+export interface ForumUser {
+  id: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string;
+}
+
+export interface ForumCategory {
   id: string;
   name: string;
-  description: string | null;
   slug: string;
-  color: string;
-  icon: string | null;
-  position: number;
-  isActive: boolean;
-  postsCount: number;
-  lastPostAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
+  description: string;
+  icon: string;
+  postCount?: number;
   lastPost?: {
     id: string;
     title: string;
-    author: {
-      firstName: string | null;
-      lastName: string | null;
-    };
     createdAt: Date;
+    author: ForumUser;
   } | null;
-};
+}
 
-export type ForumPostWithAuthor = {
+export interface ForumCategoryWithStats extends ForumCategory {
+  postCount: number;
+  replyCount: number;
+  lastPost?: {
+    id: string;
+    title: string;
+    createdAt: Date;
+    author: ForumUser;
+  } | null;
+}
+
+// Corregir la interfaz ForumReaction para coincidir con Prisma
+export interface ForumReaction {
+  id: string;
+  type: string;
+  userId: string;
+  postId: string | null;  // Prisma usa null, no undefined
+  replyId: string | null; // Prisma usa null, no undefined
+  createdAt: Date;
+}
+
+export interface ForumReply {
+  id: string;
+  content: string;
+  createdAt: Date;
+  author: ForumUser;
+  reactions: ForumReaction[];
+}
+
+export interface ForumPost {
   id: string;
   title: string;
-  content: string;
   slug: string;
-  authorId: string;
-  categoryId: string;
-  isLocked: boolean;
-  isPinned: boolean;
-  isDeleted: boolean;
-  viewsCount: number;
-  repliesCount: number;
-  reactionsCount: number;
-  lastActivityAt: Date;
+  content: string;
   createdAt: Date;
   updatedAt: Date;
-  author: {
-    firstName: string | null;
-    lastName: string | null;
-    imageUrl: string | null;
-  };
-  category: {
-    name: string;
-    slug: string;
-    color: string;
-  };
+  author: ForumUser;
+  category: ForumCategory;
+  replyCount: number;
+  reactionCount: number;
   lastReply?: {
     id: string;
-    author: {
-      firstName: string | null;
-      lastName: string | null;
-    };
     createdAt: Date;
+    author: ForumUser;
   } | null;
-};
+}
 
-export type ForumReplyWithAuthor = {
-  id: string;
-  content: string;
-  authorId: string;
-  postId: string;
-  parentId: string | null;
-  isDeleted: boolean;
-  reactionsCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  author: {
-    firstName: string | null;
-    lastName: string | null;
-    imageUrl: string | null;
-  };
-  children?: ForumReplyWithAuthor[];
-};
-
-// Get all active forum categories with statistics
 export async function getForumCategories(): Promise<ForumCategoryWithStats[]> {
   const categories = await prisma.forumCategory.findMany({
-    where: { isActive: true },
     include: {
       _count: {
         select: {
-          posts: {
-            where: { isDeleted: false }
-          }
+          posts: true
         }
       },
       posts: {
-        where: { isDeleted: false },
-        orderBy: { lastActivityAt: 'desc' },
-        take: 1,
         include: {
           author: {
-            select: { firstName: true, lastName: true }
-          }
-        }
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true
+            }
+          },
+          replies: true
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        take: 1
       }
     },
-    orderBy: { position: 'asc' }
+    orderBy: {
+      name: 'asc'
+    }
   });
 
   return categories.map(category => ({
     id: category.id,
     name: category.name,
-    description: category.description,
     slug: category.slug,
-    color: category.color,
+    description: category.description,
     icon: category.icon,
-    position: category.position,
-    isActive: category.isActive,
-    postsCount: category._count.posts,
-    lastPostAt: category.lastPostAt,
-    createdAt: category.createdAt,
-    updatedAt: category.updatedAt,
+    postCount: category._count.posts,
+    replyCount: category.posts.reduce((acc, post) => acc + post.replies.length, 0),
     lastPost: category.posts[0] ? {
       id: category.posts[0].id,
       title: category.posts[0].title,
-      author: category.posts[0].author,
-      createdAt: category.posts[0].createdAt
+      createdAt: category.posts[0].createdAt,
+      author: {
+        id: category.posts[0].author.id,
+        firstName: category.posts[0].author.firstName,
+        lastName: category.posts[0].author.lastName,
+        email: category.posts[0].author.email
+      }
     } : null
   }));
 }
 
-// Get a forum category by slug
-export async function getForumCategoryBySlug(slug: string) {
-  return await prisma.forumCategory.findUnique({
-    where: { slug, isActive: true }
-  });
-}
-
-// Get posts for a category with pagination
-export async function getForumPostsByCategory(
-  categoryId: string,
-  page: number = 1,
-  limit: number = 20
-): Promise<{ posts: ForumPostWithAuthor[]; total: number; hasMore: boolean }> {
-  const skip = (page - 1) * limit;
-
-  const [posts, total] = await Promise.all([
-    prisma.forumPost.findMany({
-      where: { categoryId, isDeleted: false },
+export async function getCategoryPosts(categorySlug: string): Promise<ForumPost[]> {
+  try {
+    const posts = await prisma.forumPost.findMany({
+      where: {
+        category: { slug: categorySlug }
+      },
       include: {
         author: {
-          select: { firstName: true, lastName: true, imageUrl: true }
+          select: { id: true, firstName: true, lastName: true, email: true }
         },
-        category: {
-          select: { name: true, slug: true, color: true }
-        },
+        category: true,
         replies: {
-          where: { isDeleted: false },
-          orderBy: { createdAt: 'desc' },
-          take: 1,
           include: {
             author: {
-              select: { firstName: true, lastName: true }
+              select: { id: true, firstName: true, lastName: true, email: true }
             }
-          }
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 1
+        },
+        reactions: true,
+        _count: {
+          select: { replies: true, reactions: true }
         }
       },
-      orderBy: [
-        { isPinned: 'desc' },
-        { lastActivityAt: 'desc' }
-      ],
-      skip,
-      take: limit
-    }),
-    prisma.forumPost.count({
-      where: { categoryId, isDeleted: false }
-    })
-  ]);
+      orderBy: { createdAt: 'desc' }
+    });
 
-  return {
-    posts: posts.map(post => ({
-      ...post,
-      lastReply: post.replies[0] || null
-    })),
-    total,
-    hasMore: skip + posts.length < total
-  };
-}
-
-// Get a single forum post with replies
-export async function getForumPostBySlug(categorySlug: string, postSlug: string) {
-  return await prisma.forumPost.findFirst({
-    where: {
-      slug: postSlug,
-      isDeleted: false,
-      category: {
-        slug: categorySlug,
-        isActive: true
-      }
-    },
-    include: {
+    return posts.map(post => ({
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      content: post.content,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
       author: {
-        select: { firstName: true, lastName: true, imageUrl: true }
+        id: post.author.id,
+        firstName: post.author.firstName,
+        lastName: post.author.lastName,
+        email: post.author.email
       },
       category: {
-        select: { name: true, slug: true, color: true }
+        id: post.category.id,
+        name: post.category.name,
+        slug: post.category.slug,
+        description: post.category.description,
+        icon: post.category.icon
       },
-      replies: {
-        where: { 
-          isDeleted: false,
-          parentId: null // Solo replies de primer nivel
-        },
-        include: {
-          author: {
-            select: { firstName: true, lastName: true, imageUrl: true }
-          },
-          children: {
-            where: { isDeleted: false },
-            include: {
-              author: {
-                select: { firstName: true, lastName: true, imageUrl: true }
-              }
-            },
-            orderBy: { createdAt: 'asc' }
-          }
-        },
-        orderBy: { createdAt: 'asc' }
-      }
-    }
-  });
+      replyCount: post._count.replies,
+      reactionCount: post._count.reactions,
+      lastReply: post.replies[0] ? {
+        id: post.replies[0].id,
+        createdAt: post.replies[0].createdAt,
+        author: {
+          id: post.replies[0].author.id,
+          firstName: post.replies[0].author.firstName,
+          lastName: post.replies[0].author.lastName,
+          email: post.replies[0].author.email
+        }
+      } : null
+    }));
+  } catch (error) {
+    console.error('Error fetching category posts:', error);
+    return [];
+  }
 }
 
-// Create a new forum post
-export async function createForumPost(data: {
-  title: string;
-  content: string;
-  categoryId: string;
-  authorId: string;
-}) {
-  const slug = generateSlug(data.title);
-  
-  // Check if slug exists in this category
-  let finalSlug = slug;
-  let counter = 1;
-  
-  while (true) {
-    const existing = await prisma.forumPost.findUnique({
-      where: { 
-        categoryId_slug: { 
-          categoryId: data.categoryId, 
-          slug: finalSlug 
-        } 
+export async function getPostWithReplies(slug: string): Promise<ForumPost & { replies: ForumReply[] } | null> {
+  try {
+    const post = await prisma.forumPost.findUnique({
+      where: { slug },
+      include: {
+        author: {
+          select: { id: true, firstName: true, lastName: true, email: true }
+        },
+        category: true,
+        replies: {
+          include: {
+            author: {
+              select: { id: true, firstName: true, lastName: true, email: true }
+            },
+            reactions: true
+          },
+          orderBy: { createdAt: 'asc' }
+        },
+        reactions: true,
+        _count: {
+          select: { replies: true, reactions: true }
+        }
       }
     });
-    
-    if (!existing) break;
-    
-    finalSlug = `${slug}-${counter}`;
-    counter++;
+
+    if (!post) return null;
+
+    return {
+      id: post.id,
+      title: post.title,
+      slug: post.slug,
+      content: post.content,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      author: {
+        id: post.author.id,
+        firstName: post.author.firstName,
+        lastName: post.author.lastName,
+        email: post.author.email
+      },
+      category: {
+        id: post.category.id,
+        name: post.category.name,
+        slug: post.category.slug,
+        description: post.category.description,
+        icon: post.category.icon
+      },
+      replyCount: post._count.replies,
+      reactionCount: post._count.reactions,
+      replies: post.replies.map(reply => ({
+        id: reply.id,
+        content: reply.content,
+        createdAt: reply.createdAt,
+        author: {
+          id: reply.author.id,
+          firstName: reply.author.firstName,
+          lastName: reply.author.lastName,
+          email: reply.author.email
+        },
+        reactions: reply.reactions
+      }))
+    };
+  } catch (error) {
+    console.error('Error fetching post with replies:', error);
+    return null;
   }
-
-  const post = await prisma.forumPost.create({
-    data: {
-      ...data,
-      slug: finalSlug,
-      lastActivityAt: new Date()
-    },
-    include: {
-      author: {
-        select: { firstName: true, lastName: true, imageUrl: true }
-      },
-      category: {
-        select: { name: true, slug: true, color: true }
-      }
-    }
-  });
-
-  // Update category statistics
-  await updateCategoryStats(data.categoryId);
-
-  return post;
-}
-
-// Create a new forum reply
-export async function createForumReply(data: {
-  content: string;
-  postId: string;
-  authorId: string;
-  parentId?: string;
-}) {
-  const reply = await prisma.forumReply.create({
-    data,
-    include: {
-      author: {
-        select: { firstName: true, lastName: true, imageUrl: true }
-      }
-    }
-  });
-
-  // Update post statistics and last activity
-  await prisma.forumPost.update({
-    where: { id: data.postId },
-    data: {
-      repliesCount: { increment: 1 },
-      lastActivityAt: new Date()
-    }
-  });
-
-  return reply;
-}
-
-// Increment post view count
-export async function incrementPostViews(postId: string) {
-  await prisma.forumPost.update({
-    where: { id: postId },
-    data: { viewsCount: { increment: 1 } }
-  });
-}
-
-// Update category statistics
-async function updateCategoryStats(categoryId: string) {
-  const postsCount = await prisma.forumPost.count({
-    where: { categoryId, isDeleted: false }
-  });
-
-  const lastPost = await prisma.forumPost.findFirst({
-    where: { categoryId, isDeleted: false },
-    orderBy: { lastActivityAt: 'desc' },
-    select: { lastActivityAt: true }
-  });
-
-  await prisma.forumCategory.update({
-    where: { id: categoryId },
-    data: {
-      postsCount,
-      lastPostAt: lastPost?.lastActivityAt || null
-    }
-  });
-}
-
-// Generate URL-friendly slug
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Remove multiple consecutive hyphens
-    .trim()
-    .substring(0, 50); // Limit length
-}
-
-// Search forum posts
-export async function searchForumPosts(query: string, limit: number = 20) {
-  return await prisma.forumPost.findMany({
-    where: {
-      isDeleted: false,
-      OR: [
-        { title: { contains: query } },
-        { content: { contains: query } }
-      ]
-    },
-    include: {
-      author: {
-        select: { firstName: true, lastName: true, imageUrl: true }
-      },
-      category: {
-        select: { name: true, slug: true, color: true }
-      }
-    },
-    orderBy: { lastActivityAt: 'desc' },
-    take: limit
-  });
 }

@@ -1,79 +1,44 @@
 'use client';
-
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { Send, MessageSquare } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface ReplyFormProps {
   postId: string;
-  categorySlug: string;
-  postSlug: string;
-  parentId?: string;
-  onSuccess?: () => void;
-  onCancel?: () => void;
-  placeholder?: string;
+  onReplyAdded?: () => void;
 }
 
-export default function ReplyForm({ 
-  postId, 
-  categorySlug, 
-  postSlug, 
-  parentId,
-  onSuccess,
-  onCancel,
-  placeholder = "Escribe tu respuesta..."
-}: ReplyFormProps) {
-  const [content, setContent] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  
+export default function ReplyForm({ postId, onReplyAdded }: ReplyFormProps) {
   const { user } = useUser();
   const router = useRouter();
+  const [content, setContent] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!content.trim()) {
-      setError('Por favor, escribe una respuesta');
-      return;
-    }
-
-    if (!user) {
-      setError('Debes iniciar sesión para responder');
-      return;
-    }
+    if (!user || !content.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
-    setError('');
-
     try {
       const response = await fetch('/api/forum/replies', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          content: content.trim(),
           postId,
-          parentId
-        }),
+          content: content.trim()
+        })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Error al enviar la respuesta');
+      if (response.ok) {
+        setContent('');
+        router.refresh();
+        onReplyAdded?.();
+      } else {
+        throw new Error('Error al enviar respuesta');
       }
-
-      setContent('');
-      router.refresh(); // Refresh to show new reply
-      
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (err) {
-      console.error('Error submitting reply:', err);
-      setError(err instanceof Error ? err.message : 'Error al enviar la respuesta');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al enviar la respuesta');
     } finally {
       setIsSubmitting(false);
     }
@@ -81,102 +46,36 @@ export default function ReplyForm({
 
   if (!user) {
     return (
-      <div className="text-center py-8">
-        <MessageSquare className="w-8 h-8 text-gray-400 mx-auto mb-3" />
-        <p className="text-gray-600 mb-4">Inicia sesión para participar en la discusión</p>
+      <div className="bg-gray-50 rounded-lg p-4 text-center">
+        <p className="text-gray-600">Inicia sesión para participar en la conversación</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {/* User Info */}
-      <div className="flex items-center gap-3 mb-4">
-        {user.imageUrl ? (
-          <img
-            src={user.imageUrl}
-            alt={user.fullName || 'Usuario'}
-            className="w-8 h-8 rounded-full"
-          />
-        ) : (
-          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-            <span className="text-indigo-600 font-medium text-sm">
-              {user.firstName?.[0]}{user.lastName?.[0]}
-            </span>
-          </div>
-        )}
-        <span className="text-sm text-gray-700 font-medium">
-          {user.firstName} {user.lastName}
-        </span>
-      </div>
-
-      {/* Textarea */}
-      <div>
+    <form onSubmit={handleSubmit} className="bg-white rounded-lg border p-4">
+      <div className="mb-4">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          Tu respuesta
+        </label>
         <textarea
           value={content}
           onChange={(e) => setContent(e.target.value)}
-          placeholder={placeholder}
+          placeholder="Comparte tu perspectiva, experiencia o consejo..."
           rows={4}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
-          disabled={isSubmitting}
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
+          required
         />
-        
-        {/* Character count */}
-        <div className="flex items-center justify-between mt-2">
-          <div className="text-xs text-gray-500">
-            {content.length}/1000 caracteres
-          </div>
-          {content.length > 1000 && (
-            <div className="text-xs text-red-500">
-              Excede el límite de caracteres
-            </div>
-          )}
-        </div>
       </div>
-
-      {/* Error Message */}
-      {error && (
-        <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
-          {error}
-        </div>
-      )}
-
-      {/* Buttons */}
-      <div className="flex items-center justify-between">
-        <div className="text-xs text-gray-500">
-          Tip: Sé respetuoso y constructivo en tus comentarios
-        </div>
-        
-        <div className="flex items-center gap-3">
-          {onCancel && (
-            <button
-              type="button"
-              onClick={onCancel}
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 transition-colors"
-              disabled={isSubmitting}
-            >
-              Cancelar
-            </button>
-          )}
-          
-          <button
-            type="submit"
-            disabled={isSubmitting || !content.trim() || content.length > 1000}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Enviando...
-              </>
-            ) : (
-              <>
-                <Send className="w-4 h-4" />
-                Responder
-              </>
-            )}
-          </button>
-        </div>
+      
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          disabled={isSubmitting || !content.trim()}
+          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? 'Enviando...' : 'Responder'}
+        </button>
       </div>
     </form>
   );

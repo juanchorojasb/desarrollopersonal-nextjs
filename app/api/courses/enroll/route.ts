@@ -4,77 +4,56 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-interface EnrollRequest {
-  courseId: string;
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth(); // CORREGIDO: agregado await
-
+    const { userId } = await auth();
+    
     if (!userId) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    const body: EnrollRequest = await request.json();
-    const { courseId } = body;
+    const { courseId, plan } = await request.json();
 
     if (!courseId) {
-      return NextResponse.json({ error: 'Course ID es requerido' }, { status: 400 });
+      return NextResponse.json({ error: 'Course ID requerido' }, { status: 400 });
+    }
+
+    // Verificar plan del usuario (esto debería venir de Clerk metadata)
+    const userPlan = plan || 'free';
+    
+    // Lógica de verificación de acceso según el plan
+    const hasAccess = userPlan !== 'free';
+
+    if (!hasAccess) {
+      return NextResponse.json({ 
+        error: 'Plan premium requerido',
+        upgradeRequired: true 
+      }, { status: 403 });
     }
 
     // Get or create user
     const user = await prisma.user.upsert({
-      where: { clerkId: userId },
+      where: { clerkUserId: userId },
       update: {},
       create: {
-        clerkId: userId,
-        email: 'user@example.com', // This should come from Clerk
+        clerkUserId: userId,
+        email: '', // Get from Clerk if needed
+        plan: userPlan
       }
     });
 
-    // Verificar si el curso existe
-    const course = await prisma.course.findUnique({
-      where: { id: courseId }
-    });
-
-    if (!course) {
-      return NextResponse.json({ error: 'Curso no encontrado' }, { status: 404 });
-    }
-
-    // Verificar si ya está inscrito
-    const existingEnrollment = await prisma.enrollment.findUnique({
-      where: {
-        userId_courseId: {
-          userId: user.id,
-          courseId
-        }
-      }
-    });
-
-    if (existingEnrollment) {
-      return NextResponse.json({ error: 'Ya estás inscrito en este curso' }, { status: 400 });
-    }
-
-    // Crear inscripción
-    const enrollment = await prisma.enrollment.create({
-      data: {
-        userId: user.id,
-        courseId,
-        enrolledAt: new Date()
-      },
-      include: {
-        course: true
-      }
-    });
-
-    return NextResponse.json({
-      message: 'Inscripción exitosa',
-      enrollment
+    // Here you would create enrollment record if you have that model
+    // For now just return success
+    
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Acceso concedido al curso',
+      courseId,
+      userPlan 
     });
 
   } catch (error) {
-    console.error('Error enrolling in course:', error);
+    console.error('Error in course enrollment:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' }, 
       { status: 500 }

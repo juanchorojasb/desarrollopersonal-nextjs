@@ -1,616 +1,230 @@
-"use client";
+import { auth, currentUser } from '@clerk/nextjs/server';
+import { notFound } from 'next/navigation';
+import Link from 'next/link';
+import VideoPlayer from './VideoPlayer';
+import LessonList from './LessonList';
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '@clerk/nextjs';
-import { 
-  Play, 
-  Clock, 
-  Users, 
-  Star, 
-  BookOpen, 
-  CheckCircle,
-  Lock,
-  Download,
-  MessageCircle,
-  Share2,
-  Heart,
-  ArrowLeft,
-  Target,
-  Award,
-  PlayCircle,
-  FileText,
-  ChevronDown,
-  ChevronRight
-} from 'lucide-react';
+const coursesData = {
+  'gps-salud-mental': {
+    title: 'GPS Salud Mental',
+    description: 'Navega hacia el bienestar emocional con herramientas prácticas y científicamente respaldadas para gestionar el estrés, la ansiedad y mejorar tu salud mental.',
+    image: '🧭',
+    requiredPlan: 'basico',
+    duration: '2.5 horas',
+    lessons: [
+      { id: 1, title: 'Introducción al GPS Mental', videoId: '93fd37b8-4ccb-4b1b-9227-d8accebfabaf', duration: '25 min' },
+      { id: 2, title: 'Navegando las Emociones', videoId: 'c71755cc-d89e-4c76-8870-e52c6ab17658', duration: '30 min' },
+      { id: 3, title: 'Herramientas de Regulación', videoId: '8c3b7cd2-e5eb-44f3-a888-2dd90b9721dc', duration: '35 min' },
+      { id: 4, title: 'Construyendo Resiliencia', videoId: 'e33758a5-aeda-4a0c-b12e-aad06cd20a78', duration: '40 min' }
+    ]
+  },
+  'arquitectura-descanso': {
+    title: 'Arquitectura del Descanso',
+    description: 'Construye rutinas de sueño reparador y productividad sostenible. Aprende a diseñar tu entorno y horarios para optimizar tu descanso y energía.',
+    image: '🏗️',
+    requiredPlan: 'basico',
+    duration: '3 horas',
+    lessons: [
+      { id: 1, title: 'Fundamentos del Sueño', videoId: '6d398119-2c3a-4ba9-ac1e-d8d51a0cb911', duration: '30 min' },
+      { id: 2, title: 'Diseñando tu Entorno', videoId: 'a2d31bb1-bd57-424e-88a5-54229d0bf142', duration: '35 min' },
+      { id: 3, title: 'Rutinas de Descanso', videoId: 'ef26a4b5-db39-4239-a049-2d825910bb8b', duration: '40 min' },
+      { id: 4, title: 'Optimización del Sueño', videoId: '2d6144b5-f737-49fe-b6a0-a71aad965269', duration: '38 min' },
+      { id: 5, title: 'Recuperación Avanzada', videoId: '95c57c4c-eccb-428b-9519-2a468002a0cf', duration: '42 min' }
+    ]
+  },
+  'gestionando-depresion': {
+    title: 'Gestionando la Depresión',
+    description: 'Estrategias basadas en evidencia para superar la depresión y recuperar el bienestar. Técnicas cognitivo-conductuales y herramientas prácticas.',
+    image: '🌅',
+    requiredPlan: 'basico',
+    duration: '2 horas',
+    lessons: [
+      { id: 1, title: 'Entendiendo la Depresión', videoId: '5d457920-2a95-4fce-a326-ce664ab3ff97', duration: '35 min' },
+      { id: 2, title: 'Estrategias de Afrontamiento', videoId: '4741f5f0-b7c6-4b8c-b07a-a5896f282218', duration: '45 min' },
+      { id: 3, title: 'Construyendo el Bienestar', videoId: 'a96727cf-ad3a-42d4-93d5-53fbb1bf845e', duration: '40 min' }
+    ]
+  },
+  'emociones-equilibrio': {
+    title: 'Emociones en Equilibrio',
+    description: 'Desarrolla inteligencia emocional y autorregulación para una vida más plena. Aprende a gestionar tus emociones de manera saludable.',
+    image: '⚖️',
+    requiredPlan: 'free',
+    duration: '5 horas',
+    lessons: [
+      { id: 1, title: 'Introducción a las Emociones', videoId: 'cea9cf65-6466-4ebd-b670-8baea2f6c1e9', duration: '30 min' },
+      { id: 2, title: 'Identificando Emociones', videoId: '7288352b-3466-4477-a805-a7a5da3fcc71', duration: '32 min' },
+      { id: 3, title: 'Regulación Emocional Básica', videoId: 'c189a931-08ea-4aeb-8d6f-a95d0b3873f4', duration: '35 min' },
+      { id: 4, title: 'Manejo del Estrés', videoId: 'd837af16-6e3f-46ef-9b86-cf6f1795c2ac', duration: '38 min' },
+      { id: 5, title: 'Inteligencia Emocional', videoId: '69ab3b9f-486b-4c4f-b1d5-d44bb490b55c', duration: '40 min' },
+      { id: 6, title: 'Comunicación Asertiva', videoId: '0dde13f5-7915-46d4-b2d8-08af8a1777f7', duration: '35 min' },
+      { id: 7, title: 'Relaciones Saludables', videoId: 'f36f8f75-4b66-4747-bcff-72be870aaa27', duration: '42 min' },
+      { id: 8, title: 'Autoestima y Confianza', videoId: 'cb737748-58c9-4f90-a6cf-36041f6c3861', duration: '38 min' },
+      { id: 9, title: 'Equilibrio y Bienestar', videoId: '8c3472e4-d00a-4177-bae7-8511cd19d2a8', duration: '45 min' }
+    ]
+  },
+  'neurocalma': {
+    title: 'NeuroCalma',
+    description: 'Técnicas neurocientíficas para reducir el estrés y la ansiedad de manera efectiva. Basado en investigación actual en neurociencia.',
+    image: '🧠',
+    requiredPlan: 'basico',
+    duration: '4.5 horas',
+    lessons: [
+      { id: 1, title: 'Neurociencia del Estrés', videoId: '0d189ecb-71e2-4f32-a47c-38a298a2e793', duration: '35 min' },
+      { id: 2, title: 'Sistema Nervioso y Calma', videoId: '6b7cb42c-bb6f-42e6-b064-8d755843be7f', duration: '30 min' },
+      { id: 3, title: 'Técnicas de Respiración', videoId: '9a9b8c38-3bcb-4b78-984e-a345bf9f8a61', duration: '28 min' },
+      { id: 4, title: 'Mindfulness Neurocientífico', videoId: '612c76ff-d82b-4222-b8fe-05d4c41c2a05', duration: '32 min' },
+      { id: 5, title: 'Regulación del Sistema Nervioso', videoId: '4b53e15e-da14-4b72-a504-c89a88845afe', duration: '40 min' },
+      { id: 6, title: 'Coherencia Cardíaca', videoId: 'e9861eb2-f938-41cb-963c-41c863cdafc6', duration: '25 min' },
+      { id: 7, title: 'Técnicas de Relajación Profunda', videoId: '1c976c5d-b474-4ca6-87b9-87976c82d422', duration: '35 min' },
+      { id: 8, title: 'Neuroplasticidad y Cambio', videoId: 'a50d21fe-71e9-407b-b081-72de07cbcca0', duration: '38 min' },
+      { id: 9, title: 'Integración y Práctica', videoId: 'e3574e25-d69b-4fa3-ad02-dff865385046', duration: '42 min' }
+    ]
+  },
+  'navegando-tormenta': {
+    title: 'Navegando la Tormenta Interior',
+    description: 'Herramientas para gestionar crisis emocionales y encontrar estabilidad interior en momentos difíciles.',
+    image: '⛈️',
+    requiredPlan: 'basico',
+    duration: '3.5 horas',
+    lessons: [
+      { id: 1, title: 'Reconociendo la Tormenta', videoId: 'ca16f310-273f-4e5b-bc4e-987d1f712d33', duration: '30 min' },
+      { id: 2, title: 'Herramientas de Emergencia', videoId: 'e332c8c8-1db6-4bca-aac9-7ac54ecb8896', duration: '35 min' },
+      { id: 3, title: 'Encontrando el Refugio Interior', videoId: '3cb0913f-bd2c-45bb-89cb-6d00d8156a31', duration: '40 min' },
+      { id: 4, title: 'Construyendo Resiliencia', videoId: '327e4e9d-632d-45a6-a28c-1c7d15534985', duration: '38 min' },
+      { id: 5, title: 'Apoyo y Comunidad', videoId: '3f1f9265-f391-4133-942c-944897178729', duration: '32 min' },
+      { id: 6, title: 'Después de la Tormenta', videoId: '79a8778c-21c5-4344-98f9-410deb238324', duration: '35 min' }
+    ]
+  }
+};
 
-import { Course } from '@/types/course';
-
-interface CourseWithModules {
-  id: string;
-  title: string;
-  description: string;
-  category: string;
-  level: string;
-  duration?: number;
-  instructor?: string;
-  price: number;
-  rating: number;
-  reviewsCount: number;
-  studentsCount: number;
-  whatYouLearn: string[];
-  requirements: string[];
-  isEnrolled: boolean;
-  progressPercentage: number;
-  totalLessons: number;
-  completedLessons: number;
-  modules: {
-    id: string;
-    title: string;
-    description: string;
-    position: number;
-    courseId: string;
-    lessons: {
-      id: string;
-      title: string;
-      description: string;
-      videoUrl: string;
-      duration: number;
-      position: number;
-      moduleId: string;
-      progress: {
-        id: string;
-        isCompleted: boolean;
-        watchTime: number;
-        watchPercentage: number;
-      }[];
-    }[];
-  }[];
+interface CoursePageProps {
+  params: Promise<{ id: string }>;
 }
 
-
-export default function CursoDetailPage() {
-  const params = useParams();
-  const router = useRouter();
-  const { getToken } = useAuth();
-  const [course, setCourse] = useState<CourseWithModules | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'curriculum' | 'reviews'>('overview');
-  const [expandedModules, setExpandedModules] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchCourseData();
-  }, [params.id]);
-
-  const fetchCourseData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const token = await getToken();
-      const response = await fetch(`/api/courses/${params.id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        }
-      });
-      
-      if (!response.ok) {
-        if (response.status === 403) {
-          throw new Error('No estás inscrito en este curso');
-        }
-        if (response.status === 404) {
-          throw new Error('Curso no encontrado');
-        }
-        throw new Error('Error al cargar el curso');
-      }
-
-      const data = await response.json();
-      setCourse(data);
-      
-      // Expandir el primer módulo por defecto
-      if (data.modules && data.modules.length > 0) {
-        setExpandedModules([data.modules[0].id]);
-      }
-    } catch (error) {
-      console.error('Error fetching course:', error);
-      setError(error instanceof Error ? error.message : 'Error desconocido');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleModule = (moduleId: string) => {
-    setExpandedModules(prev => 
-      prev.includes(moduleId) 
-        ? prev.filter(id => id !== moduleId)
-        : [...prev, moduleId]
-    );
-  };
-
-  const formatDuration = (minutes?: number) => {
-    if (!minutes) return "0min";
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours > 0) {
-      return `${hours}h ${mins}min`;
-    }
-    return `${mins}min`;
-  };
-
-  const getLevelText = (level: string) => {
-    switch (level) {
-      case 'beginner': return 'Principiante';
-      case 'intermediate': return 'Intermedio';
-      case 'advanced': return 'Avanzado';
-      default: return level;
-    }
-  };
-
-  const handleLessonClick = (lesson: any, moduleSlug: string) => {
-    // Navigate to lesson page using the course ID as slug for now
-    router.push(`/dashboard/cursos/${course?.id}/sesion/${lesson.id}`);
-  };
-
-  const startCourse = () => {
-    if (course && course.modules && course.modules.length > 0) {
-      // Find the first lesson in the first module
-      const firstModule = course.modules[0];
-      if (firstModule.lessons && firstModule.lessons.length > 0) {
-        const firstLesson = firstModule.lessons[0];
-        router.push(`/dashboard/cursos/${course.id}/sesion/${firstLesson.id}`);
-      }
-    }
-  };
-
-  const getTotalLessons = () => {
-    return course?.totalLessons || 0;
-  };
-
-  const getCompletedLessons = () => {
-    return course?.completedLessons || 0;
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Error</h2>
-        <p className="text-gray-600 mb-4">{error}</p>
-        <div className="space-x-4">
-          <button 
-            onClick={() => fetchCourseData()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Reintentar
-          </button>
-          <button 
-            onClick={() => router.push('/dashboard/cursos')}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Volver a Cursos
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+export default async function CoursePage({ params }: CoursePageProps) {
+  const { id } = await params;
+  const course = coursesData[id as keyof typeof coursesData];
+  
   if (!course) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Curso no encontrado</h2>
-        <p className="text-gray-600 mb-4">El curso que buscas no existe o ha sido eliminado.</p>
-        <button 
-          onClick={() => router.push('/dashboard/cursos')}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Volver a Cursos
-        </button>
-      </div>
-    );
+    notFound();
   }
 
-  const isEnrolled = course.isEnrolled;
-
-  return (
-    <div className="max-w-7xl mx-auto space-y-8">
-      {/* Breadcrumb */}
-      <button 
-        onClick={() => router.back()}
-        className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        Volver a Cursos
-      </button>
-
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-700 rounded-2xl p-8 text-white">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div>
-            {/* Badges */}
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-xs font-medium px-3 py-1 rounded-full bg-white/20 text-white">
-                {getLevelText(course.level)}
-              </span>
-              <span className="text-xs text-white/80">{course.category}</span>
-              {isEnrolled && (
-                <span className="text-xs font-medium px-3 py-1 rounded-full bg-green-500 text-white flex items-center">
-                  <CheckCircle className="w-3 h-3 mr-1" />
-                  INSCRITO
-                </span>
-              )}
-            </div>
-
-            {/* Título */}
-            <h1 className="text-3xl lg:text-4xl font-bold mb-4">
-              {course.title}
-            </h1>
-
-            {/* Instructor */}
-            {course.instructor && (
-              <p className="text-lg text-white/90 mb-4">
-                Por {course.instructor}
-              </p>
-            )}
-
-            {/* Estadísticas */}
-            <div className="flex flex-wrap items-center gap-6 text-sm mb-6">
-              <div className="flex items-center">
-                <Star className="w-4 h-4 mr-1 fill-current text-yellow-400" />
-                {course.rating} ({course.reviewsCount} reseñas)
-              </div>
-              <div className="flex items-center">
-                <Users className="w-4 h-4 mr-1" />
-                {course.studentsCount.toLocaleString()} estudiantes
-              </div>
-              <div className="flex items-center">
-                <Clock className="w-4 h-4 mr-1" />
-                {formatDuration(course.duration)}
-              </div>
-              <div className="flex items-center">
-                <PlayCircle className="w-4 h-4 mr-1" />
-                {getTotalLessons()} lecciones
-              </div>
-            </div>
-
-            {/* Progreso si está inscrito */}
-            {isEnrolled && (
-              <div className="mb-6">
-                <div className="flex justify-between text-sm mb-2">
-                  <span>Tu progreso</span>
-                  <span>{Math.round(course.progressPercentage)}% completado</span>
-                </div>
-                <div className="w-full bg-white/20 rounded-full h-3">
-                  <div 
-                    className="bg-white h-3 rounded-full transition-all"
-                    style={{ width: `${course.progressPercentage}%` }}
-                  ></div>
-                </div>
-                <p className="text-sm text-white/80 mt-2">
-                  {getCompletedLessons()} de {getTotalLessons()} lecciones completadas
-                </p>
-              </div>
-            )}
-
-            {/* CTA */}
-            <div className="flex items-center gap-4">
-              {isEnrolled ? (
-                <button 
-                  onClick={startCourse}
-                  className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors flex items-center"
-                >
-                  <Play className="w-5 h-5 mr-2" />
-                  Continuar Curso
-                </button>
-              ) : (
-                <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-                  Inscribirse por ${course.price}
-                </button>
-              )}
-              
-              <button className="border border-white/30 text-white px-6 py-3 rounded-lg hover:bg-white/10 transition-colors flex items-center">
-                <Heart className="w-5 h-5 mr-2" />
-                Favorito
-              </button>
-              
-              <button className="border border-white/30 text-white px-6 py-3 rounded-lg hover:bg-white/10 transition-colors flex items-center">
-                <Share2 className="w-5 h-5 mr-2" />
-                Compartir
-              </button>
-            </div>
-          </div>
-
-          {/* Video Preview */}
-          <div className="relative">
-            <div className="relative rounded-xl overflow-hidden shadow-2xl">
-              <div className="w-full h-64 lg:h-80 bg-gray-800 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <PlayCircle className="w-16 h-16 mx-auto mb-2 text-white/60" />
-                  <p className="text-sm">Vista previa del curso</p>
-                </div>
-              </div>
-              <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                <button className="bg-white/90 hover:bg-white text-gray-900 w-16 h-16 rounded-full flex items-center justify-center transition-all hover:scale-110">
-                  <Play className="w-8 h-8 ml-1" />
-                </button>
-              </div>
-              <div className="absolute bottom-4 right-4 bg-black/75 text-white text-sm px-3 py-1 rounded">
-                Vista previa gratuita
-              </div>
-            </div>
+  try {
+    const { userId } = await auth();
+    
+    if (!userId) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Acceso Requerido</h1>
+            <p className="text-gray-600 mb-4">Inicia sesión para acceder a este curso</p>
+            <Link href="/sign-in" className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+              Iniciar Sesión
+            </Link>
           </div>
         </div>
-      </div>
+      );
+    }
 
-      {/* Navigation Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="flex space-x-8">
-          {[
-            { id: 'overview', label: 'Resumen', icon: BookOpen },
-            { id: 'curriculum', label: 'Contenido', icon: PlayCircle },
-            { id: 'reviews', label: 'Reseñas', icon: MessageCircle }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as 'overview' | 'curriculum' | 'reviews')}
-              className={`flex items-center py-4 px-1 border-b-2 font-medium text-sm ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
+    const user = await currentUser();
+    const metadata = user?.publicMetadata as { plan?: string } || {};
+    const userPlan = metadata.plan || 'free';
+
+    const planHierarchy = {
+      'free': ['free'],
+      'basico': ['free', 'basico'],
+      'completo': ['free', 'basico', 'completo'],
+      'personal': ['free', 'basico', 'completo', 'personal']
+    };
+
+    const allowedPlans = planHierarchy[userPlan as keyof typeof planHierarchy] || ['free'];
+    const hasAccess = allowedPlans.includes(course.requiredPlan);
+
+    if (!hasAccess) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center max-w-md">
+            <div className="text-6xl mb-4">{course.image}</div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">{course.title}</h1>
+            <p className="text-gray-600 mb-4">Este curso requiere el plan {course.requiredPlan}</p>
+            <p className="text-sm text-gray-500 mb-6">Tu plan actual: {userPlan}</p>
+            <Link 
+              href="/pricing" 
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 font-medium"
             >
-              <tab.icon className="w-4 h-4 mr-2" />
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </div>
-
-      {/* Tab Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2">
-          {activeTab === 'overview' && (
-            <div className="space-y-8">
-              {/* Descripción */}
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-4">Sobre este curso</h2>
-                <p className="text-gray-700 leading-relaxed text-lg">
-                  {course.description}
-                </p>
-              </div>
-
-              {/* Lo que aprenderás */}
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-                  <Target className="w-5 h-5 mr-2 text-green-600" />
-                  Lo que aprenderás
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {course.whatYouLearn.map((item, index) => (
-                    <div key={index} className="flex items-start">
-                      <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{item}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Requisitos */}
-              <div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">Requisitos</h3>
-                <ul className="space-y-2">
-                  {course.requirements.map((req, index) => (
-                    <li key={index} className="flex items-start text-gray-700">
-                      <span className="w-2 h-2 bg-blue-600 rounded-full mr-3 mt-2 flex-shrink-0"></span>
-                      {req}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {/* Instructor */}
-              {course.instructor && (
-                <div className="bg-gray-50 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Tu instructor</h3>
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
-                      {course.instructor.charAt(0)}
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-lg text-gray-900">{course.instructor}</h4>
-                      <p className="text-gray-600">Psicóloga Clínica y Coach Certificada</p>
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                        <span className="flex items-center">
-                          <Star className="w-4 h-4 mr-1 text-yellow-400" />
-                          4.9 calificación
-                        </span>
-                        <span className="flex items-center">
-                          <Users className="w-4 h-4 mr-1" />
-                          5,000+ estudiantes
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === 'curriculum' && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900">Contenido del curso</h2>
-              
-              <div className="space-y-4">
-                {course.modules.map((courseModule) => (
-                  <div key={courseModule.id} className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleModule(courseModule.id)}
-                      className="w-full px-6 py-4 bg-gray-50 hover:bg-gray-100 transition-colors flex items-center justify-between text-left"
-                    >
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{courseModule.title}</h3>
-                        <p className="text-sm text-gray-600 mt-1">
-                          {courseModule.lessons.length} lecciones • {formatDuration(courseModule.lessons.reduce((acc, lesson) => acc + lesson.duration, 0))}
-                        </p>
-                      </div>
-                      {expandedModules.includes(courseModule.id) ? (
-                        <ChevronDown className="w-5 h-5 text-gray-500" />
-                      ) : (
-                        <ChevronRight className="w-5 h-5 text-gray-500" />
-                      )}
-                    </button>
-                    
-                    {expandedModules.includes(courseModule.id) && (
-                      <div className="border-t border-gray-200">
-                        {courseModule.lessons.map((lesson) => (
-                          <div 
-                            key={lesson.id} 
-                            onClick={() => isEnrolled && handleLessonClick(lesson, courseModule.title)}
-                            className={`px-6 py-3 border-b border-gray-100 last:border-b-0 flex items-center justify-between hover:bg-gray-50 ${isEnrolled ? 'cursor-pointer' : ''}`}
-                          >
-                            <div className="flex items-center">
-                              <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center mr-3">
-                                <PlayCircle className="w-4 h-4 text-gray-600" />
-                              </div>
-                              <div>
-                                <h4 className="font-medium text-gray-900">{lesson.title}</h4>
-                                {lesson.description && (
-                                  <p className="text-sm text-gray-600">{lesson.description}</p>
-                                )}
-                              </div>
-                            </div>
-                            
-                            <div className="flex items-center gap-3">
-                              {lesson.progress.length > 0 && lesson.progress[0].isCompleted && (
-                                <CheckCircle className="w-5 h-5 text-green-600" />
-                              )}
-                              {!isEnrolled && (
-                                <Lock className="w-4 h-4 text-gray-400" />
-                              )}
-                              <span className="text-sm text-gray-600">
-                                {formatDuration(lesson.duration / 60)}
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {activeTab === 'reviews' && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-bold text-gray-900">Reseñas de estudiantes</h2>
-              <div className="text-center py-12 text-gray-500">
-                <MessageCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                <p>Las reseñas estarán disponibles próximamente</p>
-              </div>
-            </div>
-          )}
+              Actualizar Plan
+            </Link>
+          </div>
         </div>
+      );
+    }
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Card de inscripción */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden sticky top-6">
-            <div className="p-6">
-              {isEnrolled ? (
-                <div className="space-y-4">
-                  <div className="flex items-center text-green-600 mb-4">
-                    <CheckCircle className="w-5 h-5 mr-2" />
-                    <span className="font-semibold">Ya estás inscrito</span>
-                  </div>
-                  
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Progreso del curso</span>
-                      <span className="font-semibold">{Math.round(course.progressPercentage)}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full transition-all"
-                        style={{ width: `${course.progressPercentage}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  
-                  <button 
-                    onClick={startCourse}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center"
-                  >
-                    <Play className="w-5 h-5 mr-2" />
-                    Continuar Aprendiendo
-                  </button>
-                  
-                  <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center">
-                    <Download className="w-5 h-5 mr-2" />
-                    Descargar Recursos
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="text-center">
-                    <span className="text-3xl font-bold text-gray-900">${course.price}</span>
-                    <span className="text-gray-600 ml-2">USD</span>
-                  </div>
-                  
-                  <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
-                    Inscribirse Ahora
-                  </button>
-                  
-                  <div className="text-center text-sm text-gray-600">
-                    Garantía de satisfacción de 30 días
-                  </div>
-                </div>
-              )}
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 py-8">
+          {/* Header del Curso */}
+          <div className="mb-8">
+            <div className="flex items-center mb-4">
+              <Link 
+                href="/dashboard/cursos" 
+                className="text-blue-600 hover:text-blue-700 flex items-center"
+              >
+                ← Volver a Cursos
+              </Link>
             </div>
             
-            <div className="border-t border-gray-100 p-6 bg-gray-50">
-              <h4 className="font-semibold text-gray-900 mb-3">Este curso incluye:</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li className="flex items-center">
-                  <PlayCircle className="w-4 h-4 mr-2 text-blue-600" />
-                  {formatDuration(course.duration)} de video HD
-                </li>
-                <li className="flex items-center">
-                  <Download className="w-4 h-4 mr-2 text-blue-600" />
-                  Recursos descargables
-                </li>
-                <li className="flex items-center">
-                  <Award className="w-4 h-4 mr-2 text-blue-600" />
-                  Certificado de finalización
-                </li>
-                <li className="flex items-center">
-                  <Clock className="w-4 h-4 mr-2 text-blue-600" />
-                  Acceso de por vida
-                </li>
-              </ul>
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-start space-x-4">
+                <div className="text-6xl">{course.image}</div>
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{course.title}</h1>
+                  <p className="text-gray-600 mb-4">{course.description}</p>
+                  <div className="flex items-center space-x-6 text-sm text-gray-500">
+                    <span>{course.lessons.length} lecciones</span>
+                    <span>{course.duration}</span>
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                      Plan {course.requiredPlan}
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Cursos relacionados */}
-          <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
-            <h4 className="font-semibold text-gray-900 mb-4">Cursos relacionados</h4>
-            <div className="space-y-4">
-              {/* Placeholder para cursos relacionados */}
-              <div className="text-sm text-gray-500 text-center py-4">
-                Próximamente más cursos relacionados
-              </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Video Player */}
+            <div className="lg:col-span-2">
+              <VideoPlayer 
+                courseId={id}
+                lessons={course.lessons}
+                courseTitle={course.title}
+              />
+            </div>
+
+            {/* Lista de Lecciones */}
+            <div className="lg:col-span-1">
+              <LessonList 
+                lessons={course.lessons}
+                courseId={id}
+              />
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+
+  } catch (error) {
+    console.error('Error en página de curso:', error);
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Error Temporal</h1>
+          <p className="text-gray-600 mb-4">Estamos experimentando problemas técnicos</p>
+          <Link href="/dashboard/cursos" className="bg-blue-600 text-white px-4 py-2 rounded-lg">
+            Volver a Cursos
+          </Link>
+        </div>
+      </div>
+    );
+  }
 }

@@ -1,81 +1,140 @@
+import { requirePremiumAccess } from '@/lib/forum-access';
+import { PrismaClient } from '@prisma/client';
 import { notFound } from 'next/navigation';
-import PlanGate from '@/components/auth/PlanGate';
-import { getForumCategoryBySlug } from '@/lib/forum';
-import NewPostForm from './NewPostForm';
-import * as Icons from 'lucide-react';
-import { MessageCircle } from 'lucide-react';
+import Link from 'next/link';
+import CreatePostForm from '../CreatePostForm';
 
-interface Props {
-  params: Promise<{ categoria: string }>;
+const prisma = new PrismaClient();
+
+async function getCategoryBySlug(slug: string) {
+  try {
+    return await prisma.forumCategory.findUnique({
+      where: { slug }
+    });
+  } catch (error) {
+    console.error('Error fetching category:', error);
+    return null;
+  }
 }
 
-export default async function NewPostPage({ params }: Props) {
+interface PageProps {
+  params: Promise<{
+    categoria: string;
+  }>;
+}
+
+export default async function NuevoPostPage({ params }: PageProps) {
   const { categoria } = await params;
-  const category = await getForumCategoryBySlug(categoria);
+  
+  const { hasAccess, user, upgradeMessage } = await requirePremiumAccess();
+  
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
+          <div className="mb-6">
+            <div className="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-2xl">🔒</span>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Comunidad Premium</h2>
+            <p className="text-gray-600">{upgradeMessage}</p>
+          </div>
+          
+          <div className="space-y-3">
+            <Link 
+              href="/pricing" 
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium block"
+            >
+              Ver Planes Premium
+            </Link>
+            <Link 
+              href="/dashboard" 
+              className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors block"
+            >
+              Volver al Dashboard
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Verificar que user no sea null antes de usarlo
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Error</h1>
+          <p className="text-gray-600">No se pudo obtener la información del usuario.</p>
+          <Link 
+            href="/dashboard" 
+            className="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
+          >
+            Volver al Dashboard
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const category = await getCategoryBySlug(categoria);
   
   if (!category) {
     notFound();
   }
 
-  const getIcon = (iconName: string | null) => {
-    if (!iconName) return MessageCircle;
-    const Icon = (Icons as any)[iconName];
-    return Icon || MessageCircle;
-  };
-
-  const Icon = getIcon(category.icon);
-
   return (
-    <PlanGate requiredPlan="complete">
-      <div className="p-6">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            <div 
-              className="flex items-center justify-center w-10 h-10 rounded-lg"
-              style={{ backgroundColor: `${category.color}20` }}
-            >
-              <Icon 
-                className="w-5 h-5" 
-                style={{ color: category.color }}
-              />
+        <div className="mb-6">
+          <nav className="mb-4">
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <Link href="/dashboard" className="hover:text-blue-600">Dashboard</Link>
+              <span>/</span>
+              <Link href="/dashboard/comunidad" className="hover:text-blue-600">Comunidad</Link>
+              <span>/</span>
+              <Link 
+                href={`/dashboard/comunidad/${categoria}`}
+                className="hover:text-blue-600 capitalize"
+              >
+                {categoria.replace('-', ' ')}
+              </Link>
+              <span>/</span>
+              <span className="text-gray-900">Nueva Publicación</span>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Nuevo tema en {category.name}
-              </h1>
-              {category.description && (
-                <p className="text-gray-600">{category.description}</p>
-              )}
-            </div>
-          </div>
+          </nav>
           
-          {/* Guidelines */}
-          <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-            <h3 className="font-semibold text-indigo-900 mb-2">
-              Pautas para crear un buen tema:
-            </h3>
-            <ul className="text-sm text-indigo-800 space-y-1">
-              <li>• Usa un título claro y descriptivo</li>
-              <li>• Proporciona contexto suficiente en tu mensaje</li>
-              <li>• Sé respetuoso y constructivo</li>
-              <li>• Busca primero si ya existe un tema similar</li>
-              <li>• Mantén la conversación en el tema de la categoría</li>
-            </ul>
+          <div className="flex items-center space-x-3">
+            <span className="text-3xl">{category.icon}</span>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Nueva Publicación</h1>
+              <p className="text-gray-600">Comparte en {category.name}</p>
+            </div>
           </div>
         </div>
 
-        {/* Form */}
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="p-6">
-            <NewPostForm 
-              categoryId={category.id} 
-              categorySlug={category.slug}
-              categoryName={category.name}
-            />
-          </div>
+        {/* Form - Solo pasamos las props que el componente espera */}
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <CreatePostForm categoryId={category.id} />
         </div>
       </div>
-    </PlanGate>
+    </div>
   );
+}
+
+export async function generateMetadata({ params }: PageProps) {
+  const { categoria } = await params;
+  const category = await getCategoryBySlug(categoria);
+  
+  if (!category) {
+    return {
+      title: 'Categoría no encontrada | DesarrolloPersonal.uno'
+    };
+  }
+
+  return {
+    title: `Nueva Publicación en ${category.name} | DesarrolloPersonal.uno`,
+    description: `Crear una nueva publicación en ${category.name}`
+  };
 }

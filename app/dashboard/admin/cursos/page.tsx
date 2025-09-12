@@ -1,84 +1,90 @@
-import { PrismaClient } from '@prisma/client';
+import { requireAdminAccess } from '@/lib/admin-access';
 
-const prisma = new PrismaClient();
-
-async function getCourses() {
-  try {
-    const courses = await prisma.course.findMany({
-      include: {
-        enrollments: {
-          select: {
-            id: true,
-            user: {
-              select: {
-                firstName: true,
-                lastName: true
-              }
-            }
-          }
-        },
-        modules: {
-          include: {
-            lessons: true
-          }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
-    return courses;
-  } catch (error) {
-    console.error('Error getting courses:', error);
-    return [];
+// Datos simulados de cursos
+const mockCourses = [
+  {
+    id: 'habitos-estudio',
+    title: 'Hábitos de Estudio Efectivos',
+    description: 'Desarrolla técnicas probadas para optimizar tu aprendizaje',
+    lessons: 5,
+    enrollments: 45,
+    published: true
+  },
+  {
+    id: 'gps-salud-mental',
+    title: 'GPS Salud Mental',
+    description: 'Navega hacia el bienestar emocional',
+    lessons: 4,
+    enrollments: 32,
+    published: true
+  },
+  {
+    id: 'arquitectura-descanso',
+    title: 'Arquitectura del Descanso',
+    description: 'Construye rutinas de sueño reparador',
+    lessons: 5,
+    enrollments: 28,
+    published: true
   }
-}
+];
 
-export default async function CursosAdminPage() {
-  const courses = await getCourses();
+export default async function CursosPage() {
+  const { hasAccess } = await requireAdminAccess();
   
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Acceso Denegado</h1>
+          <p className="text-gray-600">No tienes permisos para acceder a esta sección.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Gestión de Cursos</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => {
-          const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
-          
-          return (
-            <div key={course.id} className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">{course.title}</h3>
-                <span className={`px-2 py-1 text-xs rounded-full ${
-                  true ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                }`}>
-                  {true ? 'Publicado' : 'Borrador'}
-                </span>
-              </div>
-              
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3">{course.description}</p>
-              
-              <div className="space-y-2 text-sm text-gray-500">
-                <div className="flex justify-between">
-                  <span>Módulos:</span>
-                  <span>{course.modules.length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Lecciones:</span>
-                  <span>{totalLessons}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Inscritos:</span>
-                  <span>{course.enrollments.length}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Creado:</span>
-                  <span>{new Date(course.createdAt).toLocaleDateString()}</span>
-                </div>
-              </div>
-            </div>
-          );
-        })}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">Gestión de Cursos</h1>
+        <p className="text-gray-600">Administra el contenido educativo de la plataforma</p>
+      </div>
+
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-6 py-4 border-b">
+          <h2 className="text-lg font-semibold">Cursos Disponibles</h2>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Curso</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lecciones</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estudiantes</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {mockCourses.map((course) => (
+                <tr key={course.id}>
+                  <td className="px-6 py-4">
+                    <div>
+                      <div className="font-medium text-gray-900">{course.title}</div>
+                      <div className="text-sm text-gray-500">{course.description}</div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{course.lessons}</td>
+                  <td className="px-6 py-4 text-sm text-gray-900">{course.enrollments}</td>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                      Publicado
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

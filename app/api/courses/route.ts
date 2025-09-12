@@ -1,100 +1,127 @@
-import { NextResponse } from 'next/server';
-import { auth, clerkClient } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { auth, currentUser } from '@clerk/nextjs/server';
 import { PrismaClient } from '@prisma/client';
-import { getUserPlan, hasAccess, Plan } from '@/lib/plans';
 
 const prisma = new PrismaClient();
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     const { userId } = await auth();
-
+    
     if (!userId) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
     }
 
-    // Get user from Clerk to check plan
-    const client = await clerkClient()
-    const clerkUser = await client.users.getUser(userId);
-    const userPlan = getUserPlan(clerkUser);
-
-    // Get or create user in database
+    // Get current user data from Clerk (simpler approach)
+    const clerkUser = await currentUser();
+    
+    if (!clerkUser) {
+      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
+    }
+    
+    // Get or create user in our database
     const user = await prisma.user.upsert({
-      where: { clerkId: userId },
-      update: {},
-      create: {
-        clerkId: userId,
-        email: clerkUser.emailAddresses[0]?.emailAddress || 'user@example.com',
+      where: { clerkUserId: userId },
+      update: {
+        email: clerkUser.emailAddresses[0]?.emailAddress || '',
         firstName: clerkUser.firstName || undefined,
         lastName: clerkUser.lastName || undefined,
-        imageUrl: clerkUser.imageUrl || undefined,
+      },
+      create: {
+        clerkUserId: userId,
+        email: clerkUser.emailAddresses[0]?.emailAddress || '',
+        firstName: clerkUser.firstName || undefined,
+        lastName: clerkUser.lastName || undefined,
       }
     });
 
-    const courses = await prisma.course.findMany({
-      where: {
-        status: 'published' // Only show published courses
-      },
-      include: {
-        modules: {
-          include: {
-            lessons: {
-              include: {
-                progress: {
-                  where: { userId: user.id }
-                }
-              }
-            }
-          },
-          orderBy: { position: 'asc' }
-        },
-        enrollments: {
-          where: { userId: user.id }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    // Get user's plan from Clerk metadata
+    const metadata = clerkUser.publicMetadata as { plan?: string };
+    const userPlan = metadata.plan || 'free';
 
-    // Calcular progreso para cada curso
-    const coursesWithProgress = courses.map(course => {
-      const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
-      const completedLessons = course.modules.reduce((acc, module) => 
-        acc + module.lessons.filter(lesson => 
-          lesson.progress.length > 0 && lesson.progress[0].isCompleted
-        ).length, 0
-      );
-      
-      // Check if user has access based on plan
-      const hasAccessToCourse = hasAccess(userPlan, 'basic'); // Basic plan or higher for course access
-      const isEnrolled = course.enrollments.length > 0;
-      const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-      
-      return {
-        id: course.id,
-        title: course.title,
-        description: course.description,
-        thumbnail: course.thumbnail,
-        category: course.category,
-        level: course.level,
-        duration: course.duration || 0,
-        instructorName: course.instructor || 'Instructor',
-        price: course.price,
-        rating: 4.5, // Default rating
-        studentsCount: course.studentsCount,
-        totalLessons,
-        completedLessons,
-        isEnrolled,
-        hasAccess: hasAccessToCourse,
-        userPlan,
-        progressPercentage
-      };
-    });
+    // Define available courses based on plan
+    const allCourses = [
+      {
+        id: 'habitos-estudio',
+        title: 'Hábitos de Estudio Efectivos',
+        description: 'Desarrolla técnicas probadas para optimizar tu aprendizaje',
+        requiredPlan: 'basico',
+        lessons: 5
+      },
+      {
+        id: 'gps-salud-mental',
+        title: 'GPS Salud Mental',
+        description: 'Navega hacia el bienestar emocional con herramientas prácticas',
+        requiredPlan: 'basico',
+        lessons: 4
+      },
+      {
+        id: 'arquitectura-descanso',
+        title: 'Arquitectura del Descanso',
+        description: 'Construye rutinas de sueño reparador y productividad sostenible',
+        requiredPlan: 'basico',
+        lessons: 5
+      },
+      {
+        id: 'gestionando-depresion',
+        title: 'Gestionando la Depresión',
+        description: 'Estrategias basadas en evidencia para superar la depresión',
+        requiredPlan: 'basico',
+        lessons: 3
+      },
+      {
+        id: 'emociones-equilibrio',
+        title: 'Emociones en Equilibrio',
+        description: 'Desarrolla inteligencia emocional y autorregulación',
+        requiredPlan: 'free', // Este es gratuito
+        lessons: 9
+      },
+      {
+        id: 'neurocalma',
+        title: 'NeuroCalma',
+        description: 'Técnicas neurocientíficas para reducir el estrés y la ansiedad',
+        requiredPlan: 'basico',
+        lessons: 9
+      },
+      {
+        id: 'navegando-tormenta',
+        title: 'Navegando la Tormenta Interior',
+        description: 'Herramientas para gestionar crisis emocionales y encontrar estabilidad',
+        requiredPlan: 'basico',
+        lessons: 6
+      }
+    ];
 
-    return NextResponse.json(coursesWithProgress);
+    // Filter courses based on user's plan
+    const planHierarchy = {
+      'free': ['free'],
+      'basico': ['free', 'basico'],
+      'completo': ['free', 'basico', 'completo'],
+      'personal': ['free', 'basico', 'completo', 'personal']
+    };
+
+    const allowedPlans = planHierarchy[userPlan as keyof typeof planHierarchy] || ['free'];
+    
+    const accessibleCourses = allCourses.map(course => ({
+      ...course,
+      hasAccess: allowedPlans.includes(course.requiredPlan),
+      userPlan
+    }));
+
+    return NextResponse.json({ 
+      courses: accessibleCourses,
+      userPlan,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        plan: userPlan
+      }
+    });
 
   } catch (error) {
-    console.error('Error getting courses:', error);
+    console.error('Error fetching courses:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' }, 
       { status: 500 }

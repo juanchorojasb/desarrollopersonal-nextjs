@@ -5,13 +5,13 @@ const adminEmail = 'juanchorojasb@gmail.com';
 
 async function makeAdmin() {
   try {
-    const users = await clerkClient.users.getUserList({
+    const users = await (await clerkClient()).users.getUserList({
       emailAddress: [adminEmail]
     });
     
     if (users.length > 0) {
       const user = users[0];
-      await clerkClient.users.updateUser(user.id, {
+      await (await clerkClient()).users.updateUser(user.id, {
         publicMetadata: {
           ...user.publicMetadata,
           role: 'admin'
