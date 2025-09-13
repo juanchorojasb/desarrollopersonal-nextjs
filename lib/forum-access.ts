@@ -27,7 +27,8 @@ export async function requirePremiumAccess() {
     const userPlan = metadata.plan || 'free';
 
     // Los planes que tienen acceso a la comunidad premium
-    const premiumPlans = ['completo', 'personal'];
+    const premiumPlans = ['completo', 'personal', 'free']; // Temporal: permitir acceso free
+
     const hasAccess = premiumPlans.includes(userPlan);
 
     let upgradeMessage = '';

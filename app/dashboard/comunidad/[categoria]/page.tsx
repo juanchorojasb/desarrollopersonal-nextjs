@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import CreatePostForm from './CreatePostForm';
+import PremiumUpgradeNotification from '@/components/ui/PremiumUpgradeNotification';
 
 const prisma = new PrismaClient();
 
@@ -40,7 +41,7 @@ function formatTimeAgo(date: Date) {
   if (minutes < 60) return `hace ${minutes} minuto${minutes !== 1 ? 's' : ''}`;
   if (hours < 24) return `hace ${hours} hora${hours !== 1 ? 's' : ''}`;
   if (days < 30) return `hace ${days} día${days !== 1 ? 's' : ''}`;
-  
+
   return date.toLocaleDateString('es-ES', {
     year: 'numeric',
     month: 'long',
@@ -56,10 +57,11 @@ interface PageProps {
 
 export default async function CategoryPage({ params }: PageProps) {
   const { categoria } = await params;
-  
+
   const { hasAccess, user, upgradeMessage } = await requirePremiumAccess();
-  
-  if (!hasAccess) {
+
+  // Permitir acceso para usuarios free pero mostrar notificación
+  if (!hasAccess && user?.plan !== 'free') {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
@@ -70,16 +72,16 @@ export default async function CategoryPage({ params }: PageProps) {
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Comunidad Premium</h2>
             <p className="text-gray-600">{upgradeMessage}</p>
           </div>
-          
+
           <div className="space-y-3">
-            <Link 
-              href="/pricing" 
+            <Link
+              href="/pricing"
               className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium block"
             >
               Ver Planes Premium
             </Link>
-            <Link 
-              href="/dashboard" 
+            <Link
+              href="/dashboard"
               className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors block"
             >
               Volver al Dashboard
@@ -96,8 +98,8 @@ export default async function CategoryPage({ params }: PageProps) {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Error</h1>
           <p className="text-gray-600">No se pudo obtener la información del usuario.</p>
-          <Link 
-            href="/dashboard" 
+          <Link
+            href="/dashboard"
             className="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
           >
             Volver al Dashboard
@@ -108,7 +110,7 @@ export default async function CategoryPage({ params }: PageProps) {
   }
 
   const category = await getCategoryWithPosts(categoria);
-  
+
   if (!category) {
     notFound();
   }
@@ -116,6 +118,11 @@ export default async function CategoryPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Premium Upgrade Notification for free users */}
+        {user.plan === 'free' && (
+          <PremiumUpgradeNotification userPlan={user.plan} context="forum" />
+        )}
+
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border mb-6">
           <div className="p-6">
@@ -127,7 +134,7 @@ export default async function CategoryPage({ params }: PageProps) {
                   <p className="text-gray-600">{category.description}</p>
                 </div>
               </div>
-              <Link 
+              <Link
                 href="/dashboard/comunidad"
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
@@ -156,7 +163,7 @@ export default async function CategoryPage({ params }: PageProps) {
               category.posts.map((post) => (
                 <div key={post.id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
                   <div className="p-6">
-                    <Link 
+                    <Link
                       href={`/dashboard/comunidad/${categoria}/post/${post.slug}`}
                       className="block"
                     >
@@ -167,7 +174,7 @@ export default async function CategoryPage({ params }: PageProps) {
                         {post.content.substring(0, 200)}...
                       </p>
                     </Link>
-                    
+
                     <div className="flex items-center justify-between text-sm text-gray-500">
                       <div className="flex items-center space-x-4">
                         <span>
@@ -175,7 +182,7 @@ export default async function CategoryPage({ params }: PageProps) {
                         </span>
                         <span>{formatTimeAgo(new Date(post.createdAt))}</span>
                       </div>
-                      
+
                       <div className="flex items-center space-x-4">
                         <span className="flex items-center space-x-1">
                           <span>💬</span>
@@ -195,8 +202,11 @@ export default async function CategoryPage({ params }: PageProps) {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            <CreatePostForm categoryId={category.id} />
-            
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="font-semibold text-gray-900 mb-4">Nueva Publicación</h3>
+              <CreatePostForm categoryId={category.id} userPlan={user.plan} />
+            </div>
+
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h3 className="font-semibold text-gray-900 mb-4">Estadísticas</h3>
               <div className="space-y-3">
@@ -210,6 +220,21 @@ export default async function CategoryPage({ params }: PageProps) {
                     {category.posts.reduce((acc: number, post) => acc + post.replies.length, 0)}
                   </span>
                 </div>
+                {user.plan === 'free' && (
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 mb-2">
+                        Como usuario gratuito tienes acceso limitado
+                      </p>
+                      <Link
+                        href="/pricing"
+                        className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        Actualizar a Premium
+                      </Link>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -222,7 +247,7 @@ export default async function CategoryPage({ params }: PageProps) {
 export async function generateMetadata({ params }: PageProps) {
   const { categoria } = await params;
   const category = await getCategoryWithPosts(categoria);
-  
+
   if (!category) {
     return {
       title: 'Categoría no encontrada | DesarrolloPersonal.uno'
