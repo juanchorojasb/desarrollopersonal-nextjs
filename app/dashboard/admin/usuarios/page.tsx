@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { requireAdminAccess } from '@/lib/admin-access';
 import { PrismaClient } from '@prisma/client';
 
