@@ -1,0 +1,592 @@
+'use client';
+
+import { useUser } from '@clerk/nextjs';
+import { UserButton } from '@clerk/nextjs';
+import { useState, useEffect } from 'react';
+import {
+  BookOpen, Users, Trophy, Star, ArrowRight,
+  Calendar, MessageCircle, TrendingUp, Target,
+  MapPin, Clock, Award, Play, Lightbulb,
+  Building, PenTool, Brain, Handshake
+} from 'lucide-react';
+
+export default function DashboardPage() {
+  const { user, isLoaded } = useUser();
+  const [planUsuario, setPlanUsuario] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState('principal');
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      const plan = user.unsafeMetadata?.plan as string;
+      setPlanUsuario(plan);
+    }
+  }, [isLoaded, user]);
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  const isProgramaGratuito = planUsuario === 'programa';
+
+  // Configuración de videos de sesiones
+  const sessionVideos = [
+    {
+      id: 1,
+      titulo: "Sesión 1: Transformación Digital Norte de Caldas",
+      descripcion: "Primera sesión del programa - Conceptos fundamentales y introducción",
+      url: "https://iframe.mediadelivery.net/play/481547/5bb91813-21a3-428e-ae3a-78a9b03ecf63",
+      fecha: "Agosto 27, 2025",
+      duracion: "1h 30min",
+      estado: "completada"
+    },
+    {
+      id: 2,
+      titulo: "Sesión 2: Universo de LLMs y Herramientas IA",
+      descripcion: "Segunda sesión del programa - Explorando el universo de modelos de lenguaje y herramientas de inteligencia artificial",
+      url: "https://iframe.mediadelivery.net/play/481547/21e5013e-9c98-4b84-90d4-54070fbdf45d",
+      fecha: "Septiembre 3, 2025",
+      duracion: "1h 30min",
+      estado: "disponible"
+    },
+    {
+      id: 3,
+      titulo: "Sesión 3: Prompts Ganadores y Técnicas Avanzadas", 
+      descripcion: "Tercera sesión del programa - Técnicas avanzadas de prompting y casos de uso prácticos",
+      url: "https://iframe.mediadelivery.net/play/481547/844e8b4d-72ba-49d9-9c48-8e1522e7f42e",
+      fecha: "Septiembre 10, 2025",
+      duracion: "1h 30min",
+      estado: "disponible"
+    }
+  ];
+
+  const VideoSessionCard = ({ video }: { video: any }) => {
+    return (
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+        <div className="relative">
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 h-32 flex items-center justify-center">
+            <Play className="w-12 h-12 text-white" />
+          </div>
+          <div className="absolute top-2 right-2">
+            <span className="bg-red-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+              HD
+            </span>
+          </div>
+          {video.estado === 'completada' && (
+            <div className="absolute top-2 left-2">
+              <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                ✅ VISTA
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="p-4">
+          <h3 className="font-semibold text-gray-900 mb-2">
+            {video.titulo}
+          </h3>
+          <p className="text-sm text-gray-600 mb-3">
+            {video.descripcion}
+          </p>
+          
+          <div className="flex flex-col gap-2 mb-3">
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>{video.duracion}</span>
+              <span>{video.fecha}</span>
+            </div>
+          </div>
+
+          <a
+            href={video.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+          >
+            <Play className="w-4 h-4" />
+            Ver Sesión
+          </a>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center">
+              <h1 className="text-2xl font-bold text-gray-900">MercadoLocal</h1>
+              <span className="ml-3 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                {isProgramaGratuito ? 'Programa de Formación' : 'Plan Premium'}
+              </span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="text-sm text-gray-600">
+                ¡Hola, {user?.firstName || 'Emprendedor'}!
+              </span>
+              <UserButton afterSignOutUrl="/" />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Banner Sesión en Vivo */}
+      <div className="bg-gradient-to-r from-red-600 via-orange-600 to-red-700 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <div className="w-4 h-4 bg-red-500 rounded-full animate-pulse"></div>
+                <div className="absolute inset-0 w-4 h-4 bg-red-400 rounded-full animate-ping"></div>
+              </div>
+              <div className="text-white">
+                <h2 className="text-lg sm:text-xl font-bold flex items-center">
+                  🔴 PRÓXIMA SESIÓN EN VIVO
+                  <span className="ml-2 text-xs bg-white/20 px-2 py-1 rounded-full">
+                    7:00 PM
+                  </span>
+                </h2>
+                <p className="text-white/90 text-sm">
+                  <strong>Sesión 4: Herramientas IA para Marketing Digital</strong>
+                </p>
+                <p className="text-white/80 text-xs">
+                  Miércoles, 17 de septiembre • 7:00 – 8:30pm
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3">
+              <a
+                href="https://meet.google.com/frx-deap-ixi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white text-red-600 hover:bg-red-50 font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 animate-pulse"
+              >
+                🚀 UNIRSE AHORA
+              </a>
+
+              <div className="sm:hidden text-center">
+                <p className="text-white/80 text-xs">
+                  📞 Teléfono: +593 95 866 6050
+                </p>
+                <p className="text-white/80 text-xs">
+                  PIN: 312 459 368 0812
+                </p>
+              </div>
+
+              <div className="hidden sm:block text-right">
+                <p className="text-white/90 text-sm font-medium">
+                  📞 Respaldo telefónico:
+                </p>
+                <p className="text-white/80 text-xs">
+                  +593 95 866 6050
+                </p>
+                <p className="text-white/80 text-xs">
+                  PIN: 312 459 368 0812
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-3">
+            <p className="text-white/90 text-sm">
+              ⚡ Próxima sesión del programa - ¡No te la pierdas! ⚡
+            </p>
+          </div>
+        </div>
+
+        {/* Canal de WhatsApp */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+          <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-xl shadow-lg overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="bg-white/20 p-3 rounded-full">
+                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                    </svg>
+                  </div>
+                  <div className="text-white">
+                    <h3 className="text-xl font-bold flex items-center">
+                      Canal Oficial WhatsApp
+                      <span className="ml-2 text-xs bg-white/20 px-2 py-1 rounded-full">
+                        NUEVO
+                      </span>
+                    </h3>
+                    <p className="text-green-100 text-sm mt-1">
+                      Únete al canal oficial del Programa de Transformación Digital
+                    </p>
+                    <div className="flex items-center space-x-4 mt-2 text-green-100 text-xs">
+                      <span className="flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        Actualizaciones del programa
+                      </span>
+                      <span className="flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        Recursos adicionales
+                      </span>
+                      <span className="flex items-center">
+                        <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        Avisos importantes
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center">
+                  <a
+                    href="https://whatsapp.com/channel/0029VbB12Ph3gvWTMYsGWx3r"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white text-green-600 hover:bg-green-50 font-bold py-3 px-6 rounded-lg shadow-lg transition-all duration-300 hover:scale-105 flex items-center space-x-2"
+                  >
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                    </svg>
+                    <span>Unirse al Canal</span>
+                  </a>
+                  <p className="text-green-100 text-xs mt-2">
+                    Solo lectura - Sin spam
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {isProgramaGratuito ? (
+          /* Dashboard para Programa de Formación */
+          <>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                🎓 Academia de Transformación Digital
+              </h2>
+              <p className="text-gray-600">
+                Tu centro de aprendizaje completo - Norte de Caldas
+              </p>
+            </div>
+
+            {/* Navegación por pestañas */}
+            <div className="mb-8">
+              <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-8 overflow-x-auto">
+                  {[
+                    { id: 'principal', name: 'Panel Principal', icon: Target },
+                    { id: 'sesiones', name: 'Sesiones Grabadas', icon: Play },
+                  ].map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`${
+                        activeTab === tab.id
+                          ? 'border-blue-500 text-blue-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      } whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2`}
+                    >
+                      <tab.icon className="w-4 h-4" />
+                      {tab.name}
+                    </button>
+                  ))}
+                </nav>
+              </div>
+            </div>
+
+            {/* Contenido según la pestaña activa */}
+            {activeTab === 'principal' && (
+              <>
+                {/* Sección Psicognitiva Destacada */}
+                <div className="bg-gradient-to-r from-orange-500 to-red-500 rounded-xl p-6 text-white shadow-lg mb-8">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <span className="text-4xl">🧠</span>
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-bold">🤝 ALIANZA</span>
+                        </div>
+                        <h3 className="text-xl font-bold">Habilidades Blandas para Emprendedores</h3>
+                        <p className="text-orange-100">Desarrolla inteligencia emocional y liderazgo</p>
+                      </div>
+                    </div>
+                    <a
+                      href="https://psicognitiva.thinkific.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                    >
+                      Acceder a Psicognitiva →
+                    </a>
+                  </div>
+
+                  <div className="mt-4 grid md:grid-cols-2 gap-4">
+                    <div>
+                      <h4 className="font-semibold mb-2">📚 Módulos:</h4>
+                      <ul className="space-y-1 text-sm text-orange-100">
+                        <li>• Inteligencia Emocional Empresarial</li>
+                        <li>• Liderazgo y Gestión de Equipos</li>
+                        <li>• Comunicación Efectiva y Persuasión</li>
+                        <li>• Manejo del Estrés y Resiliencia</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2">🎯 Beneficios:</h4>
+                      <ul className="space-y-1 text-sm text-orange-100">
+                        <li>• Mejor toma de decisiones bajo presión</li>
+                        <li>• Liderazgo más efectivo</li>
+                        <li>• Mayor productividad personal</li>
+                        <li>• Relaciones empresariales sólidas</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Estadísticas */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  <div className="bg-white p-6 rounded-lg shadow-sm">
+                    <div className="flex items-center">
+                      <BookOpen className="w-8 h-8 text-blue-600" />
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Clientes</p>
+                    <p className="text-2xl font-semibold text-gray-900">246</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <div className="flex items-center">
+                  <Star className="w-8 h-8 text-yellow-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Rating</p>
+                    <p className="text-2xl font-semibold text-gray-900">4.8</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                🛍️ Acciones Rápidas
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <Target className="w-6 h-6 text-blue-600 mr-3" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Agregar Producto</p>
+                    <p className="text-sm text-gray-600">Sube un nuevo producto</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+                </button>
+
+                <button className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <MessageCircle className="w-6 h-6 text-green-600 mr-3" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Mensajes</p>
+                    <p className="text-sm text-gray-600">5 mensajes nuevos</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+                </button>
+
+                <button className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <TrendingUp className="w-6 h-6 text-purple-600 mr-3" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Estadísticas</p>
+                    <p className="text-sm text-gray-600">Ver analíticas</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}">Sesiones Disponibles</p>
+                        <p className="text-2xl font-semibold text-gray-900">3</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-lg shadow-sm">
+                    <div className="flex items-center">
+                      <Calendar className="w-8 h-8 text-green-600" />
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Próxima Sesión</p>
+                        <p className="text-2xl font-semibold text-gray-900">Sep 17</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-lg shadow-sm">
+                    <div className="flex items-center">
+                      <Users className="w-8 h-8 text-purple-600" />
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Compañeros</p>
+                        <p className="text-2xl font-semibold text-gray-900">50</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white p-6 rounded-lg shadow-sm">
+                    <div className="flex items-center">
+                      <Trophy className="w-8 h-8 text-yellow-600" />
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Progreso</p>
+                        <p className="text-2xl font-semibold text-gray-900">40%</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Acceso rápido */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <button
+                    onClick={() => setActiveTab('sesiones')}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-lg text-white hover:from-blue-700 hover:to-purple-700 transition-all"
+                  >
+                    <Play className="w-8 h-8 mb-3" />
+                    <h3 className="font-bold mb-2">Sesiones Grabadas</h3>
+                    <p className="text-sm text-blue-100">3 sesiones de IA disponibles</p>
+                  </button>
+
+                  <div className="bg-gradient-to-r from-green-500 to-teal-500 p-6 rounded-lg text-white">
+                    <Target className="w-8 h-8 mb-3" />
+                    <h3 className="font-bold mb-2">Tu Ruta de Aprendizaje</h3>
+                    <p className="text-sm text-green-100">Sigue tu progreso paso a paso</p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeTab === 'sesiones' && (
+              <div>
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">📹 Sesiones Grabadas del Programa</h3>
+                  <p className="text-gray-600">Todas las sesiones en vivo han sido grabadas para tu conveniencia</p>
+                </div>
+
+                {/* Grid de sesiones */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {sessionVideos.map((video) => (
+                    <VideoSessionCard key={video.id} video={video} />
+                  ))}
+                </div>
+
+                {/* Información adicional */}
+                <div className="mt-8 bg-blue-50 rounded-lg p-6">
+                  <h4 className="font-bold text-blue-900 mb-2">💡 Información sobre las sesiones</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Todas las sesiones están disponibles las 24 horas</li>
+                    <li>• Puedes ver las grabaciones cuantas veces necesites</li>
+                    <li>• Calidad HD para una mejor experiencia de aprendizaje</li>
+                    <li>• Acceso garantizado durante todo el programa</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          /* Dashboard para otros planes */
+          <>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                🚀 Tu Marketplace
+              </h2>
+              <p className="text-gray-600">
+                Panel de control de tu negocio en MercadoLocal
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <div className="flex items-center">
+                  <TrendingUp className="w-8 h-8 text-green-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Ventas Este Mes</p>
+                    <p className="text-2xl font-semibold text-gray-900">$850K</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <div className="flex items-center">
+                  <Target className="w-8 h-8 text-blue-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Productos</p>
+                    <p className="text-2xl font-semibold text-gray-900">12</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <div className="flex items-center">
+                  <Users className="w-8 h-8 text-purple-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600
+<p className="text-sm font-medium text-gray-600">Clientes</p>
+                    <p className="text-2xl font-semibold text-gray-900">246</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm">
+                <div className="flex items-center">
+                  <Star className="w-8 h-8 text-yellow-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Rating</p>
+                    <p className="text-2xl font-semibold text-gray-900">4.8</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                🛍️ Acciones Rápidas
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <button className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <Target className="w-6 h-6 text-blue-600 mr-3" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Agregar Producto</p>
+                    <p className="text-sm text-gray-600">Sube un nuevo producto</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+                </button>
+
+                <button className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <MessageCircle className="w-6 h-6 text-green-600 mr-3" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Mensajes</p>
+                    <p className="text-sm text-gray-600">5 mensajes nuevos</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+                </button>
+
+                <button className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                  <TrendingUp className="w-6 h-6 text-purple-600 mr-3" />
+                  <div className="text-left">
+                    <p className="font-medium text-gray-900">Estadísticas</p>
+                    <p className="text-sm text-gray-600">Ver analíticas</p>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-400 ml-auto" />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

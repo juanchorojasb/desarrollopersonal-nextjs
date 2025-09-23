@@ -1,0 +1,1540 @@
+<div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-6 border-l-4 border-yellow-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller Cambio Digital: "Creciendo con la IA"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Descubre cómo la inteligencia artificial puede ser tu aliada. Adáptate con criterio, sentido crítico y sin perder tu esencia humana.
+                </p>
+                <div className="text-xs text-yellow-600 font-semibold">Diciembre 2024</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-6 border-l-4 border-red-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller Orientación Vocacional: "Mi brújula profesional"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Encuentra claridad explorando intereses, talentos y valores para diseñar un camino profesional alineado con tu propósito.
+                </p>
+                <div className="text-xs text-red-600 font-semibold">Diciembre 2024</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 border-l-4 border-gray-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller Psicología Transgeneracional: "Herencias invisibles"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Identifica cargas emocionales heredadas. Sanar tu historia familiar es clave para crear tu propio destino con libertad.
+                </p>
+                <div className="text-xs text-gray-600 font-semibold">Enero 2025</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-cyan-50 to-cyan-100 rounded-lg p-6 border-l-4 border-cyan-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller Manejo de Estrés y Ansiedad: "Del caos a la calma"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Descubre ejercicios de respiración, atención plena y gestión de pensamientos para recuperar tu paz mental.
+                </p>
+                <div className="text-xs text-cyan-600 font-semibold">Enero 2025</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-6 border-l-4 border-emerald-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller "Seres y Sentidos"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Un viaje íntimo hacia el autoconocimiento para resignificar tu narrativa personal con herramientas reflexivas, emocionales y creativas.
+                </p>
+                <div className="text-xs text-emerald-600 font-semibold">Enero 2025</div>
+              </div>
+            </div>
+            
+            <div className="text-center mt-8">
+              <p className="text-gray-600 mb-4">
+                Cada taller incluye material descargable, seguimiento post-sesión y acceso a la grabación por 30 días.
+              </p>
+              <SignedOut>
+                <Link href="/pricing" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                  Ver Planes para Acceder
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard/talleres" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                  Reservar Talleres
+                </Link>
+              </SignedIn>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg p-6">
+              <h4 className="text-xl font-semibold text-gray-900 mb-2">
+                ¿Nuevo en los talleres?
+              </h4>
+              <p className="text-gray-600 mb-4">
+                Tu primer taller incluye una sesión de orientación 30 minutos antes para familiarizarte 
+                con la plataforma y conocer a otros participantes.
+              </p>
+              <p className="text-sm text-gray-500">
+                Los talleres están incluidos en los planes Completo y Personal. Plan Básico: $15.000 COP por taller.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Team Section */}
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Nuestro Equipo
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Un equipo multidisciplinario comprometido con tu crecimiento personal y bienestar emocional
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-white font-bold text-2xl">DL</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Dora Luz Betancourth</h3>
+              <div className="text-blue-600 font-semibold mb-2">Psicóloga Clínico-Educativa</div>
+              <div className="text-gray-600 text-sm mb-4">Magíster en Discapacidad</div>
+              <p className="text-gray-700 text-sm">
+                Fundadora y directora de la plataforma. Más de 12 años de experiencia en psicología clínica 
+                y educativa, especializada en desarrollo emocional empresarial.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-white font-bold text-2xl">PA</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Paula Andrea Marín García</h3>
+              <div className="text-purple-600 font-semibold mb-4">Psicóloga</div>
+              <p className="text-gray-700 text-sm">
+                Especialista en terapia individual y grupal. Experta en procesos de acompañamiento 
+                emocional y desarrollo de programas de bienestar mental.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-white font-bold text-2xl">JD</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Juan David Rojas B.</h3>
+              <div className="text-green-600 font-semibold mb-4">Desarrollador de la Plataforma</div>
+              <p className="text-gray-700 text-sm">
+                Arquitecto tecnológico responsable del desarrollo y mantenimiento de la plataforma. 
+                Especializado en crear experiencias digitales intuitivas y seguras.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
+              <div className="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <span className="text-white font-bold text-2xl">MG</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">María González</h3>
+              <div className="text-orange-600 font-semibold mb-4">Trabajadora Social</div>
+              <p className="text-gray-700 text-sm">
+                Coordinadora de programas sociales y bienestar comunitario. Especialista en 
+                desarrollo de redes de apoyo y acompañamiento integral.
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <p className="text-gray-700 text-lg">
+                "Nuestro equipo combina experiencia clínica, innovación tecnológica y compromiso social 
+                para crear un ecosistema completo de desarrollo personal."
+              </p>
+              <div className="text-blue-600 font-semibold mt-4">- Equipo DesarrolloPersonal.uno</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Mini Blog Section */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Psicología Práctica para una Vida Plena
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Reflexiones, técnicas y conocimientos de nuestro equipo para tu crecimiento personal
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <article className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-8 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-white font-bold">DL</span>
+                </div>
+                <div>
+                  <p className="text-blue-600 font-semibold">Por Dora Luz Betancourth</p>
+                  <p className="text-gray-600 text-sm">Psicóloga Clínico-Educativa</p>
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                Importancia de la atención psicológica
+              </h3>
+              
+              <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                Antes de referirme a la utilidad que reviste la atención psicológica, considero esencial 
+                primero mencionar lo que es salud mental, entendida como el bienestar emocional, 
+                psicológico y social de la persona...
+              </p>
+              
+              <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                Es allí donde se hace necesario, útil, importante y urgente acudir al profesional porque 
+                esa ayuda permite comprender claramente qué es lo que está sucediendo...
+              </p>
+              
+              <p className="text-gray-700 text-sm leading-relaxed mb-6">
+                El acompañamiento personal individual... se hace imprescindible desde la toma de conciencia 
+                para aprender a gestionar...
+              </p>
+              
+              <Link href="/blog/atencion-psicologica" className="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold transition-colors">
+                Leer más <PlayCircle className="w-4 h-4 ml-2" />
+              </Link>
+            </article>
+
+            <article className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-8 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-white font-bold">JC</span>
+                </div>
+                <div>
+                  <p className="text-purple-600 font-semibold">Por Juan Carlos Mejía</p>
+                  <p className="text-gray-600 text-sm">Psicólogo invitado</p>
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                Gestionar las emociones, vivir con conciencia
+              </h3>
+              
+              <div className="mb-4">
+                <h4 className="font-semibold text-gray-900 mb-2 text-sm">¿Qué es la gestión emocional?</h4>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  La gestión emocional no se trata de reprimir o negar lo que sentimos, sino de aprender 
+                  a reconocer nuestras emociones...
+                </p>
+              </div>
+              
+              <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                Emociones como el miedo, la tristeza o la rabia, lejos de ser enemigos, son señales valiosas...
+              </p>
+              
+              <p className="text-gray-700 text-sm leading-relaxed mb-6">
+                Vivir con conciencia emocional es vivir con libertad...
+              </p>
+              
+              <Link href="/blog/gestion-emocional" className="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold transition-colors">
+                Leer más <PlayCircle className="w-4 h-4 ml-2" />
+              </Link>
+            </article>
+
+            <article className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-8 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-white font-bold">LM</span>
+                </div>
+                <div>
+                  <p className="text-green-600 font-semibold">Por Lina Marcela Orozco</p>
+                  <p className="text-gray-600 text-sm">Psicóloga invitada</p>
+                </div>
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                Ecología del Sueño: Dormir para sanar
+              </h3>
+              
+              <div className="mb-4">
+                <h4 className="font-semibold text-gray-900 mb-2 text-sm">La importancia del descanso en nuestra salud mental</h4>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  En nuestra cultura del "hacer sin parar", dormir ha pasado a segundo plano...
+                </p>
+              </div>
+              
+              <p className="text-gray-700 text-sm leading-relaxed mb-4">
+                La ecología del sueño nos invita a crear entornos favorables para un descanso reparador...
+              </p>
+              
+              <p className="text-gray-700 text-sm leading-relaxed mb-6">
+                Dormir no es una pérdida de tiempo. Es un acto de amor propio...
+              </p>
+              
+              <Link href="/blog/ecologia-sueno" className="inline-flex items-center text-green-600 hover:text-green-700 font-semibold transition-colors">
+                Leer más <PlayCircle className="w-4 h-4 ml-2" />
+              </Link>
+            </article>
+          </div>
+
+          <div className="text-center mt-12">
+            <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg p-8 text-white">
+              <h4 className="text-2xl font-semibold mb-4">
+                Suscríbete a Nuestro Blog
+              </h4>
+              <p className="text-gray-300 mb-6">
+                Recibe contenido exclusivo sobre psicología práctica, técnicas de bienestar 
+                y reflexiones de nuestro equipo directamente en tu correo.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+                <input 
+                  type="email" 
+                  placeholder="Tu correo electrónico"
+                  className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                  Suscribirme
+                </button>
+              </div>
+              <p className="text-gray-400 text-sm mt-4">
+                Artículos nuevos cada semana • Sin spam • Cancela cuando quieras
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Plans Section */}
+      <section id="planes" className="py-16 sm:py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Elige el Camino que Resuene Contigo
+            </h2>
+            <p className="text-xl text-gray-600">
+              Planes diseñados para cada etapa de tu viaje de crecimiento personal
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-gray-200">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Plan Gratuito</h3>
+                <div className="text-4xl font-bold text-blue-600 mb-2">$0</div>
+                <p className="text-gray-600">Para empezar a explorar</p>
+              </div>
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">Acceso a cursos introductorios</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">Meditaciones seleccionadas</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">Vista previa de la plataforma</span>
+                </div>
+              </div>
+
+              <SignedOut>
+                <Link href="/sign-up" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors block text-center">
+                  Empieza Gratis
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/videos" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors block text-center">
+                  Ver Contenido
+                </Link>
+              </SignedIn>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-blue-200">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Plan Básico</h3>
+                <div className="text-4xl font-bold text-blue-600 mb-1">$25.000</div>
+                <p className="text-gray-600 text-sm">COP/mes</p>
+                <p className="text-blue-600 font-semibold">$6 USD/mes</p>
+                <p className="text-gray-600 text-sm mt-2">Para aprender a tu ritmo</p>
+              </div>
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm font-semibold">Acceso COMPLETO a TODOS los cursos</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">Descarga de materiales y guías</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">Certificados de finalización</span>
+                </div>
+              </div>
+
+              <Link href="/pricing" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors block text-center">
+                Elegir Plan Básico
+              </Link>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-8 shadow-xl border-2 border-blue-400 relative">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <span className="bg-yellow-400 text-yellow-900 px-4 py-1 rounded-full text-sm font-bold">
+                  MÁS POPULAR
+                </span>
+              </div>
+              
+              <div className="text-center mb-6 text-white">
+                <h3 className="text-2xl font-bold mb-2">Plan Completo</h3>
+                <div className="text-4xl font-bold mb-1">$80.000</div>
+                <p className="text-blue-100 text-sm">COP/mes</p>
+                <p className="text-white font-semibold">$20 USD/mes</p>
+                <p className="text-blue-100 text-sm mt-2">Para transformar tu vida</p>
+              </div>
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span className="text-sm font-semibold text-white">TODO lo del Plan Básico</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span className="text-sm font-semibold text-white">Talleres mensuales EN VIVO</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span className="text-sm text-white">Acceso a la Comunidad Premium</span>
+                </div>
+              </div>
+
+              <Link href="/pricing" className="w-full bg-white text-blue-600 hover:bg-gray-100 py-3 px-6 rounded-lg font-semibold transition-colors block text-center">
+                Unirme al Plan Completo
+              </Link>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-purple-200">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Plan Personal</h3>
+                <div className="text-4xl font-bold text-purple-600 mb-1">$160.000</div>
+                <p className="text-gray-600 text-sm">COP/mes</p>
+                <p className="text-purple-600 font-semibold">$40 USD/mes</p>
+                <p className="text-gray-600 text-sm mt-2">Para acelerar tu transformación</p>
+              </div>
+              
+              <div className="space-y-4 mb-8">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm font-semibold">TODO lo del Plan Completo</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm font-semibold">1 Sesión individual de 1 hora al mes</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">Acompañamiento personalizado</span>
+                </div>
+              </div>
+
+              <Link href="/pricing" className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg font-semibold transition-colors block text-center">
+                Solicitar Plan Personal
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 sm:py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
+            Tu Viaje de Transformación Comienza Hoy
+          </h2>
+          <p className="text-lg sm:text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            Únete a miles de personas que ya han comenzado su camino hacia una vida más plena, 
+            consciente y feliz. Tu bienestar es nuestra razón de ser.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <SignedOut>
+              <Link href="/sign-up" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-4 px-6 sm:px-8 rounded-lg transition-colors text-base sm:text-lg inline-flex items-center justify-center">
+                <PlayCircle className="w-5 h-5 mr-2" />
+                Comenzar Gratis Ahora
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <Link href="https://psicognitiva.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-4 px-6 sm:px-8 rounded-lg transition-colors text-base sm:text-lg inline-flex items-center justify-center">
+                <PlayCircle className="w-5 h-5 mr-2" />
+                Ver Curso Gratuito
+              </Link>
+            </SignedIn>
+            <Link href="#planes" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 font-semibold py-4 px-6 sm:px-8 rounded-lg transition-colors text-base sm:text-lg">
+              Ver Todos los Planes
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-12 sm:py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="col-span-1 md:col-span-2">
+              <Link href="/" className="text-xl sm:text-2xl font-bold text-blue-400 mb-4 block">
+                DesarrolloPersonal.uno
+              </Link>
+              <p className="text-gray-300 mb-6 max-w-md">
+                Tu plataforma completa de desarrollo personal. Reconecta con tu potencial ilimitado 
+                y vive una vida más plena, consciente y feliz.
+              </p>
+              <div className="flex space-x-4">
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+                  <span className="sr-only">LinkedIn</span>
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </a>
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+                  <span className="sr-only">Instagram</span>
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.621 5.367 11.988 11.988 11.988s11.987-5.367 11.987-11.988C24.004 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348zm7.718 0c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348z"/>
+                  </svg>
+                </a>
+                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
+                  <span className="sr-only">YouTube</span>
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Plataforma</h3>
+              <ul className="space-y-3">
+                <li><Link href="https://psicognitiva.thinkific.com/" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">Curso Gratuito</Link></li>
+                <li><Link href="/pricing" className="text-gray-300 hover:text-white transition-colors">Planes Premium</Link></li>
+                <li><SignedIn><Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">Mi Dashboard</Link></SignedIn></li>
+                <li><SignedIn><Link href="/dashboard/talleres" className="text-gray-300 hover:text-white transition-colors">Talleres en Vivo</Link></SignedIn></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Soporte</h3>
+              <ul className="space-y-3">
+                <li><Link href="/faq" className="text-gray-300 hover:text-white transition-colors">Preguntas Frecuentes</Link></li>
+                <li><Link href="/dashboard/ayuda" className="text-gray-300 hover:text-white transition-colors">Centro de Ayuda</Link></li>
+                <li><a href="mailto:soporte@desarrollopersonal.uno" className="text-gray-300 hover:text-white transition-colors">Contacto</a></li>
+                <li><a href="/politica-privacidad" className="text-gray-300 hover:text-white transition-colors">Política de Privacidad</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 mt-8 sm:mt-12 pt-6 sm:pt-8 text-center">
+            <p className="text-gray-400">
+              © 2024 DesarrolloPersonal.uno. Todos los derechos reservados.
+            </p>
+            <SignedIn>
+              <div className="mt-4">
+                <Link
+                  href="/dashboard/admin"
+                  className="inline-block text-xs text-gray-600 hover:text-gray-400 transition-colors opacity-50 hover:opacity-100"
+                  title="Panel de administración"
+                >
+                  •
+                </Link>
+              </div>
+            </SignedIn>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}              <SignedOut>
+                <Link href="/pricing" className="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold">
+                  Ver planes <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedOut>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-8 border">
+              <div className="flex items-start space-x-4 mb-6">
+                <div className="w-16 h-16 bg-purple-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Users className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">GPS Salud Mental</h3>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>4 videos</span>
+                    <span>•</span>
+                    <span>2.08 GB</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                Tu guía completa para navegar el bienestar mental en el mundo empresarial. 
+                Estrategias para identificar señales de alarma, técnicas de autorregulación 
+                y herramientas para mantener el equilibrio en entornos de alta demanda.
+              </p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 mb-4">
+                <p className="text-sm italic text-gray-600">
+                  "Me ayudó a identificar mis patrones de estrés antes de que se volvieran abrumadores. 
+                  Herramientas súper prácticas para el día a día." - <strong>Ana L.</strong>
+                </p>
+              </div>
+              <SignedIn>
+                <Link href="/dashboard/cursos" className="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold">
+                  Acceder ahora <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedIn>
+              <SignedOut>
+                <Link href="/pricing" className="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold">
+                  Ver planes <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedOut>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-8 border">
+              <div className="flex items-start space-x-4 mb-6">
+                <div className="w-16 h-16 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Calendar className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Arquitectura del Sueño</h3>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>5 videos</span>
+                    <span>•</span>
+                    <span>5.94 GB</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                Diseña tu descanso como un profesional del bienestar. Comprende los ciclos del sueño, 
+                optimiza tu higiene del descanso y aprende técnicas para dormir mejor, 
+                incluso con horarios empresariales demandantes.
+              </p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 mb-4">
+                <p className="text-sm italic text-gray-600">
+                  "Por fin duermo 7 horas seguidas. Mi energía en las reuniones se disparó. 
+                  Los rituales nocturnos funcionan de verdad." - <strong>Roberto S.</strong>
+                </p>
+              </div>
+              <SignedIn>
+                <Link href="/dashboard/cursos" className="inline-flex items-center text-green-600 hover:text-green-700 font-semibold">
+                  Acceder ahora <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedIn>
+              <SignedOut>
+                <Link href="/pricing" className="inline-flex items-center text-green-600 hover:text-green-700 font-semibold">
+                  Ver planes <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedOut>
+            </div>
+
+            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-8 border">
+              <div className="flex items-start space-x-4 mb-6">
+                <div className="w-16 h-16 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Heart className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Gestionando la Depresión</h3>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>3 videos</span>
+                    <span>•</span>
+                    <span>1.89 GB</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                Un acompañamiento profesional y compasivo para entender y gestionar los episodios depresivos. 
+                Herramientas de la terapia cognitivo-conductual adaptadas para profesionales 
+                que buscan recuperar su bienestar emocional.
+              </p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 mb-4">
+                <p className="text-sm italic text-gray-600">
+                  "Me dio las herramientas para salir del hoyo sin medicación. 
+                  El enfoque es muy práctico y sin estigmas." - <strong>María P.</strong>
+                </p>
+              </div>
+              <SignedIn>
+                <Link href="/dashboard/cursos" className="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
+                  Acceder ahora <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedIn>
+              <SignedOut>
+                <Link href="/pricing" className="inline-flex items-center text-orange-600 hover:text-orange-700 font-semibold">
+                  Ver planes <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedOut>
+            </div>
+
+            <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-xl p-8 border">
+              <div className="flex items-start space-x-4 mb-6">
+                <div className="w-16 h-16 bg-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Target className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Emociones en Equilibrio</h3>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>9 videos</span>
+                    <span>•</span>
+                    <span>6.83 GB</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                Domina el arte de la regulación emocional en situaciones profesionales complejas. 
+                Aprende a mantener la calma bajo presión, gestionar conflictos con inteligencia emocional 
+                y crear un ambiente laboral más armonioso.
+              </p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 mb-4">
+                <p className="text-sm italic text-gray-600">
+                  "Cambió completamente como manejo las reuniones difíciles. 
+                  Ahora soy el que mantiene la calma cuando todo se pone tenso." - <strong>Diego F.</strong>
+                </p>
+              </div>
+              <SignedIn>
+                <Link href="/dashboard/cursos" className="inline-flex items-center text-pink-600 hover:text-pink-700 font-semibold">
+                  Acceder ahora <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedIn>
+              <SignedOut>
+                <Link href="/pricing" className="inline-flex items-center text-pink-600 hover:text-pink-700 font-semibold">
+                  Ver planes <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedOut>
+            </div>
+
+            <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-xl p-8 border">
+              <div className="flex items-start space-x-4 mb-6">
+                <div className="w-16 h-16 bg-teal-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Zap className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Neurocálma</h3>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>9 videos</span>
+                    <span>•</span>
+                    <span>9.47 GB</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                Técnicas neurocientíficas avanzadas para reducir el estrés y aumentar la claridad mental. 
+                Basado en investigación actual sobre neuroplasticidad, mindfulness y técnicas 
+                de respiración para profesionales de alto rendimiento.
+              </p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 mb-4">
+                <p className="text-sm italic text-gray-600">
+                  "Los ejercicios de respiración me salvaron en presentaciones importantes. 
+                  La ciencia detrás es fascinante y funciona al 100%." - <strong>Laura G.</strong>
+                </p>
+              </div>
+              <SignedIn>
+                <Link href="/dashboard/cursos" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-semibold">
+                  Acceder ahora <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedIn>
+              <SignedOut>
+                <Link href="/pricing" className="inline-flex items-center text-teal-600 hover:text-teal-700 font-semibold">
+                  Ver planes <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedOut>
+            </div>
+
+            <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-8 border">
+              <div className="flex items-start space-x-4 mb-6">
+                <div className="w-16 h-16 bg-indigo-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Trophy className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Navegando la Tormenta Interior</h3>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>6 videos</span>
+                    <span>•</span>
+                    <span>2.83 GB</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                Desarrolla resiliencia emocional para enfrentar crisis personales y profesionales. 
+                Estrategias para transformar adversidades en oportunidades de crecimiento, 
+                gestionar la incertidumbre y salir fortalecido de las dificultades.
+              </p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 mb-4">
+                <p className="text-sm italic text-gray-600">
+                  "Me ayudó a superar el burnout más fuerte de mi carrera. 
+                  Ahora veo los obstáculos como oportunidades de crecer." - <strong>Andrés C.</strong>
+                </p>
+              </div>
+              <SignedIn>
+                <Link href="/dashboard/cursos" className="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-semibold">
+                  Acceder ahora <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedIn>
+              <SignedOut>
+                <Link href="/pricing" className="inline-flex items-center text-indigo-600 hover:text-indigo-700 font-semibold">
+                  Ver planes <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedOut>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <div className="bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg p-8 text-white">
+              <h4 className="text-2xl font-semibold mb-4">
+                Más Colecciones en Desarrollo
+              </h4>
+              <p className="text-gray-300 mb-6">
+                Nuestro equipo trabaja constantemente en nuevas colecciones basadas en las últimas 
+                investigaciones en psicología positiva y neurociencia aplicada.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                  <h5 className="font-semibold text-lg mb-2">🎯 Liderazgo Consciente</h5>
+                  <p className="text-gray-300 text-sm">
+                    Técnicas avanzadas para liderar equipos con inteligencia emocional y mindfulness
+                  </p>
+                  <span className="text-blue-300 text-xs">Q1 2025</span>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
+                  <h5 className="font-semibold text-lg mb-2">🚀 Peak Performance Mental</h5>
+                  <p className="text-gray-300 text-sm">
+                    Optimización cognitiva para profesionales de alto rendimiento
+                  </p>
+                  <span className="text-blue-300 text-xs">Q2 2025</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Workshops Section */}
+      <section className="py-16 sm:py-20 bg-gradient-to-br from-blue-50 to-purple-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+              Talleres en Vivo: 2 Sábados al Mes
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+              Únete a nuestra comunidad exclusiva cada primer y tercer sábado del mes para sesiones 
+              interactivas donde profundizamos en técnicas avanzadas y resolvemos casos reales 
+              de desarrollo personal y liderazgo emocional.
+            </p>
+            <div className="inline-flex items-center bg-blue-100 text-blue-800 px-6 py-3 rounded-full">
+              <Calendar className="w-5 h-5 mr-2" />
+              <span className="font-semibold">Próximo taller: Sábado 21 de Septiembre • 10:00 AM</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                Formato y Metodología
+              </h3>
+
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Calendario Fijo</h4>
+                    <p className="text-gray-600 text-sm">
+                      <strong>1er y 3er sábado de cada mes</strong> • 10:00 AM - 12:30 PM (GMT-5)
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      Sesiones de 2.5 horas con descanso incluido para máximo aprovechamiento
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Users className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Grupos Íntimos</h4>
+                    <p className="text-gray-600 text-sm">
+                      <strong>Máximo 15 participantes</strong> para garantizar atención personalizada
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      Ambiente seguro y confidencial para compartir experiencias reales
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Trophy className="w-6 h-6 text-green-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Casos Prácticos</h4>
+                    <p className="text-gray-600 text-sm">
+                      <strong>Situaciones reales</strong> de liderazgo empresarial y desarrollo personal
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      Trabajo en breakout rooms y análisis grupal de estrategias efectivas
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <PlayCircle className="w-6 h-6 text-orange-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-900 mb-1">Grabaciones Disponibles</h4>
+                    <p className="text-gray-600 text-sm">
+                      <strong>Acceso 24/7</strong> a las grabaciones de todos los talleres
+                    </p>
+                    <p className="text-gray-600 text-sm">
+                      Material complementario y ejercicios descargables incluidos
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+              <div className="text-center">
+                <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Users className="w-10 h-10 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">Próximos Talleres</h3>
+                
+                <div className="space-y-4 mb-6">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-left">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold">Gestión de Crisis Emocionales</h4>
+                      <span className="bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full text-xs font-bold">
+                        PRÓXIMO
+                      </span>
+                    </div>
+                    <p className="text-blue-100 text-sm mb-2">
+                      Estrategias para mantener la claridad mental en momentos de alta presión
+                    </p>
+                    <div className="flex items-center text-sm">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      <span>Sábado 21 Sep • 10:00 AM</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-left">
+                    <h4 className="font-semibold mb-2">Comunicación Asertiva en Equipos</h4>
+                    <p className="text-blue-100 text-sm mb-2">
+                      Técnicas para expresar ideas y límites de manera efectiva y respetuosa
+                    </p>
+                    <div className="flex items-center text-sm">
+                      <Calendar className="w-4 h-4 mr-2" />
+                      <span>Sábado 5 Oct • 10:00 AM</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center justify-center space-x-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-300" />
+                    <span>Acceso ilimitado a talleres</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-300" />
+                    <span>Grabaciones disponibles 24/7</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-300" />
+                    <span>Material complementario descargable</span>
+                  </div>
+                  <div className="flex items-center justify-center space-x-2 text-sm">
+                    <CheckCircle className="w-4 h-4 text-green-300" />
+                    <span>Interacción directa con Dora Luz</span>
+                  </div>
+                </div>
+
+                <SignedIn>
+                  <Link href="/dashboard/talleres" className="w-full bg-white text-blue-600 py-3 px-6 rounded-lg font-semibold hover:bg-blue-50 transition-colors block text-center">
+                    Reservar Mi Lugar
+                  </Link>
+                </SignedIn>
+                <SignedOut>
+                  <Link href="/pricing" className="w-full bg-white text-blue-600 py-3 px-6 rounded-lg font-semibold hover:bg-blue-50 transition-colors block text-center">
+                    Acceder a Talleres
+                  </Link>
+                </SignedOut>
+              </div>
+            </div>
+          </div>
+
+          {/* Cronograma detallado de talleres */}
+          <div className="bg-white rounded-2xl p-8 shadow-lg mt-16">
+            <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">
+              Programación Completa de Talleres 2024
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              
+              <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border-l-4 border-blue-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller de Duelo: "Honrando el recuerdo, abrazando la vida"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Para personas que han vivido una pérdida significativa y desean transformar su proceso de duelo explorando emociones desde el amor y la memoria.
+                </p>
+                <div className="text-xs text-blue-600 font-semibold">Octubre 2024</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border-l-4 border-purple-500">
+                <h4 className="font-bold text-gray-900 mb-2">Formación Docentes: "El docente que soy..."</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Espacio de reflexión crítica sobre la práctica pedagógica para maestros y equipos educativos. Fortalece tu vocación y actualiza herramientas.
+                </p>
+                <div className="text-xs text-purple-600 font-semibold">Octubre 2024</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border-l-4 border-green-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller Hábitos de Estudio: "Aprender con propósito"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Para estudiantes que buscan mejorar su rendimiento aprendiendo métodos prácticos de estudio, planificación y motivación.
+                </p>
+                <div className="text-xs text-green-600 font-semibold">Noviembre 2024</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border-l-4 border-orange-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller Habilidades Socioemocionales: "Crecer, sentir y conectar"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Desarrolla inteligencia emocional para mejorar relaciones y bienestar. Gestiona estrés, fortalece autoestima y crea vínculos saludables.
+                </p>
+                <div className="text-xs text-orange-600 font-semibold">Noviembre 2024</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-6 border-l-4 border-pink-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller Etapa Pensional: "Renacer en la nueva etapa"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Para personas preparándose o viviendo la jubilación. Reconecta contigo, descubre pasiones y vive esta etapa con plenitud.
+                </p>
+                <div className="text-xs text-pink-600 font-semibold">Noviembre 2024</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-teal-50 to-teal-100 rounded-lg p-6 border-l-4 border-teal-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller Gestión Emocional: "Emociones en equilibrio"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Aprende a escuchar y canalizar emociones si sientes que te desbordan. Logra dominio emocional, armonía y mejores decisiones.
+                </p>
+                <div className="text-xs text-teal-600 font-semibold">Diciembre 2024</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg p-6 border-l-4 border-indigo-500">
+                <h4 className="font-bold text-gray-900 mb-2">Taller de Asertividad: "Decir lo que pienso sin miedo"</h4>
+                <p className="text-gray-700 text-sm mb-3">
+                  Fortalece tu comunicación y autoestima. Aprende técnicas para hablar con respeto y firmeza, sin culpa ni ansiedad.
+                </p>
+                <div className="text-xs text-indigo-600 font-semibold">Diciembre 2024</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounde'use client'
+import Link from 'next/link'
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import { useState } from 'react'
+import { Menu, X, PlayCircle, Calendar, Users, Trophy, CheckCircle, Star, MessageCircle, BookOpen, Heart, Target, Zap, Award } from 'lucide-react'
+
+function ResponsiveNavbar() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
+
+  const closeMenu = () => {
+    setIsMenuOpen(false)
+  }
+
+  return (
+    <nav className="border-b border-gray-200 bg-white sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center">
+            <Link href="/" className="text-xl sm:text-2xl font-bold text-blue-600">
+              DesarrolloPersonal.uno
+            </Link>
+          </div>
+
+          <div className="hidden md:flex items-center space-x-4">
+            <Link href="https://psicognitiva.thinkific.com/" target="_blank" rel="noopener noreferrer" className="text-gray-700 hover:text-blue-600 transition-colors">
+              Curso Gratuito
+            </Link>
+            <Link href="/pricing" className="text-gray-700 hover:text-blue-600 transition-colors">
+              Precios
+            </Link>
+            <SignedOut>
+              <Link href="/sign-in" className="text-gray-700 hover:text-blue-600 transition-colors">
+                Iniciar Sesión
+              </Link>
+              <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                Inscríbete Gratis
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors">
+                Mi Dashboard
+              </Link>
+              <UserButton />
+            </SignedIn>
+          </div>
+
+          <div className="md:hidden flex items-center">
+            <SignedIn>
+              <div className="mr-2">
+                <UserButton />
+              </div>
+            </SignedIn>
+            <button
+              onClick={toggleMenu}
+              className="text-gray-700 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md p-2"
+              aria-label="Toggle menu"
+            >
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
+
+        {isMenuOpen && (
+          <>
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onClick={closeMenu} />
+            <div className="absolute top-full left-0 right-0 bg-white border-b border-gray-200 shadow-lg z-50 md:hidden">
+              <div className="px-4 py-4 space-y-4">
+                <Link
+                  href="https://psicognitiva.thinkific.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-gray-700 hover:text-blue-600 transition-colors py-2"
+                  onClick={closeMenu}
+                >
+                  Curso Gratuito
+                </Link>
+                <Link
+                  href="/pricing"
+                  className="block text-gray-700 hover:text-blue-600 transition-colors py-2"
+                  onClick={closeMenu}
+                >
+                  Precios
+                </Link>
+                <SignedOut>
+                  <div className="pt-2 border-t border-gray-200 space-y-4">
+                    <Link
+                      href="/sign-in"
+                      className="block text-gray-700 hover:text-blue-600 transition-colors py-2"
+                      onClick={closeMenu}
+                    >
+                      Iniciar Sesión
+                    </Link>
+                    <Link
+                      href="/sign-up"
+                      className="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors text-center"
+                      onClick={closeMenu}
+                    >
+                      Inscríbete Gratis
+                    </Link>
+                  </div>
+                </SignedOut>
+                <SignedIn>
+                  <Link
+                    href="/dashboard"
+                    className="block bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors text-center"
+                    onClick={closeMenu}
+                  >
+                    Mi Dashboard
+                  </Link>
+                </SignedIn>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </nav>
+  )
+}
+
+export default function HomePage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <ResponsiveNavbar />
+
+      {/* Hero Section */}
+      <section className="pt-20 pb-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              Reconecta con tu
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                {" "}potencial ilimitado{" "}
+              </span>
+              y vive más pleno
+            </h1>
+
+            <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-4xl mx-auto">
+              Porque creemos firmemente que dentro de ti existe un potencial ilimitado para vivir 
+              una vida más plena, consciente y feliz. Somos esa pausa, esa guía y esa chispa 
+              que te ayuda a reconectar contigo.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <SignedOut>
+                <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 sm:px-8 rounded-lg transition-colors text-base sm:text-lg inline-flex items-center justify-center">
+                  <PlayCircle className="w-5 h-5 mr-2" />
+                  Inscríbete Gratis
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link href="https://psicognitiva.thinkific.com/" target="_blank" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 sm:px-8 rounded-lg transition-colors text-base sm:text-lg inline-flex items-center justify-center">
+                  <PlayCircle className="w-5 h-5 mr-2" />
+                  Ver Curso Gratuito
+                </Link>
+              </SignedIn>
+              <Link href="#planes" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-4 px-6 sm:px-8 rounded-lg transition-colors text-base sm:text-lg">
+                Conocer Planes
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+              <div className="text-center">
+                <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-2">10+</div>
+                <div className="text-gray-600">Años de Experiencia</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl sm:text-4xl font-bold text-purple-600 mb-2">1,200+</div>
+                <div className="text-gray-600">Vidas Transformadas</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-2">7</div>
+                <div className="text-gray-600">Colecciones de Cursos</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl sm:text-4xl font-bold text-orange-600 mb-2">97%</div>
+                <div className="text-gray-600">Satisfacción</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Section */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6 flex items-center justify-center">
+              <Heart className="w-10 h-10 mr-4 text-red-500" />
+              Nuestra Razón de Ser: Creemos en tu Potencial
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">¿Por qué hacemos lo que hacemos?</h3>
+              <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                Porque creemos firmemente que dentro de cada persona, incluida tú, existe un potencial 
+                ilimitado para vivir una vida más plena, consciente y feliz.
+              </p>
+              <p className="text-gray-700 text-lg leading-relaxed mb-6">
+                Sabemos que el ritmo de la vida moderna, el estrés y las viejas costumbres a menudo 
+                nos desconectan de esa esencia, dejándonos en piloto automático.
+              </p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-6">
+                <p className="text-gray-900 font-semibold text-lg">
+                  Tu bienestar es nuestra razón de ser.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Target className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold text-gray-900 mb-2">Transformación Real</h4>
+                  <p className="text-gray-600">
+                    Hemos visto la increíble transformación que ocurre cuando una persona 
+                    recibe las herramientas correctas para entenderse y gestionarse mejor.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Zap className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold text-gray-900 mb-2">Reconexión Auténtica</h4>
+                  <p className="text-gray-600">
+                    Somos esa pausa, esa guía y esa chispa que te ayude a reconectar 
+                    contigo mismo y con tu verdadero potencial.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Award className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold text-gray-900 mb-2">Década de Experiencia</h4>
+                  <p className="text-gray-600">
+                    Más de 10 años de experiencia real en psicología clínica y docencia 
+                    respaldan cada una de nuestras metodologías.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How Section */}
+      <section className="py-16 sm:py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+              Nuestro Método: Sabiduría Humana, Potenciada por la Tecnología
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              No ofrecemos soluciones mágicas, sino un camino de aprendizaje y práctica. 
+              Nuestro método es único porque combina dos mundos.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl p-8 text-white">
+              <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-6">
+                <Heart className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold mb-4">El Corazón y la Ciencia</h3>
+              <p className="text-blue-100 text-lg leading-relaxed mb-4">
+                Todo nuestro contenido nace de más de 10 años de experiencia real 
+                en psicología clínica y docencia.
+              </p>
+              <p className="text-blue-100 text-lg leading-relaxed">
+                Te guiamos con metodologías probadas, de una forma profesional, 
+                cercana y profundamente humana.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 shadow-lg border">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+                <Zap className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">La Simplicidad y el Acceso</h3>
+              <p className="text-gray-700 text-lg leading-relaxed mb-4">
+                Hemos creado una plataforma tecnológica intuitiva y fácil de usar, 
+                para que puedas acceder a este conocimiento donde quieras y cuando quieras.
+              </p>
+              <p className="text-gray-700 text-lg leading-relaxed">
+                Sin presiones y a tu propio ritmo. Un ecosistema de bienestar que 
+                te acompaña, te enseña y te da el poder de ser tu propio guía.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What Section */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
+              Tus Herramientas: Un Universo de Bienestar a tu Alcance
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Te damos las herramientas y los planes para que inicies tu viaje de la manera 
+              que mejor se adapte a ti.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            <div className="bg-white rounded-xl p-6 shadow-lg border text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <PlayCircle className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Cursos en Video Prácticos</h3>
+              <p className="text-gray-600 text-sm">
+                Aprende a tu ritmo sobre inteligencia emocional, autoestima, resiliencia y más.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-lg border text-center">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="w-8 h-8 text-purple-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Meditaciones Guiadas</h3>
+              <p className="text-gray-600 text-sm">
+                Encuentra calma y claridad en tu día a día con audios para cada momento.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-lg border text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Talleres y Comunidad</h3>
+              <p className="text-gray-600 text-sm">
+                Profundiza en temas específicos y conecta con otros que están en el mismo camino.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-lg border text-center">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-8 h-8 text-orange-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">Acompañamiento Profesional</h3>
+              <p className="text-gray-600 text-sm">
+                Si lo necesitas, camina de la mano de una de nuestras psicólogas en sesiones personales.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Free Content Section */}
+      <section id="contenido-gratuito" className="py-16 sm:py-20 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+              Curso Gratuito: Regulación de Emociones para Empresarios
+            </h2>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto mb-8">
+              Desarrollado por <strong>Dora Luz Betancourth</strong>, Psicóloga Clínica con 12+ años de experiencia.
+              Metodología científica validada para líderes y emprendedores.
+            </p>
+            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full">
+              <Star className="w-5 h-5 mr-2 text-yellow-300" />
+              <span className="font-semibold">100% Gratuito • Acceso Inmediato • 5 Sesiones Completas</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6">
+                <h3 className="text-2xl font-semibold mb-6 flex items-center">
+                  <CheckCircle className="w-6 h-6 mr-3 text-green-300" />
+                  Programa Completo Gratuito
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                    <div>
+                      <h4 className="font-semibold">Sesión 1: Introducción</h4>
+                      <p className="text-blue-100 text-sm">Regulación de Emociones para Empresarios • Ejercicios y Conclusión • Tabla de Emociones (Material descargable)</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                    <div>
+                      <h4 className="font-semibold">Sesión 2: Inteligencia Emocional</h4>
+                      <p className="text-blue-100 text-sm">Desarrollo de competencias emocionales clave para líderes</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                    <div>
+                      <h4 className="font-semibold">Sesión 3: Habilidades Socio-Emocionales</h4>
+                      <p className="text-blue-100 text-sm">Liderazgo emocional y comunicación efectiva en equipos</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center text-sm font-bold">4</div>
+                    <div>
+                      <h4 className="font-semibold">Sesión 4: Metamorfosis</h4>
+                      <p className="text-blue-100 text-sm">Transformación profunda y cambio sostenido</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <div className="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-sm font-bold">5</div>
+                    <div>
+                      <h4 className="font-semibold">Sesión 5: Técnicas de Afrontamiento</h4>
+                      <p className="text-blue-100 text-sm">Estrategias prácticas para situaciones empresariales complejas</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-8 text-gray-900 shadow-2xl">
+              <div className="text-center mb-6">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <PlayCircle className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold mb-2">Accede al Curso</h3>
+                <p className="text-gray-600">Disponible en nuestra plataforma externa</p>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">5 sesiones completas en video</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">Material descargable incluido</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">Acceso inmediato</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-sm">Certificado de participación</span>
+                </div>
+              </div>
+
+              <Link href="https://psicognitiva.thinkific.com/" target="_blank" rel="noopener noreferrer" className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 px-6 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all block text-center">
+                Acceder al Curso Gratuito
+              </Link>
+              <p className="text-xs text-gray-500 text-center mt-3">
+                * Curso disponible en plataforma externa • 100% Gratuito
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Detailed Courses Section */}
+      <section className="py-16 sm:py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+              Nuestras 7 Colecciones Especializadas
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+              Cada colección está diseñada con metodología científica y años de experiencia clínica. 
+              <strong> Constantemente agregamos nuevos cursos</strong> para profundizar tu desarrollo personal.
+            </p>
+            <div className="inline-flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-full">
+              <Star className="w-4 h-4 mr-2" />
+              <span className="text-sm font-medium">2 nuevas colecciones en desarrollo para 2025</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-8 border">
+              <div className="flex items-start space-x-4 mb-6">
+                <div className="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Hábitos de Estudio</h3>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <span>5 videos</span>
+                    <span>•</span>
+                    <span>6.17 GB</span>
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 leading-relaxed">
+                Transforma tu capacidad de aprendizaje con técnicas neurocientíficas probadas. 
+                Aprende a crear rutinas de estudio efectivas, gestionar la procrastinación y 
+                optimizar tu retención de información para el crecimiento profesional continuo.
+              </p>
+              <div className="bg-white/80 backdrop-blur-sm rounded-lg p-4 mb-4">
+                <p className="text-sm italic text-gray-600">
+                  "Increíble cómo cambió mi productividad. Ahora puedo estudiar 3 horas concentrado 
+                  sin distracciones. Los ejercicios de enfoque son gold." - <strong>Carlos M.</strong>
+                </p>
+              </div>
+              <SignedIn>
+                <Link href="/dashboard/cursos" className="inline-flex items-center text-blue-600 hover:text-blue-700 font-semibold">
+                  Acceder ahora <PlayCircle className="w-4 h-4 ml-2" />
+                </Link>
+              </SignedIn>
+              <SignedOut>
+                <Link href="/pricing  
