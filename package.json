@@ -4,10 +4,10 @@
   "description": "Plataforma de Desarrollo Personal - Next.js 15 con TypeScript",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3010",
+    "dev": "next dev -p 3030",
     "build": "next build",
     "build:prod": "NODE_ENV=production next build",
-    "start": "next start -p 3010",
+    "start": "next start -p 3030",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
