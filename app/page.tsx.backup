@@ -1,0 +1,429 @@
+import Link from 'next/link'
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+
+export default function HomePage() {
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Navigation */}
+      <nav className="border-b border-gray-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/" className="text-2xl font-bold text-blue-600">
+                DesarrolloPersonal.uno
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/videos" className="text-gray-700 hover:text-blue-600 transition-colors">
+                Contenido Gratuito
+              </Link>
+              <Link href="/pricing" className="text-gray-700 hover:text-blue-600 transition-colors">
+                Precios
+              </Link>
+              <SignedOut>
+                <Link href="/sign-in" className="text-gray-700 hover:text-blue-600 transition-colors">
+                  Iniciar Sesión
+                </Link>
+                <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                  Registrarse
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors">
+                  Mi Dashboard
+                </Link>
+                <UserButton />
+              </SignedIn>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-20 pb-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              Transforma tu vida con
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                {" "}Desarrollo Personal{" "}
+              </span>
+              Profesional
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Únete a miles de personas que están transformando sus vidas con nuestra plataforma
+              liderada por psicólogas expertas. Cursos, talleres, mindfulness y comunidad en un solo lugar.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <SignedOut>
+                <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+                  Comienza tu Transformación Gratuita
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+                  Ir a Mi Dashboard
+                </Link>
+              </SignedIn>
+              <Link href="#plan-gratuito" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+                Explorar Plan Gratuito
+              </Link>
+            </div>
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-blue-600 mb-2">1500+</div>
+                <div className="text-gray-600">Estudiantes Activos</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-purple-600 mb-2">35+</div>
+                <div className="text-gray-600">Cursos y Talleres</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-green-600 mb-2">95%</div>
+                <div className="text-gray-600">Satisfacción</div>
+              </div>
+              <div className="text-center">
+                <div className="text-4xl font-bold text-orange-600 mb-2">24/7</div>
+                <div className="text-gray-600">Acceso Comunidad</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Free Plan Section */}
+      <section id="plan-gratuito" className="py-20 bg-gradient-to-r from-green-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Plan Gratuito - Comienza tu Transformación Hoy
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Regístrate gratis y accede inmediatamente a contenido exclusivo diseñado
+              por psicólogas expertas. Sin compromisos, sin tarjeta de crédito.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="bg-white rounded-lg shadow-xl p-8">
+                <div className="text-center mb-6">
+                  <div className="text-5xl mb-4">🎁</div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">Contenido Gratuito Incluido</h3>
+                  <p className="text-green-600 font-semibold text-xl">100% Gratis - Sin Límites</p>
+                </div>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-center">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      </svg>
+                    </div>
+                    <span>Curso completo en Thinkific: "Fundamentos de Bienestar Emocional"</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      </svg>
+                    </div>
+                    <span>Podcasts semanales de "Psicología Práctica" en Spotify</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      </svg>
+                    </div>
+                    <span>Acceso completo a la comunidad y foros</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      </svg>
+                    </div>
+                    <span>Recursos descargables y herramientas prácticas</span>
+                  </li>
+                  <li className="flex items-center">
+                    <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                      </svg>
+                    </div>
+                    <span>Notificaciones de talleres gratuitos disponibles</span>
+                  </li>
+                </ul>
+                <SignedOut>
+                  <Link href="/sign-up" className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors text-center block">
+                    Registrarse Gratis Ahora
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <Link href="/dashboard" className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors text-center block">
+                    Acceder a Mi Contenido
+                  </Link>
+                </SignedIn>
+              </div>
+            </div>
+            <div>
+              <div className="space-y-6">
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+                      <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Curso en Thinkific</h4>
+                      <p className="text-sm text-gray-600">Acceso directo desde tu dashboard</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-700 text-sm">
+                    Nuestro curso completo "Fundamentos de Bienestar Emocional" te espera en Thinkific.
+                     Regístrate y accede inmediatamente desde tu dashboard personalizado.
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mr-4">
+                      <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Podcasts Semanales</h4>
+                      <p className="text-sm text-gray-600">Disponibles en Spotify</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-700 text-sm">
+                    Escucha nuestros podcasts de "Psicología Práctica" cada semana.
+                     Enlaces directos disponibles en tu dashboard para fácil acceso.
+                  </p>
+                </div>
+                <div className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="flex items-center mb-4">
+                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+                      <svg className="w-6 h-6 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                      </svg>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900">Comunidad Activa</h4>
+                      <p className="text-sm text-gray-600">Conecta con otros miembros</p>
+                    </div>
+                  </div>
+                  <p className="text-gray-700 text-sm">
+                    Participa en nuestra comunidad vibrante, comparte experiencias y
+                     recibe apoyo de personas en tu mismo viaje de crecimiento personal.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-20 bg-blue-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Lo que dicen nuestros estudiantes
+            </h2>
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+              Miles de personas han transformado sus vidas con nuestra plataforma
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-white rounded-lg p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 font-semibold">MG</span>
+                </div>
+                <div className="ml-3">
+                  <p className="font-semibold text-gray-900">María García</p>
+                  <p className="text-sm text-gray-600">Plan Premium</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 text-sm">
+                "Los cursos de gestión emocional me han ayudado enormemente a manejar mi ansiedad.
+                El contenido es muy práctico y las psicólogas explican todo de manera muy clara."
+              </p>
+              <div className="flex text-yellow-400">
+                ⭐⭐⭐⭐⭐
+              </div>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                  <span className="text-purple-600 font-semibold">JL</span>
+                </div>
+                <div className="ml-3">
+                  <p className="font-semibold text-gray-900">Juan López</p>
+                  <p className="text-sm text-gray-600">Plan VIP</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 text-sm">
+                "El acompañamiento personalizado del plan VIP cambió mi vida. Las sesiones 1:1
+                 me dieron herramientas específicas para mi situación. Altamente recomendado."
+              </p>
+              <div className="flex text-yellow-400">
+                ⭐⭐⭐⭐⭐
+              </div>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <span className="text-green-600 font-semibold">AR</span>
+                </div>
+                <div className="ml-3">
+                  <p className="font-semibold text-gray-900">Ana Rodríguez</p>
+                  <p className="text-sm text-gray-600">Plan Básico</p>
+                </div>
+              </div>
+              <p className="text-gray-700 mb-4 text-sm">
+                "Empecé con el plan gratuito y luego pasé al básico. Los talleres grupales
+                 son increíbles y he aprendido muchísimo. La comunidad es muy acogedora."
+              </p>
+              <div className="flex text-yellow-400">
+                ⭐⭐⭐⭐⭐
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold text-white mb-6">
+            ¿Listo para transformar tu vida?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            Únete a nuestra comunidad y accede a cursos exclusivos, talleres en vivo,
+            sesiones de mindfulness y mucho más. Tu transformación personal comienza hoy.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <SignedOut>
+              <Link href="/sign-up" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+                Comenzar Gratis Ahora
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/dashboard" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+                Ir a Mi Dashboard
+              </Link>
+            </SignedIn>
+            <Link href="/pricing" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+              Ver Todos los Planes
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="col-span-1 md:col-span-2">
+              <Link href="/" className="text-2xl font-bold text-white mb-4 block">
+                DesarrolloPersonal.uno
+              </Link>
+              <p className="text-gray-400 mb-6 max-w-md">
+                Transformamos vidas a través del desarrollo personal profesional.
+                 Únete a nuestra comunidad de crecimiento y bienestar emocional.
+              </p>
+              <div className="flex space-x-4">
+                <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                  </svg>
+                </a>
+                <a href="https://open.spotify.com/show/..." target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                     <path fillRule="evenodd" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-3.311 13.84c-.534.333-1.22-.057-1.343-.642-2.112-3.703-5.503-4.887-9.289-5.46-.4-.06-.657-.456-.597-.857.06-.4.456-.657.857-.597 4.14.62 7.893 1.953 10.273 5.99.124.585-.265 1.15-.799 1.15h-.102zm1.99-3.235c-.42.253-.941.043-1.072-.41 1.74-3.132 4.544-4.11 7.766-4.633.38-.06.67-.4.61-.78-.06-.38-.4-.67-.78-.61-3.553.57-6.66 1.67-8.625 5.093-.131.453.15 1.013.611 1.013h.1zM15.55 6.13c-.3.18-.671.03-.802-.294-1.29-3.31-3.61-4.2-5.918-4.653-.33-.06-.57-.38-.51-.71.06-.33.38-.57.71-.51 2.585.51 5.216 1.54 6.7 5.2.13.32-.05.74-.48.74v.227z" clipRule="evenodd" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Plataforma</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors">
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/videos" className="text-gray-400 hover:text-white transition-colors">
+                    Videos Gratuitos
+                  </Link>
+                </li>
+                <li>
+                  <a href="https://psicognitiva.thinkific.com/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+                    Cursos Thinkific
+                  </a>
+                </li>
+                <li>
+                  <Link href="/pricing" className="text-gray-400 hover:text-white transition-colors">
+                    Planes y Precios
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Soporte</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
+                    Contacto
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="text-gray-400 hover:text-white transition-colors">
+                    Preguntas Frecuentes
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">
+                    Términos de Servicio
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">
+                    Política de Privacidad
+                  </Link>
+                </li>
+              </ul>
+            </div>
+             <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Compañía</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/about" className="text-gray-400 hover:text-white transition-colors">
+                    Sobre Nosotros
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/blog" className="text-gray-400 hover:text-white transition-colors">
+                    Blog
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-12 pt-8 text-center">
+            <p className="text-gray-400">
+              © 2025 DesarrolloPersonal.uno. Todos los derechos reservados.
+            </p>
+            <p className="text-gray-500 text-sm mt-2">
+              Desarrollado con ❤️ para tu crecimiento personal
+            </p>
+          </div>
+        </div>
+      </footer>
+    </div>
+  )
+}

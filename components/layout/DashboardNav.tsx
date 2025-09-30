@@ -1,28 +1,28 @@
 'use client';
-
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Home, 
-  BookOpen, 
-  Play, 
-  User, 
+import {
+  Home,
+  BookOpen,
+  Play,
+  User,
   Settings,
   HelpCircle,
   LogOut,
   CreditCard,
   FileText,
-  Crown
+  Crown,
+  Users,
+  Calendar
 } from 'lucide-react';
 import { useClerk } from '@clerk/nextjs';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Cursos', href: '/dashboard/cursos', icon: BookOpen },
-  { name: 'Videos', href: '/videos', icon: Play },
+  { name: 'Talleres', href: '/dashboard/talleres', icon: Calendar },
+  { name: 'Comunidad', href: '/dashboard/community', icon: Users },
   { name: 'Mi Plan', href: '/dashboard/mi-plan', icon: Crown },
-  { name: 'Suscripción', href: '/dashboard/suscripcion', icon: CreditCard },
-  { name: 'Facturas', href: '/dashboard/facturas', icon: FileText },
   { name: 'Perfil', href: '/dashboard/perfil', icon: User },
   { name: 'Configuración', href: '/dashboard/configuracion', icon: Settings },
   { name: 'Ayuda', href: '/dashboard/ayuda', icon: HelpCircle },
@@ -35,7 +35,8 @@ function DashboardNav() {
   return (
     <nav className="space-y-1">
       {navigation.map((item) => {
-        const isActive = pathname === item.href;
+        const isActive = pathname === item.href || 
+          (item.href !== '/dashboard' && pathname.startsWith(item.href));
         return (
           <Link
             key={item.name}
@@ -55,7 +56,6 @@ function DashboardNav() {
           </Link>
         );
       })}
-      
       <button
         onClick={() => signOut()}
         className="group flex items-center w-full px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors"

@@ -5,32 +5,24 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navigation */}
-      <nav className="border-b border-gray-200 bg-white">
+      <nav className="border-b border-gray-200 bg-white sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold text-blue-600">
-                DesarrolloPersonal.uno
-              </Link>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Link href="/videos" className="text-gray-700 hover:text-blue-600 transition-colors">
-                Contenido Gratuito
-              </Link>
-              <Link href="/pricing" className="text-gray-700 hover:text-blue-600 transition-colors">
-                Precios
-              </Link>
+          <div className="flex justify-between items-center h-16">
+            <Link href="/" className="text-lg sm:text-2xl font-bold text-blue-600">
+              DesarrolloPersonal.uno
+            </Link>
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <SignedOut>
-                <Link href="/sign-in" className="text-gray-700 hover:text-blue-600 transition-colors">
-                  Iniciar Sesión
+                <Link href="/sign-in" className="text-gray-700 hover:text-blue-600 text-sm hidden sm:block">
+                  Entrar
                 </Link>
-                <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 sm:px-4 rounded-lg text-sm">
                   Registrarse
                 </Link>
               </SignedOut>
               <SignedIn>
-                <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors">
-                  Mi Dashboard
+                <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 text-sm">
+                  Dashboard
                 </Link>
                 <UserButton />
               </SignedIn>
@@ -40,369 +32,468 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-20 pb-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <section className="pt-12 sm:pt-20 pb-12 sm:pb-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
               Transforma tu vida con
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                {" "}Desarrollo Personal{" "}
+              <span className="block sm:inline text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                {" "}Desarrollo Personal
               </span>
-              Profesional
             </h1>
-            
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Únete a miles de personas que están transformando sus vidas con nuestra plataforma 
-              liderada por psicólogas expertas. Cursos, talleres, mindfulness y comunidad en un solo lugar.
+            <p className="text-base sm:text-xl text-gray-600 mb-6 sm:mb-8 max-w-3xl mx-auto">
+              Plataforma liderada por psicólogas expertas. Cursos, talleres y comunidad en un solo lugar.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 sm:mb-12">
               <SignedOut>
-                <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
-                  Comienza tu Transformación Gratuita
+                <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg text-base sm:text-lg">
+                  Comenzar Gratis
                 </Link>
               </SignedOut>
               <SignedIn>
-                <Link href="/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
-                  Ir a Mi Dashboard
+                <Link href="/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg text-base sm:text-lg">
+                  Ir a Dashboard
                 </Link>
               </SignedIn>
-              <Link href="#cursos-gratuitos" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
-                Ver Contenido Gratuito
+              <Link href="#planes" className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 font-semibold py-3 sm:py-4 px-6 sm:px-8 rounded-lg text-base sm:text-lg">
+                Ver Planes
               </Link>
             </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="text-4xl font-bold text-blue-600 mb-2">500+</div>
-                <div className="text-gray-600">Estudiantes Activos</div>
+                <div className="text-2xl sm:text-3xl font-bold text-blue-600 mb-1">1500+</div>
+                <div className="text-xs sm:text-sm text-gray-600">Estudiantes</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-purple-600 mb-2">25+</div>
-                <div className="text-gray-600">Cursos Especializados</div>
+                <div className="text-2xl sm:text-3xl font-bold text-purple-600 mb-1">35+</div>
+                <div className="text-xs sm:text-sm text-gray-600">Cursos</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-green-600 mb-2">95%</div>
-                <div className="text-gray-600">Satisfacción</div>
+                <div className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">95%</div>
+                <div className="text-xs sm:text-sm text-gray-600">Satisfacción</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl sm:text-3xl font-bold text-orange-600 mb-1">24/7</div>
+                <div className="text-xs sm:text-sm text-gray-600">Comunidad</div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Free Courses Section */}
-      <section id="cursos-gratuitos" className="py-20 bg-gray-50">
+      {/* Cursos Destacados */}
+      <section className="py-12 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Cursos Gratuitos de Gestión de Emociones
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+              Nuestros Cursos Más Valorados
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Comienza tu viaje de transformación con nuestros cursos gratuitos diseñados 
-              por psicólogas expertas para ayudarte a gestionar mejor tus emociones.
+            <p className="text-base sm:text-xl text-gray-600">
+              Cursos que han transformado miles de vidas
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-5 sm:p-6 shadow-lg">
+              <div className="flex justify-between items-start mb-3">
+                <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">Más Popular</span>
+                <div className="text-yellow-400 text-sm">⭐⭐⭐⭐⭐</div>
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                Arquitectura del Sueño
+              </h3>
+              <p className="text-sm text-gray-700 mb-3">
+                Técnicas científicas para mejorar la calidad del sueño.
+              </p>
+              <div className="flex justify-between text-xs text-gray-600 mb-3">
+                <span>5 sesiones</span>
+                <span>4.9/5 (340)</span>
+              </div>
+              <p className="text-xs italic text-gray-600">
+                "Mi calidad de sueño mejoró drásticamente" - María S.
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-5 sm:p-6 shadow-lg">
+              <div className="flex justify-between items-start mb-3">
+                <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">Alta Demanda</span>
+                <div className="text-yellow-400 text-sm">⭐⭐⭐⭐⭐</div>
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                Emociones en Equilibrio
+              </h3>
+              <p className="text-sm text-gray-700 mb-3">
+                Aprende a gestionar tus emociones efectivamente.
+              </p>
+              <div className="flex justify-between text-xs text-gray-600 mb-3">
+                <span>9 sesiones</span>
+                <span>4.8/5 (287)</span>
+              </div>
+              <p className="text-xs italic text-gray-600">
+                "Herramientas invaluables para la ansiedad" - Carlos M.
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-5 sm:p-6 shadow-lg">
+              <div className="flex justify-between items-start mb-3">
+                <span className="bg-purple-600 text-white px-2 py-1 rounded text-xs font-medium">Innovador</span>
+                <div className="text-yellow-400 text-sm">⭐⭐⭐⭐⭐</div>
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
+                Neurocalma
+              </h3>
+              <p className="text-sm text-gray-700 mb-3">
+                Técnicas neurocientíficas para reducir el estrés.
+              </p>
+              <div className="flex justify-between text-xs text-gray-600 mb-3">
+                <span>9 sesiones</span>
+                <span>4.9/5 (195)</span>
+              </div>
+              <p className="text-xs italic text-gray-600">
+                "Un enfoque científico que funciona" - Ana R.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Próximos Talleres */}
+      <section className="py-12 sm:py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+              Próximos Talleres en Vivo
+            </h2>
+            <p className="text-base sm:text-xl text-gray-600">
+              Todos los sábados de 9:00 AM a 11:00 AM
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="bg-gradient-to-r from-red-500 to-red-600 p-3 sm:p-4 text-white">
+                <div className="text-xs sm:text-sm font-medium">Próximo</div>
+                <div className="text-base sm:text-lg font-bold">4 Oct, 9:00 AM</div>
+              </div>
+              <div className="p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  Taller de Duelo
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  Honrando el recuerdo. Para personas que han vivido una pérdida.
+                </p>
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-green-600 font-semibold">15 cupos</span>
+                  <span className="text-gray-500">2 horas</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-3 sm:p-4 text-white">
+                <div className="text-xs sm:text-sm font-medium">Siguiente</div>
+                <div className="text-base sm:text-lg font-bold">18 Oct, 9:00 AM</div>
+              </div>
+              <div className="p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  Formación Docentes
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  Reflexión sobre práctica pedagógica para maestros.
+                </p>
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-green-600 font-semibold">12 cupos</span>
+                  <span className="text-gray-500">2 horas</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 p-3 sm:p-4 text-white">
+                <div className="text-xs sm:text-sm font-medium">Después</div>
+                <div className="text-base sm:text-lg font-bold">1 Nov, 9:00 AM</div>
+              </div>
+              <div className="p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
+                  Hábitos de Estudio
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  Métodos prácticos para mejorar rendimiento académico.
+                </p>
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-green-600 font-semibold">20 cupos</span>
+                  <span className="text-gray-500">2 horas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Comunidad */}
+      <section className="py-12 sm:py-20 bg-gradient-to-r from-purple-600 to-blue-600">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-4xl font-bold text-white mb-3 sm:mb-4">
+              Únete a Nuestra Comunidad
+            </h2>
+            <p className="text-base sm:text-lg text-purple-100">
+              Conecta con personas en tu mismo viaje de crecimiento
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Conexiones Reales</h3>
+              <p className="text-sm sm:text-base text-purple-100">
+                Forma conexiones auténticas que duran
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7z" clipRule="evenodd"/>
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Apoyo Continuo</h3>
+              <p className="text-sm sm:text-base text-purple-100">
+                Nunca estarás solo en tu camino
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd"/>
+                </svg>
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">Crecimiento Compartido</h3>
+              <p className="text-sm sm:text-base text-purple-100">
+                Celebra logros juntos
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Planes y Precios */}
+      <section id="planes" className="py-12 sm:py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-4xl font-bold text-gray-900 mb-3 sm:mb-4">
+              Elige el Plan Perfecto para Ti
+            </h2>
+            <p className="text-base sm:text-xl text-gray-600">
+              Desde contenido gratuito hasta acompañamiento personalizado
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-                <div className="text-white text-6xl">🧘‍♀️</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {/* Plan Gratuito */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="bg-green-50 p-4 sm:p-6 text-center">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Gratuito</h3>
+                <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-1">$0</div>
+                <div className="text-xs sm:text-sm text-gray-600">Para siempre</div>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Fundamentos de Inteligencia Emocional
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Aprende a reconocer, entender y gestionar tus emociones de manera efectiva.
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-green-600 font-semibold">GRATUITO</span>
-                  <Link href="/videos" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
-                    Ver Curso
+              <div className="p-4 sm:p-6">
+                <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Curso en Thinkific
+                  </li>
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Podcasts semanales
+                  </li>
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-green-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Acceso a comunidad
+                  </li>
+                </ul>
+                <SignedOut>
+                  <Link href="/sign-up" className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2 sm:py-3 px-4 rounded-lg text-center block text-sm">
+                    Comenzar Gratis
                   </Link>
-                </div>
+                </SignedOut>
+                <SignedIn>
+                  <div className="w-full bg-gray-100 text-gray-500 font-semibold py-2 sm:py-3 px-4 rounded-lg text-center text-sm">
+                    Plan Actual
+                  </div>
+                </SignedIn>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center">
-                <div className="text-white text-6xl">🌱</div>
+            {/* Plan Básico */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="bg-blue-50 p-4 sm:p-6 text-center">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Básico</h3>
+                <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-1">$25.000</div>
+                <div className="text-xs sm:text-sm text-gray-600">por mes</div>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Técnicas de Mindfulness
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Descubre el poder de la atención plena para reducir el estrés y la ansiedad.
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-green-600 font-semibold">GRATUITO</span>
-                  <Link href="/videos" className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors">
-                    Ver Curso
-                  </Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-              <div className="h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center">
-                <div className="text-white text-6xl">💪</div>
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                  Resiliencia y Autoestima
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Fortalece tu confianza y capacidad para superar los desafíos de la vida.
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-green-600 font-semibold">GRATUITO</span>
-                  <Link href="/videos" className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors">
-                    Ver Curso
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Podcasts Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Podcasts de Desarrollo Personal
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Escucha conversaciones profundas con expertos en psicología y desarrollo personal. 
-              Contenido que puedes disfrutar en cualquier momento y lugar.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white text-xl">
-                  🎧
-                </div>
-                <div className="ml-4">
-                  <h3 className="font-semibold text-gray-900">Mentes en Equilibrio</h3>
-                  <p className="text-sm text-gray-600">Episodio semanal</p>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-4">
-                Estrategias prácticas para mantener tu salud mental en el día a día.
-              </p>
-              <div className="flex items-center text-sm text-gray-500">
-                <span>45 min</span>
-                <span className="mx-2">•</span>
-                <span>Nuevo episodio</span>
+              <div className="p-4 sm:p-6">
+                <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-blue-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Todo del gratuito
+                  </li>
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-blue-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    5 cursos especializados
+                  </li>
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-blue-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Talleres grupales
+                  </li>
+                </ul>
+                <Link href="/pricing" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 sm:py-3 px-4 rounded-lg text-center block text-sm">
+                  Seleccionar Plan
+                </Link>
               </div>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white text-xl">
-                  🎤
-                </div>
-                <div className="ml-4">
-                  <h3 className="font-semibold text-gray-900">Historias de Transformación</h3>
-                  <p className="text-sm text-gray-600">Bi-semanal</p>
-                </div>
+            {/* Plan Premium */}
+            <div className="bg-white rounded-lg shadow-xl overflow-hidden border-2 border-purple-200 relative">
+              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <span className="bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-medium">Popular</span>
               </div>
-              <p className="text-gray-700 mb-4">
-                Testimonios reales de personas que han transformado sus vidas.
-              </p>
-              <div className="flex items-center text-sm text-gray-500">
-                <span>30 min</span>
-                <span className="mx-2">•</span>
-                <span>Inspirador</span>
+              <div className="bg-purple-50 p-4 sm:p-6 text-center">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Premium</h3>
+                <div className="text-3xl sm:text-4xl font-bold text-purple-600 mb-1">$80.000</div>
+                <div className="text-xs sm:text-sm text-gray-600">por mes</div>
               </div>
-            </div>
-
-            <div className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center text-white text-xl">
-                  🧠
-                </div>
-                <div className="ml-4">
-                  <h3 className="font-semibold text-gray-900">Psicología Práctica</h3>
-                  <p className="text-sm text-gray-600">Mensual</p>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-4">
-                Análisis profundo de temas psicológicos con expertos invitados.
-              </p>
-              <div className="flex items-center text-sm text-gray-500">
-                <span>60 min</span>
-                <span className="mx-2">•</span>
-                <span>Expertos</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 bg-blue-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Lo que dicen nuestros estudiantes
-            </h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
-              Miles de personas han transformado sus vidas con nuestra plataforma
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-lg p-6 shadow-lg">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-semibold">MG</span>
-                </div>
-                <div className="ml-3">
-                  <p className="font-semibold text-gray-900">María García</p>
-                  <p className="text-sm text-gray-600">Estudiante activa</p>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-4">
-                "Los cursos de gestión emocional me han ayudado enormemente a manejar mi ansiedad. 
-                El contenido es muy práctico y las psicólogas explican todo de manera muy clara."
-              </p>
-              <div className="flex text-yellow-400">
-                ⭐⭐⭐⭐⭐
+              <div className="p-4 sm:p-6">
+                <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-purple-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Todo del básico
+                  </li>
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-purple-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Todos los cursos (35+)
+                  </li>
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-purple-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Mindfulness
+                  </li>
+                </ul>
+                <Link href="/pricing" className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 sm:py-3 px-4 rounded-lg text-center block text-sm">
+                  Seleccionar Plan
+                </Link>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-lg">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                  <span className="text-purple-600 font-semibold">JL</span>
-                </div>
-                <div className="ml-3">
-                  <p className="font-semibold text-gray-900">Juan López</p>
-                  <p className="text-sm text-gray-600">Empresario</p>
-                </div>
+            {/* Plan VIP */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="bg-gradient-to-r from-yellow-400 to-orange-500 p-4 sm:p-6 text-center">
+                <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">VIP</h3>
+                <div className="text-3xl sm:text-4xl font-bold text-white mb-1">$160.000</div>
+                <div className="text-xs sm:text-sm text-yellow-100">por mes</div>
               </div>
-              <p className="text-gray-700 mb-4">
-                "La plataforma me ha dado herramientas increíbles para mejorar mi liderazgo 
-                y gestionar mejor el estrés del trabajo. Altamente recomendado."
-              </p>
-              <div className="flex text-yellow-400">
-                ⭐⭐⭐⭐⭐
-              </div>
-            </div>
-
-            <div className="bg-white rounded-lg p-6 shadow-lg">
-              <div className="flex items-center mb-4">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-green-600 font-semibold">AR</span>
-                </div>
-                <div className="ml-3">
-                  <p className="font-semibold text-gray-900">Ana Rodríguez</p>
-                  <p className="text-sm text-gray-600">Madre de familia</p>
-                </div>
-              </div>
-              <p className="text-gray-700 mb-4">
-                "Gracias a los cursos de mindfulness he aprendido a estar más presente 
-                con mi familia y a manejar mejor las situaciones difíciles del día a día."
-              </p>
-              <div className="flex text-yellow-400">
-                ⭐⭐⭐⭐⭐
+              <div className="p-4 sm:p-6">
+                <ul className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-orange-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Todo del premium
+                  </li>
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-orange-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Acompañamiento 1:1
+                  </li>
+                  <li className="flex items-center text-xs sm:text-sm">
+                    <svg className="w-4 h-4 text-orange-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"/>
+                    </svg>
+                    Sesiones con psicólogas
+                  </li>
+                </ul>
+                <Link href="/pricing" className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold py-2 sm:py-3 px-4 rounded-lg text-center block text-sm">
+                  Seleccionar Plan
+                </Link>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            ¿Listo para transformar tu vida?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            Únete a nuestra comunidad y accede a cursos exclusivos, talleres en vivo, 
-            sesiones de mindfulness y mucho más. Tu transformación personal comienza hoy.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <SignedOut>
-              <Link href="/sign-up" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
-                Registrarse Gratis
-              </Link>
-            </SignedOut>
-            <SignedIn>
-              <Link href="/dashboard" className="bg-white text-blue-600 hover:bg-gray-100 font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
-                Ir a Mi Dashboard
-              </Link>
-            </SignedIn>
-            <Link href="/pricing" className="border-2 border-white text-white hover:bg-white hover:text-blue-600 font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
-              Ver Planes
-            </Link>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-16">
+      <footer className="bg-gray-900 text-white py-8 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="col-span-1 md:col-span-2">
-              <Link href="/" className="text-2xl font-bold text-blue-400 mb-4 block">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            <div className="col-span-1 sm:col-span-2">
+              <Link href="/" className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 block">
                 DesarrolloPersonal.uno
               </Link>
-              <p className="text-gray-300 mb-6 max-w-md">
-                La plataforma más completa de desarrollo personal en español. 
-                Cursos, talleres, mindfulness y comunidad para tu crecimiento.
+              <p className="text-gray-400 mb-4 text-sm sm:text-base max-w-md">
+                Transformamos vidas a través del desarrollo personal profesional.
               </p>
-              <div className="flex space-x-4">
-                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                  <span className="sr-only">Facebook</span>
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/>
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                  <span className="sr-only">Instagram</span>
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 6.621 5.367 11.988 11.988 11.988s11.987-5.367 11.987-11.988C24.004 5.367 18.637.001 12.017.001zM8.449 16.988c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348zm7.718 0c-1.297 0-2.348-1.051-2.348-2.348s1.051-2.348 2.348-2.348 2.348 1.051 2.348 2.348-1.051 2.348-2.348 2.348z"/>
-                  </svg>
-                </a>
-                <a href="#" className="text-gray-400 hover:text-blue-400 transition-colors">
-                  <span className="sr-only">YouTube</span>
-                  <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                  </svg>
-                </a>
-              </div>
             </div>
             
             <div>
-              <h3 className="text-lg font-semibold mb-4">Plataforma</h3>
-              <ul className="space-y-3">
-                <li><Link href="/videos" className="text-gray-300 hover:text-white transition-colors">Contenido Gratuito</Link></li>
-                <li><Link href="/pricing" className="text-gray-300 hover:text-white transition-colors">Precios</Link></li>
-                <li><SignedIn><Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">Mi Dashboard</Link></SignedIn></li>
-                <li><Link href="/academia" className="text-gray-300 hover:text-white transition-colors">Academia</Link></li>
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">Plataforma</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/dashboard" className="text-gray-400 hover:text-white transition-colors text-sm">
+                    Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/videos" className="text-gray-400 hover:text-white transition-colors text-sm">
+                    Videos Gratuitos
+                  </Link>
+                </li>
+                <li>
+                  <a href="https://psicognitiva.thinkific.com/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors text-sm">
+                    Cursos Thinkific
+                  </a>
+                </li>
               </ul>
             </div>
             
             <div>
-              <h3 className="text-lg font-semibold mb-4">Soporte</h3>
-              <ul className="space-y-3">
-                <li><Link href="/faq" className="text-gray-300 hover:text-white transition-colors">Preguntas Frecuentes</Link></li>
-                <li><Link href="/dashboard/ayuda" className="text-gray-300 hover:text-white transition-colors">Centro de Ayuda</Link></li>
-                <li><a href="mailto:soporte@desarrollopersonal.uno" className="text-gray-300 hover:text-white transition-colors">Contacto</a></li>
-                <li><a href="/politica-privacidad" className="text-gray-300 hover:text-white transition-colors">Política de Privacidad</a></li>
+              <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">Soporte</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/contact" className="text-gray-400 hover:text-white transition-colors text-sm">
+                    Contacto
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/faq" className="text-gray-400 hover:text-white transition-colors text-sm">
+                    Preguntas Frecuentes
+                  </Link>
+                </li>
               </ul>
             </div>
           </div>
           
-          <div className="border-t border-gray-800 mt-12 pt-8 text-center">
-            <p className="text-gray-400">
+          <div className="border-t border-gray-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center">
+            <p className="text-gray-400 text-xs sm:text-sm">
               © 2024 DesarrolloPersonal.uno. Todos los derechos reservados.
             </p>
           </div>

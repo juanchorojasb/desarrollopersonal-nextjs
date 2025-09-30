@@ -1,0 +1,104 @@
+import Link from 'next/link'
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+
+export default function HomePage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <nav className="border-b border-gray-200 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between h-16">
+            <div className="flex items-center">
+              <Link href="/" className="text-2xl font-bold text-blue-600">
+                DesarrolloPersonal.uno
+              </Link>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Link href="/videos" className="text-gray-700 hover:text-blue-600 transition-colors">
+                Contenido Gratuito
+              </Link>
+              <SignedOut>
+                <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+                  Registrarse
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard" className="text-gray-700 hover:text-blue-600 transition-colors">
+                  Mi Dashboard
+                </Link>
+                <UserButton />
+              </SignedIn>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <section className="pt-20 pb-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
+              Transforma tu vida con Desarrollo Personal Profesional
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+              Únete a miles de personas que están transformando sus vidas con nuestra plataforma
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <SignedOut>
+                <Link href="/sign-up" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+                  Comienza tu Transformación Gratuita
+                </Link>
+              </SignedOut>
+              <SignedIn>
+                <Link href="/dashboard" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-8 rounded-lg transition-colors text-lg">
+                  Ir a Mi Dashboard
+                </Link>
+              </SignedIn>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-20 bg-gradient-to-r from-green-50 to-blue-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Plan Gratuito - Comienza tu Transformación Hoy
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Regístrate gratis y accede inmediatamente a contenido exclusivo
+            </p>
+          </div>
+          <div className="bg-white rounded-lg shadow-xl p-8 max-w-2xl mx-auto">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">Contenido Gratuito Incluido</h3>
+              <p className="text-green-600 font-semibold text-xl">100% Gratis - Sin Límites</p>
+            </div>
+            <ul className="space-y-4 mb-8">
+              <li className="flex items-center">
+                <span className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm">✓</span>
+                <span>Curso completo en Thinkific: "Fundamentos de Bienestar Emocional"</span>
+              </li>
+              <li className="flex items-center">
+                <span className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm">✓</span>
+                <span>Podcasts semanales de "Psicología Práctica" en Spotify</span>
+              </li>
+              <li className="flex items-center">
+                <span className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3 text-white text-sm">✓</span>
+                <span>Acceso completo a la comunidad y foros</span>
+              </li>
+            </ul>
+            <SignedOut>
+              <Link href="/sign-up" className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors text-center block">
+                Registrarse Gratis Ahora
+              </Link>
+            </SignedOut>
+            <SignedIn>
+              <Link href="/dashboard" className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-6 rounded-lg transition-colors text-center block">
+                Acceder a Mi Contenido
+              </Link>
+            </SignedIn>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
+}

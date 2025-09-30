@@ -1,10 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@clerk/nextjs/server';
-import { createForumPost } from '@/lib/forum';
-import { getUserPlan, hasAccess } from '@/lib/plans';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
+export async function GET(request: NextRequest) {
+  try {
+    const posts = await prisma.forumPost.findMany({
+      where: { isDeleted: false },
+      include: {
+        author: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            imageUrl: true
+          }
+        },
+        category: true,
+        _count: {
+          select: {
+            replies: true,
+            reactions: true
+          }
+        }
+      },
+      orderBy: { lastActivityAt: 'desc' },
+      take: 20
+    });
+
+    return NextResponse.json(posts);
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    return NextResponse.json(
+      { error: 'Error interno del servidor' },
+      { status: 500 }
+    );
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,126 +44,41 @@ export async function POST(request: NextRequest) {
     
     if (!userId) {
       return NextResponse.json(
-        { message: 'No autorizado' },
+        { error: 'No autorizado' },
         { status: 401 }
       );
     }
 
-    // Check if user has access to community features
-    const userClerkData = await fetch(`https://api.clerk.com/v1/users/${userId}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}`,
-      },
-    });
+    const { title, content, categoryId } = await request.json();
     
-    if (!userClerkData.ok) {
+    if (!title || !content || !categoryId) {
       return NextResponse.json(
-        { message: 'Error verificando usuario' },
-        { status: 500 }
-      );
-    }
-
-    const userData = await userClerkData.json();
-    const userPlan = getUserPlan(userData);
-    
-    if (!hasAccess(userPlan, 'complete')) {
-      return NextResponse.json(
-        { message: 'Necesitas un plan Complete o Personal para crear posts en la comunidad' },
-        { status: 403 }
-      );
-    }
-
-    const body = await request.json();
-    const { title, content, categoryId } = body;
-
-    // Validate input
-    if (!title || typeof title !== 'string' || title.trim().length === 0) {
-      return NextResponse.json(
-        { message: 'El título es requerido' },
+        { error: 'Faltan campos requeridos' },
         { status: 400 }
       );
     }
 
-    if (title.length > 200) {
-      return NextResponse.json(
-        { message: 'El título no puede exceder 200 caracteres' },
-        { status: 400 }
-      );
-    }
-
-    if (!content || typeof content !== 'string' || content.trim().length === 0) {
-      return NextResponse.json(
-        { message: 'El contenido es requerido' },
-        { status: 400 }
-      );
-    }
-
-    if (content.length > 5000) {
-      return NextResponse.json(
-        { message: 'El contenido no puede exceder 5000 caracteres' },
-        { status: 400 }
-      );
-    }
-
-    if (!categoryId || typeof categoryId !== 'string') {
-      return NextResponse.json(
-        { message: 'La categoría es requerida' },
-        { status: 400 }
-      );
-    }
-
-    // Verify category exists and is active
-    const category = await prisma.forumCategory.findUnique({
-      where: { id: categoryId },
-      select: { id: true, isActive: true }
-    });
-
-    if (!category || !category.isActive) {
-      return NextResponse.json(
-        { message: 'Categoría no encontrada o inactiva' },
-        { status: 404 }
-      );
-    }
-
-    // Get or create user record
-    let user = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { clerkId: userId }
     });
 
     if (!user) {
-      // Create user record from Clerk data
-      user = await prisma.user.create({
-        data: {
-          clerkId: userId,
-          email: userData.email_addresses[0]?.email_address || '',
-          firstName: userData.first_name,
-          lastName: userData.last_name,
-          imageUrl: userData.image_url
-        }
-      });
+      return NextResponse.json(
+        { error: 'Usuario no encontrado en base de datos' },
+        { status: 404 }
+      );
     }
 
-    // Create the post
-    const post = await createForumPost({
-      title: title.trim(),
-      content: content.trim(),
-      categoryId,
-      authorId: user.id
+    return NextResponse.json({ 
+      message: 'API POST funcionando con autenticación', 
+      userId: userId,
+      userDbId: user.id 
     });
-
-    return NextResponse.json({
-      message: 'Post creado exitosamente',
-      post: {
-        id: post.id,
-        slug: post.slug,
-        categorySlug: post.category.slug
-      }
-    });
-
+    
   } catch (error) {
-    console.error('Error creating forum post:', error);
+    console.error('Error in POST:', error);
     return NextResponse.json(
-      { message: 'Error interno del servidor' },
+      { error: 'Error interno del servidor' },
       { status: 500 }
     );
   }

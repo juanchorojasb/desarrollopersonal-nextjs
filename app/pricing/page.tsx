@@ -66,79 +66,79 @@ export default function PricingPage() {
     window.location.href = `/payment/checkout?plan=${planId}`
   }
   const plans = [
-    {
-      name: "Plan Gratuito",
-      planId: "free",
-      price: "Gratis",
-      period: "",
-      popular: false,
-      description: "Perfecto para comenzar tu viaje de desarrollo personal",
-      features: [
-        "Acceso limitado al dashboard",
-        "Contenido básico",
-        "Vista previa de cursos",
-        "Soporte por email"
-      ],
-      buttonText: "Comenzar Gratis",
-      buttonStyle: "border border-gray-300 text-gray-700 hover:border-gray-400"
-    },
-    {
-      name: "Plan Básico",
-      planId: "basic",
-      price: "15,000 COP",
-      priceUSD: "3 USD",
-      period: "/mes",
-      popular: true,
-      description: "La opción más popular para acceder a todos los cursos",
-      features: [
-        "Acceso completo a todos los cursos",
-        "Progreso y estadísticas detalladas",
-        "Certificados básicos",
-        "Soporte por email",
-        "Descarga de materiales"
-      ],
-      buttonText: "Comenzar Ahora",
-      buttonStyle: "bg-blue-600 text-white hover:bg-blue-700"
-    },
-    {
-      name: "Plan Completo",
-      planId: "complete",
-      price: "30,000 COP",
-      priceUSD: "6 USD",
-      period: "/mes",
-      popular: false,
-      description: "Experiencia completa con comunidad y talleres",
-      features: [
-        "Todo del Plan Básico",
-        "Talleres en vivo",
-        "Comunidad premium",
-        "Certificados avanzados",
-        "Soporte prioritario",
-        "Acceso temprano a contenido"
-      ],
-      buttonText: "Elegir Plan",
-      buttonStyle: "bg-purple-600 text-white hover:bg-purple-700"
-    },
-    {
-      name: "Plan Personal",
-      planId: "personal",
-      price: "40,000 COP",
-      priceUSD: "8 USD",
-      period: "/mes",
-      popular: false,
-      description: "Acompañamiento personalizado para tu crecimiento",
-      features: [
-        "Todo del Plan Completo",
-        "Acompañamiento personalizado",
-        "Sesiones 1-a-1",
-        "Contenido exclusivo",
-        "Coaching personalizado",
-        "Acceso a mentores expertos"
-      ],
-      buttonText: "Contactar Ventas",
-      buttonStyle: "bg-yellow-600 text-white hover:bg-yellow-700"
-    }
-  ]
+  {
+    name: "Plan Gratuito",
+    planId: "free",
+    price: "Gratis",
+    period: "",
+    popular: false,
+    description: "Perfecto para comenzar tu viaje de desarrollo personal",
+    features: [
+      "Acceso limitado al dashboard",
+      "Contenido básico",
+      "Vista previa de cursos",
+      "Soporte por email"
+    ],
+    buttonText: "Comenzar Gratis",
+    buttonStyle: "border border-gray-300 text-gray-700 hover:border-gray-400"
+  },
+  {
+    name: "Plan Básico",
+    planId: "basic",
+    price: "25,000 COP",
+    priceUSD: "6 USD",
+    period: "/mes",
+    popular: true,
+    description: "La opción más popular para acceder a todos los cursos",
+    features: [
+      "Acceso completo a todos los cursos",
+      "Progreso y estadísticas detalladas",
+      "Certificados básicos",
+      "Soporte por email",
+      "Descarga de materiales"
+    ],
+    buttonText: "Comenzar Ahora",
+    buttonStyle: "bg-blue-600 text-white hover:bg-blue-700"
+  },
+  {
+    name: "Plan Completo",
+    planId: "complete",
+    price: "80,000 COP",
+    priceUSD: "22 USD",
+    period: "/mes",
+    popular: false,
+    description: "Experiencia completa con comunidad y talleres",
+    features: [
+      "Todo del Plan Básico",
+      "Talleres en vivo",
+      "Comunidad premium",
+      "Certificados avanzados",
+      "Soporte prioritario",
+      "Acceso temprano a contenido"
+    ],
+    buttonText: "Elegir Plan",
+    buttonStyle: "bg-purple-600 text-white hover:bg-purple-700"
+  },
+  {
+    name: "Plan Premium",
+    planId: "premium",
+    price: "160,000 COP",
+    priceUSD: "45 USD",
+    period: "/mes",
+    popular: false,
+    description: "Acompañamiento personalizado para tu crecimiento",
+    features: [
+      "Todo del Plan Completo",
+      "Acompañamiento personalizado",
+      "Sesiones 1-a-1",
+      "Contenido exclusivo",
+      "Coaching personalizado",
+      "Acceso a mentores expertos"
+    ],
+    buttonText: "Contactar Ventas",
+    buttonStyle: "bg-yellow-600 text-white hover:bg-yellow-700"
+  }
+]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
