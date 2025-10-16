@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { auth, clerkClient } from '@clerk/nextjs/server';
 import { PrismaClient } from '@prisma/client';
-import { getUserPlan, hasAccess, Plan } from '@/lib/plans';
+import { getUserPlan, hasAccess } from '@/lib/plans';
 
 const prisma = new PrismaClient();
 
@@ -15,22 +15,51 @@ export async function GET(request: Request) {
     }
 
     // Get user from Clerk to check plan
-    const client = await clerkClient()
+    const client = await clerkClient();
     const clerkUser = await client.users.getUser(userId);
     const userPlan = getUserPlan(clerkUser);
 
     // Get or create user in database
-    const user = await prisma.user.upsert({
-      where: { clerkId: userId },
-      update: {},
-      create: {
-        clerkId: userId,
-        email: clerkUser.emailAddresses[0]?.emailAddress || 'user@example.com',
-        firstName: clerkUser.firstName || undefined,
-        lastName: clerkUser.lastName || undefined,
-        imageUrl: clerkUser.imageUrl || undefined,
-      }
+    let user = await prisma.user.findUnique({
+      where: { clerkId: userId }
     });
+
+    if (!user) {
+      // Si no existe por clerkId, buscar por email
+      const userEmail = clerkUser.emailAddresses[0]?.emailAddress;
+      
+      if (userEmail) {
+        user = await prisma.user.findUnique({
+          where: { email: userEmail }
+        });
+        
+        if (user) {
+          // Actualizar el clerkId del usuario existente
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: { 
+              clerkId: userId,
+              firstName: clerkUser.firstName || undefined,
+              lastName: clerkUser.lastName || undefined,
+              imageUrl: clerkUser.imageUrl || undefined,
+            }
+          });
+        }
+      }
+      
+      // Si aún no existe, crear nuevo usuario
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            clerkId: userId,
+            email: clerkUser.emailAddresses[0]?.emailAddress || `user_${userId}@temp.com`,
+            firstName: clerkUser.firstName || undefined,
+            lastName: clerkUser.lastName || undefined,
+            imageUrl: clerkUser.imageUrl || undefined,
+          }
+        });
+      }
+    }
 
     const courses = await prisma.course.findMany({
       where: {
@@ -59,17 +88,17 @@ export async function GET(request: Request) {
     // Calcular progreso para cada curso
     const coursesWithProgress = courses.map(course => {
       const totalLessons = course.modules.reduce((acc, module) => acc + module.lessons.length, 0);
-      const completedLessons = course.modules.reduce((acc, module) => 
-        acc + module.lessons.filter(lesson => 
+      const completedLessons = course.modules.reduce((acc, module) =>
+        acc + module.lessons.filter(lesson =>
           lesson.progress.length > 0 && lesson.progress[0].isCompleted
         ).length, 0
       );
-      
+
       // Check if user has access based on plan
       const hasAccessToCourse = hasAccess(userPlan, 'basic'); // Basic plan or higher for course access
       const isEnrolled = course.enrollments.length > 0;
       const progressPercentage = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
-      
+
       return {
         id: course.id,
         title: course.title,
@@ -96,8 +125,10 @@ export async function GET(request: Request) {
   } catch (error) {
     console.error('Error getting courses:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' }, 
+      { error: 'Error interno del servidor' },
       { status: 500 }
     );
+  } finally {
+    await prisma.$disconnect();
   }
 }
