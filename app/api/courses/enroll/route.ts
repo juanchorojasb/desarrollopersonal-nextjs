@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { requireAuth, getUserId } from '@/lib/server-auth';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -10,7 +10,7 @@ interface EnrollRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth(); // CORREGIDO: agregado await
+    const userId = await getUserId(); // CORREGIDO: agregado await
 
     if (!userId) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -25,11 +25,12 @@ export async function POST(request: NextRequest) {
 
     // Get or create user
     const user = await prisma.user.upsert({
-      where: { clerkId: userId },
+      where: { id: userId },
       update: {},
       create: {
-        clerkId: userId,
-        email: 'user@example.com', // This should come from Clerk
+        id: userId,
+        email: `user-${userId}@temp.local`,
+        subscriptionStatus: "free",
       }
     });
 
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
     const existingEnrollment = await prisma.enrollment.findUnique({
       where: {
         userId_courseId: {
-          userId: user.id,
+          userId: user?.id,
           courseId
         }
       }
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
     // Crear inscripción
     const enrollment = await prisma.enrollment.create({
       data: {
-        userId: user.id,
+        userId: user?.id,
         courseId,
         enrolledAt: new Date()
       },

@@ -1,16 +1,16 @@
-import { currentUser } from '@clerk/nextjs/server'
+import { getCurrentUser } from '@/lib/server-auth'
 import { redirect } from 'next/navigation'
 import { getUserPlan, PLANS } from '@/lib/plans'
 import PlanChangeComponent from './plan-change-component'
 
 export default async function MiPlanPage() {
-  const user = await currentUser()
+  const user = await getCurrentUser()
   
   if (!user) {
     redirect('/sign-in')
   }
 
-  const currentPlan = getUserPlan(user)
+  const currentPlan = getUserPlan(user.subscriptionStatus)
   const planConfig = PLANS[currentPlan]
 
   return (

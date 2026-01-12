@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { auth } from '@clerk/nextjs/server';
+import { requireAuth, getUserId } from '@/lib/server-auth';
 import PlanGate from '@/components/auth/PlanGate';
 import { getForumPostBySlug, incrementPostViews } from '@/lib/forum';
 import { MessageCircle, ArrowLeft, Eye, MessageSquare, Calendar } from 'lucide-react';
@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default async function ForumPostPage({ params }: Props) {
-  const { userId } = await auth();
+  const userId = await getUserId();
   const { categoria, slug } = await params;
   const post = await getForumPostBySlug(categoria, slug);
   

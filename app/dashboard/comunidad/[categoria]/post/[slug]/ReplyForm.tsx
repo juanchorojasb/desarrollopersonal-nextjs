@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Send, MessageSquare } from 'lucide-react';
 
 interface ReplyFormProps {
@@ -28,7 +28,7 @@ export default function ReplyForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -51,7 +51,7 @@ export default function ReplyForm({
       const response = await fetch('/api/forum/replies', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           content: content.trim(),
@@ -92,21 +92,21 @@ export default function ReplyForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* User Info */}
       <div className="flex items-center gap-3 mb-4">
-        {user.imageUrl ? (
+        {user?.image ? (
           <img
-            src={user.imageUrl}
-            alt={user.fullName || 'Usuario'}
+            src={user?.image}
+            alt={user.name || 'Usuario'}
             className="w-8 h-8 rounded-full"
           />
         ) : (
           <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
             <span className="text-indigo-600 font-medium text-sm">
-              {user.firstName?.[0]}{user.lastName?.[0]}
+              {user?.name?.split(' ')[0]?.[0]}{user?.name?.split(' ')[1]?.[0]}
             </span>
           </div>
         )}
         <span className="text-sm text-gray-700 font-medium">
-          {user.firstName} {user.lastName}
+          {user?.name?.split(' ')[0]} {user?.name?.split(' ')[1]}
         </span>
       </div>
 

@@ -3,68 +3,89 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                 String            @id @default(cuid())
-  clerkId            String            @unique
-  email              String            @unique
-  firstName          String?
-  lastName           String?
-  imageUrl           String?
-  bio                String?           @db.Text
-  phone              String?
-  birthDate          DateTime?
-  gender             String?
-  subscriptionStatus String            @default("free")
-  subscriptionExpiry DateTime?
-  totalXP            Int               @default(0)
-  currentLevel       Int               @default(1)
-  streakDays         Int               @default(0)
-  lastActivity       DateTime?
-  createdAt          DateTime          @default(now())
-  updatedAt          DateTime          @updatedAt
-  certificates       Certificate[]
-  enrollments        Enrollment[]
-  forumPosts         ForumPost[]
-  forumReactions     ForumReaction[]
-  forumReplies       ForumReply[]
-  lessonProgress     LessonProgress[]
-  notes              Note[]
-  achievements       UserAchievement[]
+  id                String    @id @default(cuid())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  clerkId           String?   @unique
+  email             String    @unique
+  name              String?
+  emailVerified     DateTime?
+  image             String?
+  hashedPassword    String?
+  firstName         String?
+  lastName          String?
+  imageUrl          String?
+  bio               String?   @db.Text
+  subscriptionStatus String   @default("free")
+  isAdmin           Boolean   @default(false)
 
-  @@map("users")
+  enrollments       Enrollment[]
+  lessonProgress    LessonProgress[]
+  forumPosts        ForumPost[]
+  forumReplies      ForumReply[]
+  forumReactions    ForumReaction[]
+
+  accounts          Account[]
+  sessions          Session[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model Course {
-  id            String        @id @default(cuid())
-  title         String
-  description   String        @db.Text
-  shortDesc     String?
-  thumbnail     String?
-  trailerVideo  String?
-  level         String        @default("beginner")
-  category      String
-  tags          String?
-  price         Float         @default(0)
-  currency      String        @default("USD")
-  status        String        @default("draft")
-  featured      Boolean       @default(false)
-  duration      Int?
-  studentsCount Int           @default(0)
-  instructorId  String?
-  instructor    String?
-  position      Int           @default(0)
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  certificates  Certificate[]
-  enrollments   Enrollment[]
-  modules       Module[]
-  reviews       Review[]
+  id          String   @id @default(cuid())
+  title       String
+  description String   @db.Text
+  category    String
+  level       String
+  duration    Int?
+  price       Float    @default(0)
+  instructor  String?
+  imageUrl    String?
+  requiredPlan String  @default("free")
+  isPublished Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  @@map("courses")
+  modules     Module[]
+  enrollments Enrollment[]
 }
 
 model Module {
@@ -72,297 +93,127 @@ model Module {
   title       String
   description String?  @db.Text
   position    Int
-  isRequired  Boolean  @default(true)
-  duration    Int?
   courseId    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  lessons     Lesson[]
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
-  @@index([courseId], map: "modules_courseId_fkey")
-  @@map("modules")
+  course  Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessons Lesson[]
+
+  @@index([courseId])
 }
 
 model Lesson {
-  id            String           @id @default(cuid())
-  title         String
-  description   String?          @db.Text
-  content       String?          @db.Text
-  position      Int
-  type          String           @default("video")
-  videoUrl      String?
-  videoId       String?
-  videoDuration Int?
-  isPreview     Boolean          @default(false)
-  isRequired    Boolean          @default(true)
-  minWatchTime  Int              @default(80)
-  resources     String?
-  moduleId      String
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  progress      LessonProgress[]
-  module        Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  notes         Note[]
-
-  @@index([moduleId], map: "lessons_moduleId_fkey")
-  @@map("lessons")
-}
-
-model Enrollment {
-  id             String    @id @default(cuid())
-  userId         String
-  courseId       String
-  status         String    @default("active")
-  progress       Float     @default(0)
-  enrolledAt     DateTime  @default(now())
-  completedAt    DateTime?
-  expiresAt      DateTime?
-  lastAccessedAt DateTime?
-  totalWatchTime Int       @default(0)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  course         Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, courseId])
-  @@index([courseId], map: "enrollments_courseId_fkey")
-  @@map("enrollments")
-}
-
-model LessonProgress {
-  id              String    @id @default(cuid())
-  userId          String
-  lessonId        String
-  isCompleted     Boolean   @default(false)
-  watchTime       Int       @default(0)
-  watchPercentage Float     @default(0)
-  startedAt       DateTime  @default(now())
-  completedAt     DateTime?
-  lastWatchedAt   DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  lesson          Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, lessonId])
-  @@index([lessonId], map: "lesson_progress_lessonId_fkey")
-  @@map("lesson_progress")
-}
-
-model Note {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  timestamp Int?
-  userId    String
-  lessonId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([lessonId], map: "notes_lessonId_fkey")
-  @@index([userId], map: "notes_userId_fkey")
-  @@map("notes")
-}
-
-model Certificate {
-  id                String    @id @default(cuid())
-  certificateNumber String    @unique
-  title             String
-  description       String?
-  userId            String
-  courseId          String
-  issuedAt          DateTime  @default(now())
-  expiresAt         DateTime?
-  certificateUrl    String?
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  course            Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([courseId], map: "certificates_courseId_fkey")
-  @@index([userId], map: "certificates_userId_fkey")
-  @@map("certificates")
-}
-
-model Review {
-  id         String   @id @default(cuid())
-  rating     Int
-  comment    String?  @db.Text
-  userId     String
-  courseId   String
-  isVerified Boolean  @default(false)
-  isPublic   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, courseId])
-  @@index([courseId], map: "reviews_courseId_fkey")
-  @@map("reviews")
-}
-
-model Achievement {
-  id               String            @id @default(cuid())
-  name             String
-  description      String
-  icon             String?
-  type             String
-  criteria         String            @db.Text
-  xpReward         Int               @default(0)
-  badgeUrl         String?
-  isActive         Boolean           @default(true)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  userAchievements UserAchievement[]
-
-  @@map("achievements")
-}
-
-model UserAchievement {
-  id            String      @id @default(cuid())
-  userId        String
-  achievementId String
-  unlockedAt    DateTime    @default(now())
-  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
-  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, achievementId])
-  @@index([achievementId], map: "user_achievements_achievementId_fkey")
-  @@map("user_achievements")
-}
-
-model ForumCategory {
-  id          String      @id @default(cuid())
-  name        String
-  description String?     @db.Text
-  slug        String      @unique
-  color       String      @default("#6366f1")
-  icon        String?
-  position    Int         @default(0)
-  isActive    Boolean     @default(true)
-  postsCount  Int         @default(0)
-  lastPostAt  DateTime?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  posts       ForumPost[]
-
-  @@map("forum_categories")
-}
-
-model ForumPost {
-  id             String          @id @default(cuid())
-  title          String
-  content        String          @db.Text
-  slug           String
-  authorId       String
-  categoryId     String
-  isLocked       Boolean         @default(false)
-  isPinned       Boolean         @default(false)
-  isDeleted      Boolean         @default(false)
-  viewsCount     Int             @default(0)
-  repliesCount   Int             @default(0)
-  reactionsCount Int             @default(0)
-  lastActivityAt DateTime        @default(now())
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  author         User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  category       ForumCategory   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  reactions      ForumReaction[]
-  replies        ForumReply[]
-
-  @@unique([categoryId, slug])
-  @@index([authorId], map: "forum_posts_authorId_fkey")
-  @@map("forum_posts")
-}
-
-model ForumReply {
-  id             String          @id @default(cuid())
-  content        String          @db.Text
-  authorId       String
-  postId         String
-  parentId       String?
-  isDeleted      Boolean         @default(false)
-  reactionsCount Int             @default(0)
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  reactions      ForumReaction[]
-  author         User            @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  parent         ForumReply?     @relation("ReplyToReply", fields: [parentId], references: [id])
-  children       ForumReply[]    @relation("ReplyToReply")
-  post           ForumPost       @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  @@index([authorId], map: "forum_replies_authorId_fkey")
-  @@index([parentId], map: "forum_replies_parentId_fkey")
-  @@index([postId], map: "forum_replies_postId_fkey")
-  @@map("forum_replies")
-}
-
-model ForumReaction {
-  id        String      @id @default(cuid())
-  type      String
-  userId    String
-  postId    String?
-  replyId   String?
-  createdAt DateTime    @default(now())
-  post      ForumPost?  @relation(fields: [postId], references: [id], onDelete: Cascade)
-  reply     ForumReply? @relation(fields: [replyId], references: [id], onDelete: Cascade)
-  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, postId])
-  @@unique([userId, replyId])
-  @@index([postId], map: "forum_reactions_postId_fkey")
-  @@index([replyId], map: "forum_reactions_replyId_fkey")
-  @@map("forum_reactions")
-}
-
-model AdminLog {
-  id           String   @id @default(cuid())
-  adminId      String
-  adminEmail   String
-  action       String
-  resource     String
-  resourceId   String?
-  metadata     String?  @db.Text
-  ipAddress    String?
-  userAgent    String?  @db.Text
-  success      Boolean  @default(true)
-  errorMessage String?  @db.Text
-  createdAt    DateTime @default(now())
-
-  @@map("admin_logs")
-}
-
-model SystemConfig {
   id          String   @id @default(cuid())
-  key         String   @unique
-  value       String   @db.Text
-  type        String   @default("string")
-  description String?
-  isPublic    Boolean  @default(false)
+  title       String
+  description String?  @db.Text
+  videoUrl    String?
+  content     String?  @db.Text
+  duration    Int?
+  position    Int
+  moduleId    String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@map("system_config")
+  module   Module           @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  progress LessonProgress[]
+
+  @@index([moduleId])
 }
 
-model PromoCode {
+model Enrollment {
+  id               String    @id @default(cuid())
+  userId           String
+  courseId         String
+  enrolledAt       DateTime  @default(now())
+  completedAt      DateTime?
+  progressPercentage Float   @default(0)
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model LessonProgress {
   id              String   @id @default(cuid())
-  code            String   @unique
-  discountType    String
-  discountValue   Float
-  maxUses         Int?
-  usedCount       Int      @default(0)
-  validFrom       DateTime
-  validUntil      DateTime
-  applicablePlans String?  @db.Text
-  minPurchase     Float?
-  isActive        Boolean  @default(true)
-  description     String?
-  createdBy       String?
+  userId          String
+  lessonId        String
+  isCompleted     Boolean  @default(false)
+  watchTime       Int      @default(0)
+  watchPercentage Float    @default(0)
+  completedAt     DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  @@map("promo_codes")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson Lesson @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+  @@index([userId])
+  @@index([lessonId])
+}
+
+model ForumPost {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  category  String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies   ForumReply[]
+  reactions ForumReaction[]
+
+  @@index([userId])
+  @@index([category])
+}
+
+model ForumReply {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  postId    String
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  post      ForumPost       @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions ForumReaction[]
+
+  @@index([postId])
+  @@index([userId])
+}
+
+model ForumReaction {
+  id        String   @id @default(cuid())
+  type      String
+  postId    String?
+  replyId   String?
+  userId    String
+  createdAt DateTime @default(now())
+
+  post  ForumPost?  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reply ForumReply? @relation(fields: [replyId], references: [id], onDelete: Cascade)
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([replyId])
+  @@index([userId])
+}
+
+model ForumCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?  @db.Text
+  icon        String?
+  color       String?
+  isActive    Boolean  @default(true)
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

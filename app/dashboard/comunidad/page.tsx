@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import PlanGate from '@/components/auth/PlanGate';
 import { getForumCategories } from '@/lib/forum';

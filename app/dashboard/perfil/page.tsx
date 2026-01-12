@@ -1,8 +1,8 @@
-import { currentUser } from '@clerk/nextjs/server'
+import { getCurrentUser } from '@/lib/server-auth'
 import { redirect } from 'next/navigation'
 
 export default async function PerfilPage() {
-  const user = await currentUser()
+  const user = await getCurrentUser()
   
   if (!user) {
     redirect('/sign-in')
@@ -27,14 +27,14 @@ export default async function PerfilPage() {
               <div className="text-center">
                 <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
                   <span className="text-2xl font-bold text-white">
-                    {user.firstName?.[0] || 'U'}{user.lastName?.[0] || ''}
+                    {user.name?.split(' ')[0]?.[0] || 'U'}{user.name?.split(' ')[1]?.[0] || ''}
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900">
-                  {user.firstName} {user.lastName}
+                  {user.name?.split(' ')[0]} {user.name?.split(' ')[1]}
                 </h3>
                 <p className="text-sm text-gray-600">
-                  {user.emailAddresses[0]?.emailAddress}
+                  {user.email}
                 </p>
                 <button className="mt-3 text-sm text-blue-600 hover:text-blue-700">
                   Cambiar foto
@@ -83,7 +83,7 @@ export default async function PerfilPage() {
                     Nombre completo
                   </label>
                   <div className="text-gray-900">
-                    {user.firstName} {user.lastName}
+                    {user.name?.split(' ')[0]} {user.name?.split(' ')[1]}
                   </div>
                 </div>
                 <div>
@@ -91,7 +91,7 @@ export default async function PerfilPage() {
                     Email
                   </label>
                   <div className="text-gray-900">
-                    {user.emailAddresses[0]?.emailAddress}
+                    {user.email}
                   </div>
                 </div>
                 <div>

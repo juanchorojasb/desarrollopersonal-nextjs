@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useUser } from '@clerk/nextjs';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Send, ArrowLeft, Eye, Edit } from 'lucide-react';
 
 interface NewPostFormProps {
@@ -19,7 +19,7 @@ export default function NewPostForm({ categoryId, categorySlug, categoryName }: 
   const [error, setError] = useState('');
   const [isPreview, setIsPreview] = useState(false);
   
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,7 +47,7 @@ export default function NewPostForm({ categoryId, categorySlug, categoryName }: 
       const response = await fetch('/api/forum/posts', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           title: title.trim(),
@@ -110,22 +110,22 @@ export default function NewPostForm({ categoryId, categorySlug, categoryName }: 
 
       {/* User Info */}
       <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-        {user.imageUrl ? (
+        {user?.image ? (
           <img
-            src={user.imageUrl}
-            alt={user.fullName || 'Usuario'}
+            src={user?.image}
+            alt={user.name || 'Usuario'}
             className="w-10 h-10 rounded-full"
           />
         ) : (
           <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
             <span className="text-indigo-600 font-medium">
-              {user.firstName?.[0]}{user.lastName?.[0]}
+              {user?.name?.split(' ')[0]?.[0]}{user?.name?.split(' ')[1]?.[0]}
             </span>
           </div>
         )}
         <div>
           <div className="font-medium text-gray-900">
-            {user.firstName} {user.lastName}
+            {user?.name?.split(' ')[0]} {user?.name?.split(' ')[1]}
           </div>
           <div className="text-sm text-gray-600">
             Creando en {categoryName}

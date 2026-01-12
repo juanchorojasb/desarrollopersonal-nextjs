@@ -34,9 +34,9 @@ export default function PricingPage() {
       try {
         const response = await fetch('/api/promo/apply', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+        headers: {
+          'Content-Type': 'application/json'
+        },
           body: JSON.stringify({
             promoCode: promoCode,
             selectedPlan: planId
@@ -103,7 +103,7 @@ export default function PricingPage() {
   {
     name: "Plan Completo",
     planId: "complete",
-    price: "80,000 COP",
+    price: "49,000 COP",
     priceUSD: "22 USD",
     period: "/mes",
     popular: false,

@@ -1,4 +1,4 @@
-import { User } from '@clerk/nextjs/server';
+import { prisma } from '@/lib/prisma';
 
 export type Plan = 'free' | 'basic' | 'complete' | 'personal';
 
@@ -36,10 +36,34 @@ export const PLANS: Record<Plan, PlanConfig> = {
   }
 };
 
-export function getUserPlan(user: User | null): Plan {
-  if (!user) return 'free';
+// Obtener plan del usuario desde la base de datos
+export async function getUserPlanById(userId: string): Promise<Plan> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { subscriptionStatus: true }
+    });
+    
+    if (!user) return 'free';
+    
+    // subscriptionStatus en la DB: "free", "basic", "complete", "personal"
+    const plan = user.subscriptionStatus as Plan;
+    if (plan && Object.keys(PLANS).includes(plan)) {
+      return plan;
+    }
+    
+    return 'free';
+  } catch (error) {
+    console.error('Error getting user plan:', error);
+    return 'free';
+  }
+}
+
+// Versión síncrona para cuando ya tienes el usuario
+export function getUserPlan(subscriptionStatus?: string | null): Plan {
+  if (!subscriptionStatus) return 'free';
   
-  const plan = user.publicMetadata?.plan as Plan;
+  const plan = subscriptionStatus as Plan;
   if (plan && Object.keys(PLANS).includes(plan)) {
     return plan;
   }
@@ -50,7 +74,6 @@ export function getUserPlan(user: User | null): Plan {
 export function hasAccess(userPlan: Plan, requiredPlan: Plan): boolean {
   const userLevel = PLANS[userPlan].level;
   const requiredLevel = PLANS[requiredPlan].level;
-  
   return userLevel >= requiredLevel;
 }
 
@@ -60,7 +83,9 @@ export function getUpgradeMessage(requiredPlan: Plan): string {
 }
 
 export function getPlanHierarchy(): Plan[] {
-  return Object.keys(PLANS).sort((a, b) => PLANS[a as Plan].level - PLANS[b as Plan].level) as Plan[];
+  return Object.keys(PLANS).sort((a, b) => 
+    PLANS[a as Plan].level - PLANS[b as Plan].level
+  ) as Plan[];
 }
 
 export function getNextPlan(currentPlan: Plan): Plan | null {

@@ -1,11 +1,12 @@
 "use client";
+import { signOut } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { SignOutButton, useUser } from '@clerk/nextjs';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useUserPlan } from '@/lib/plans-client';
-import { useEffect, useState as useAdminState } from 'react';
+import { useEffect } from 'react';
 import {
   Home,
   BookOpen,
@@ -228,14 +229,14 @@ const bottomNavItems: NavItem[] = [
 
 export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const pathname = usePathname();
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   const userPlan = useUserPlan();
   const [expandedSections, setExpandedSections] = useState<string[]>(['cursos']);
-  const [isAdmin, setIsAdmin] = useAdminState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Check if user is admin
   useEffect(() => {
-    if (user?.publicMetadata?.role === 'admin') {
+    if (user?.isAdmin === true) {
       setIsAdmin(true);
     } else {
       setIsAdmin(false);
@@ -388,23 +389,23 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
         <div className="flex items-center justify-between p-4 border-b border-blue-500/20">
           {!isCollapsed && (
             <div className="flex items-center gap-3">
-              {user?.imageUrl ? (
+              {user?.image ? (
                 <div className="w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img 
-                    src={user.imageUrl} 
-                    alt={user.firstName || 'Usuario'} 
+                    src={user?.image} 
+                    alt={user?.name?.split(' ')[0] || 'Usuario'} 
                     className="w-full h-full object-cover"
                   />
                 </div>
               ) : (
                 <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white font-semibold">
-                  {user?.firstName?.charAt(0) || 'U'}
+                  {user?.name?.split(" ")[0]?.charAt(0) || 'U'}
                 </div>
               )}
               <div>
                 <h3 className="font-semibold text-white">
-                  {user?.firstName || 'Usuario'}
+                  {user?.name?.split(" ")[0] || 'Usuario'}
                 </h3>
                 <p className="text-xs text-blue-200">Estudiante Activo</p>
               </div>
@@ -492,19 +493,13 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
 
         {/* Footer */}
         <div className="p-4 border-t border-blue-500/20">
-          <SignOutButton>
-            <button className="group flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 transition-all">
-              <LogOut className="w-5 h-5 flex-shrink-0" />
-              {!isCollapsed && <span>Cerrar Sesión</span>}
-              
-              {/* Tooltip for collapsed state */}
-              {isCollapsed && (
-                <div className="absolute left-full ml-2 px-3 py-1 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
-                  Cerrar Sesión
-                </div>
-              )}
-            </button>
-          </SignOutButton>
+          <button
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="group flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 transition-all"
+          >
+            <LogOut className="w-5 h-5 flex-shrink-0" />
+            {!isCollapsed && <span>Cerrar Sesión</span>}
+          </button>
 
           {!isCollapsed && (
             <div className="mt-4 p-3 bg-white/10 rounded-lg">

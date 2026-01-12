@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { requireAuth, getUserId } from '@/lib/server-auth';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -9,7 +9,7 @@ export async function GET(
   context: { params: Promise<{ lessonId: string }> }
 ) {
   try {
-    const { userId } = await auth();
+    const userId = await getUserId();
 
     if (!userId) {
       return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -19,7 +19,7 @@ export async function GET(
 
     // Get user from database
     const user = await prisma.user.findUnique({
-      where: { clerkId: userId }
+      where: { id: userId }
     });
 
     if (!user) {
@@ -35,7 +35,7 @@ export async function GET(
           }
         },
         progress: {
-          where: { userId: user.id }
+          where: { userId: user?.id }
         }
       }
     });

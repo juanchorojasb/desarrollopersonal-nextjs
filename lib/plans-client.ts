@@ -1,14 +1,18 @@
 'use client';
 
-import { useUser } from '@clerk/nextjs';
-import { Plan, PLANS, hasAccess, getUpgradeMessage, getNextPlan } from './plans';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { PLANS, Plan, hasAccess, getNextPlan, getUpgradeMessage, getPlanHierarchy } from './plans';
+
+export { PLANS, hasAccess, getNextPlan, getUpgradeMessage, getPlanHierarchy };
+export type { Plan };
 
 export function useUserPlan(): Plan {
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   
   if (!user) return 'free';
   
-  const plan = user.publicMetadata?.plan as Plan;
+  // Usar subscriptionStatus directamente del usuario
+  const plan = (user as any).subscriptionStatus as Plan;
   if (plan && Object.keys(PLANS).includes(plan)) {
     return plan;
   }
@@ -17,9 +21,6 @@ export function useUserPlan(): Plan {
 }
 
 export function useHasAccess(requiredPlan: Plan): boolean {
-  const userPlan = useUserPlan();
-  return hasAccess(userPlan, requiredPlan);
+  const currentPlan = useUserPlan();
+  return hasAccess(currentPlan, requiredPlan);
 }
-
-export { PLANS, hasAccess, getUpgradeMessage, getNextPlan };
-export type { Plan, PlanConfig } from './plans';

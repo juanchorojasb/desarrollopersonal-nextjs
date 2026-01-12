@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Course, CourseFilters, Enrollment, LessonProgress } from '@/types/course';
 
 interface UseCoursesOptions {
@@ -47,7 +47,7 @@ export function useCourses({
   initialFilters = {}, 
   autoLoad = true 
 }: UseCoursesOptions = {}): UseCoursesReturn {
-  const { user } = useUser();
+  const { user } = useCurrentUser();
   
   // Estado principal
   const [courses, setCourses] = useState<Course[]>([]);

@@ -13,7 +13,7 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       services: {
         database: 'connected',
-        auth: 'clerk',
+        auth: 'nextauth',
         cdn: 'bunny.net'
       },
       version: '1.0.0'

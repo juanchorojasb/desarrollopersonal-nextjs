@@ -2,19 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useAuth } from '@clerk/nextjs';
-import { 
-  ArrowLeft, 
-  ChevronLeft, 
-  ChevronRight, 
-  BookOpen, 
-  CheckCircle, 
-  Clock,
-  Users,
-  Star
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle,
 } from 'lucide-react';
-import CourseVideoPlayer from '@/components/cursos/CourseVideoPlayer';
-import { Course, Lesson } from '@/types/course';
 
 interface LessonWithCourse {
   id: string;
@@ -28,7 +22,10 @@ interface LessonWithCourse {
     id: string;
     title: string;
     courseId: string;
-    course: Course;
+    course: {
+      id: string;
+      title: string;
+    };
   };
   progress: {
     id: string;
@@ -46,29 +43,27 @@ interface NavigationInfo {
 export default function LessonPage() {
   const params = useParams();
   const router = useRouter();
-  const { getToken } = useAuth();
+  const { user, isLoading: userLoading } = useCurrentUser();
   
   const [lesson, setLesson] = useState<LessonWithCourse | null>(null);
-  const [navigation, setNavigation] = useState<NavigationInfo>({ previousLesson: null, nextLesson: null });
+  const [navigation, setNavigation] = useState<NavigationInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [watchTime, setWatchTime] = useState(0);
 
   useEffect(() => {
-    fetchLessonData();
-  }, [params.lessonId]);
+    if (!userLoading) {
+      fetchLessonData();
+    }
+  }, [params.lessonId, userLoading]);
 
   const fetchLessonData = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const token = await getToken();
-      const response = await fetch(`/api/lessons/${params.lessonId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        }
-      });
-      
+      const response = await fetch(`/api/lessons/${params.lessonId}`);
+
       if (!response.ok) {
         if (response.status === 403) {
           throw new Error('No tienes acceso a esta lección');
@@ -82,242 +77,227 @@ export default function LessonPage() {
       const data = await response.json();
       setLesson(data.lesson);
       setNavigation(data.navigation);
-    } catch (error) {
-      console.error('Error fetching lesson:', error);
-      setError(error instanceof Error ? error.message : 'Error desconocido');
+    } catch (err: any) {
+      setError(err.message);
+      console.error('Error fetching lesson:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleProgress = async (watchTime: number, percentage: number) => {
-    try {
-      const token = await getToken();
-      await fetch('/api/lessons/progress', {
-        method: 'POST',
+  const handleProgress = async (currentTime: number, duration: number) => {
+    if (!lesson) return;
+
+    const percentage = (currentTime / duration) * 100;
+    setWatchTime(currentTime);
+
+    // Update progress every 10 seconds
+    if (Math.floor(currentTime) % 10 === 0) {
+      try {
+        await fetch('/api/lessons/progress', {
+          method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          lessonId: params.lessonId,
-          watchTime,
-          percentage
-        })
-      });
-    } catch (error) {
-      console.error('Error updating progress:', error);
+          body: JSON.stringify({
+            lessonId: lesson.id,
+            watchTime: currentTime,
+            watchPercentage: percentage,
+          }),
+        });
+      } catch (err) {
+        console.error('Error updating progress:', err);
+      }
     }
   };
 
   const handleComplete = async () => {
+    if (!lesson) return;
+
     try {
-      const token = await getToken();
       await fetch('/api/lessons/complete', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          lessonId: params.lessonId
-        })
+          lessonId: lesson.id,
+        }),
       });
-      
-      // Refresh lesson data to update completion status
+
       fetchLessonData();
-    } catch (error) {
-      console.error('Error marking lesson as complete:', error);
+    } catch (err) {
+      console.error('Error marking complete:', err);
     }
   };
 
-  const navigateToLesson = (lessonId: string) => {
-    router.push(`/dashboard/cursos/${params.id}/sesion/${lessonId}`);
+  const handleNavigate = (direction: 'prev' | 'next') => {
+    const targetLesson = direction === 'prev' 
+      ? navigation?.previousLesson 
+      : navigation?.nextLesson;
+
+    if (targetLesson) {
+      router.push(`/dashboard/cursos/${lesson?.module.courseId}/sesion/${targetLesson.id}`);
+      router.push(`/dashboard/cursos/${lesson?.module.courseId}/sesion/${targetLesson.id}`);
   };
 
-  const handleNext = () => {
-    if (navigation.nextLesson) {
-      navigateToLesson(navigation.nextLesson.id);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (navigation.previousLesson) {
-      navigateToLesson(navigation.previousLesson.id);
-    }
-  };
-
-  const goBackToCourse = () => {
-    router.push(`/dashboard/cursos/${lesson?.module.courseId}`);
-  };
-
-  if (loading) {
+  if (loading || userLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !lesson) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Error</h2>
-        <p className="text-gray-600 mb-4">{error}</p>
-        <div className="space-x-4">
-          <button 
-            onClick={() => fetchLessonData()}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            {error || 'Lección no encontrada'}
+          </h2>
+          <button
+            onClick={() => router.back()}
+            className="text-indigo-600 hover:text-indigo-700"
           >
-            Reintentar
-          </button>
-          <button 
-            onClick={() => router.push('/dashboard/cursos')}
-            className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Volver a Cursos
+            Volver
           </button>
         </div>
       </div>
     );
   }
 
-  if (!lesson) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Lección no encontrada</h2>
-        <button 
-          onClick={() => router.push('/dashboard/cursos')}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          Volver a Cursos
-        </button>
-      </div>
-    );
-  }
-
-  const isCompleted = lesson.progress.length > 0 && lesson.progress[0].isCompleted;
+  const isCompleted = lesson.progress?.[0]?.isCompleted || false;
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <button 
-                onClick={goBackToCourse}
-                className="flex items-center text-gray-600 hover:text-gray-900 transition-colors mr-4"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Volver al Curso
-              </button>
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">{lesson.title}</h1>
-                <p className="text-sm text-gray-600">{lesson.module.course.title} • {lesson.module.title}</p>
-              </div>
+            <button
+              onClick={() => router.push(`/dashboard/cursos/${lesson.module.courseId}`)}
+              className="flex items-center text-gray-600 hover:text-gray-900"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Volver al curso
+            </button>
+            <h1 className="text-lg font-semibold text-gray-900 truncate max-w-md">
+              {lesson.title}
+            </h1>
+            <div className="flex items-center gap-2">
+              {isCompleted && (
+                <div className="flex items-center gap-1 text-green-600">
+                  <CheckCircle className="w-5 h-5" />
+                  <span className="text-sm">Completado</span>
+                </div>
+              )}
             </div>
-            
-            {isCompleted && (
-              <div className="flex items-center text-green-600">
-                <CheckCircle className="w-5 h-5 mr-2" />
-                <span className="font-medium">Completada</span>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Video Player */}
-          <div className="lg:col-span-3">
-            <CourseVideoPlayer
-              lesson={{
-                id: lesson.id,
-                title: lesson.title,
-                description: lesson.description,
-                videoUrl: lesson.videoUrl,
-                duration: lesson.duration,
-                isCompleted: isCompleted
-              }}
-              onProgress={handleProgress}
-              onComplete={handleComplete}
-              onNext={navigation.nextLesson ? handleNext : undefined}
-              onPrevious={navigation.previousLesson ? handlePrevious : undefined}
-              hasNext={!!navigation.nextLesson}
-              hasPrevious={!!navigation.previousLesson}
-              courseTitle={lesson.module.course.title}
-            />
-            
-            {/* Lesson Description */}
-            <div className="mt-6 bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Sobre esta lección</h2>
-              <p className="text-gray-700 leading-relaxed">{lesson.description}</p>
+          <div className="lg:col-span-2">
+            <div className="bg-black rounded-lg overflow-hidden aspect-video mb-6">
+              {lesson.videoUrl ? (
+                <video
+                  className="w-full h-full"
+                  controls
+                  onTimeUpdate={(e) => {
+                    const video = e.currentTarget;
+                    handleProgress(video.currentTime, video.duration);
+                  }}
+                  onEnded={handleComplete}
+                >
+                  <source src={lesson.videoUrl} type="video/mp4" />
+                  Tu navegador no soporta video HTML5.
+                </video>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white">
+                  Video no disponible
+                </div>
+              )}
+            </div>
+
+            {/* Lesson Info */}
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                {lesson.title}
+              </h2>
+              {lesson.description && (
+                <p className="text-gray-600 mb-4">{lesson.description}</p>
+              )}
+
+              {/* Navigation */}
+              <div className="flex items-center justify-between pt-6 border-t">
+                <button
+                  onClick={() => handleNavigate('prev')}
+                  disabled={!navigation?.previousLesson}
+                  className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                  <span className="hidden sm:inline">
+                    {navigation?.previousLesson?.title || 'Anterior'}
+                  </span>
+                </button>
+
+                {!isCompleted && (
+                  <button
+                    onClick={handleComplete}
+                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                  >
+                    Marcar como completado
+                  </button>
+                )}
+
+                <button
+                  onClick={() => handleNavigate('next')}
+                  disabled={!navigation?.nextLesson}
+                  className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <span className="hidden sm:inline">
+                    {navigation?.nextLesson?.title || 'Siguiente'}
+                  </span>
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Course Info */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Información del Curso</h3>
-              <div className="space-y-3">
-                <div className="flex items-center text-sm text-gray-600">
-                  <BookOpen className="w-4 h-4 mr-2" />
-                  {lesson.module.course.title}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow p-6 sticky top-24">
+              <h3 className="font-semibold text-gray-900 mb-4">
+                Información del curso
+              </h3>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <p className="text-gray-500">Curso</p>
+                  <p className="font-medium">{lesson.module.course.title}</p>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Users className="w-4 h-4 mr-2" />
-                  {lesson.module.course.studentsCount} estudiantes
+                <div>
+                  <p className="text-gray-500">Módulo</p>
+                  <p className="font-medium">{lesson.module.title}</p>
                 </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Star className="w-4 h-4 mr-2" />
-                  {lesson.module.course.rating} ★
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Clock className="w-4 h-4 mr-2" />
-                  {Math.floor(lesson.duration / 60)}:{String(lesson.duration % 60).padStart(2, '0')} min
-                </div>
-              </div>
-              
-              <button
-                onClick={goBackToCourse}
-                className="w-full mt-4 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Ver Todo el Curso
-              </button>
-            </div>
-
-            {/* Navigation */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Navegación</h3>
-              <div className="space-y-2">
-                {navigation.previousLesson && (
-                  <button
-                    onClick={handlePrevious}
-                    className="w-full flex items-center p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <ChevronLeft className="w-4 h-4 mr-2" />
-                    <div className="text-left">
-                      <div className="text-xs text-gray-500">Anterior</div>
-                      <div className="font-medium text-sm truncate">{navigation.previousLesson.title}</div>
-                    </div>
-                  </button>
+                {lesson.duration && (
+                  <div>
+                    <p className="text-gray-500">Duración</p>
+                    <p className="font-medium">
+                      {Math.floor(lesson.duration / 60)}:{String(lesson.duration % 60).padStart(2, '0')}
+                    </p>
+                  </div>
                 )}
-                
-                {navigation.nextLesson && (
-                  <button
-                    onClick={handleNext}
-                    className="w-full flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
-                  >
-                    <div className="text-left">
-                      <div className="text-xs text-blue-600">Siguiente</div>
-                      <div className="font-medium text-sm truncate">{navigation.nextLesson.title}</div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 ml-2" />
-                  </button>
+                {lesson.progress?.[0] && (
+                  <div>
+                    <p className="text-gray-500">Progreso</p>
+                    <p className="font-medium">
+                      {Math.round(lesson.progress[0].watchPercentage)}%
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
@@ -326,4 +306,5 @@ export default function LessonPage() {
       </div>
     </div>
   );
+}
 }

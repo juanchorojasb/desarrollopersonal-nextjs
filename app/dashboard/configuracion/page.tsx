@@ -1,8 +1,8 @@
-import { currentUser } from '@clerk/nextjs/server'
+import { getCurrentUser } from '@/lib/server-auth'
 import { redirect } from 'next/navigation'
 
 export default async function ConfiguracionPage() {
-  const user = await currentUser()
+  const user = await getCurrentUser()
   
   if (!user) {
     redirect('/sign-in')
@@ -71,7 +71,7 @@ export default async function ConfiguracionPage() {
                   </label>
                   <input 
                     type="text" 
-                    defaultValue={user.firstName || ''} 
+                    defaultValue={user.name?.split(' ')[0] || ''} 
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -81,7 +81,7 @@ export default async function ConfiguracionPage() {
                   </label>
                   <input 
                     type="text" 
-                    defaultValue={user.lastName || ''} 
+                    defaultValue={user.name?.split(' ')[1] || ''} 
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -91,7 +91,7 @@ export default async function ConfiguracionPage() {
                   </label>
                   <input 
                     type="email" 
-                    defaultValue={user.emailAddresses[0]?.emailAddress || ''} 
+                    defaultValue={user.email || ''} 
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>

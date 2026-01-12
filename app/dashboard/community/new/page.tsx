@@ -70,7 +70,7 @@ export default function NewPostPage() {
     try {
       const response = await fetch('/api/forum/posts', {
         method: 'POST',
-        headers: {
+          headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)

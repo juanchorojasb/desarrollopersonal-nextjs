@@ -1,4 +1,5 @@
 'use client';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -15,7 +16,8 @@ import {
   Users,
   Calendar
 } from 'lucide-react';
-import { useClerk } from '@clerk/nextjs';
+import { signOut } from 'next-auth/react';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -30,13 +32,18 @@ const navigation = [
 
 function DashboardNav() {
   const pathname = usePathname();
-  const { signOut } = useClerk();
+  const { user, isLoading } = useCurrentUser();
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: '/' });
+  };
 
   return (
     <nav className="space-y-1">
       {navigation.map((item) => {
-        const isActive = pathname === item.href || 
+        const isActive = pathname === item.href ||
           (item.href !== '/dashboard' && pathname.startsWith(item.href));
+        
         return (
           <Link
             key={item.name}
@@ -56,9 +63,11 @@ function DashboardNav() {
           </Link>
         );
       })}
+      
       <button
-        onClick={() => signOut()}
-        className="group flex items-center w-full px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors"
+        onClick={handleSignOut}
+        disabled={isLoading}
+        className="group flex items-center w-full px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900 transition-colors disabled:opacity-50"
       >
         <LogOut className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-500" />
         Cerrar Sesión

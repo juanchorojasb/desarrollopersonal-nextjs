@@ -1,8 +1,8 @@
-import { currentUser } from '@clerk/nextjs/server'
+import { getCurrentUser } from '@/lib/server-auth'
 import { redirect } from 'next/navigation'
 
 export default async function PaymentSuccessPage() {
-  const user = await currentUser()
+  const user = await getCurrentUser()
   
   if (!user) {
     redirect('/sign-in')
@@ -183,7 +183,7 @@ export default async function PaymentSuccessPage() {
               <h3 className="text-lg font-semibold text-blue-900 mb-2">Confirmación por Email</h3>
               <p className="text-blue-800 mb-3">
                 Hemos enviado una confirmación de tu pago y detalles de acceso a{' '}
-                <strong>{user.emailAddresses[0]?.emailAddress}</strong>
+                <strong>{user.email}</strong>
               </p>
               <p className="text-sm text-blue-700">
                 Si no encuentras el email en tu bandeja de entrada, revisa la carpeta de spam o promociones.

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Heart, ThumbsUp, Smile, Lightbulb, Brain } from 'lucide-react';
 
 interface Reaction {
@@ -37,7 +37,7 @@ export default function ReactionButton({
   const [showReactions, setShowReactions] = useState(false);
   const [loading, setLoading] = useState(false);
   
-  const { user } = useUser();
+  const { user } = useCurrentUser();
 
   // Load reactions on mount
   useEffect(() => {
@@ -60,7 +60,7 @@ export default function ReactionButton({
         
         // Check if current user has reacted
         const userReactionType = data.reactions?.find((r: Reaction) => 
-          r.users.some(u => u.firstName === user?.firstName && u.lastName === user?.lastName)
+          r.users.some(u => u.firstName === user?.name?.split(" ")[0] && u.lastName === user?.name?.split(" ")[1])
         )?.type;
         setUserReaction(userReactionType || null);
       }

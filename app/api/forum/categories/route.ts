@@ -5,11 +5,6 @@ export async function GET() {
   try {
     const categories = await prisma.forumCategory.findMany({
       where: { isActive: true },
-      include: {
-        _count: {
-          select: { posts: true }
-        }
-      },
       orderBy: { position: 'asc' }
     });
 

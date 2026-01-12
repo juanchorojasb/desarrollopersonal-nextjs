@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server'
+import { getCurrentUser } from '@/lib/server-auth'
 import { redirect } from 'next/navigation'
 
 interface Plan {
@@ -58,7 +58,7 @@ export default async function CheckoutPage({
 }: {
   searchParams: Promise<{ plan?: string; promo?: string }>
 }) {
-  const user = await currentUser()
+  const user = await getCurrentUser()
   
   if (!user) {
     redirect('/sign-in')
@@ -99,7 +99,7 @@ export default async function CheckoutPage({
                     </label>
                     <input 
                       type="text" 
-                      defaultValue={user.firstName || ''}
+                      defaultValue={user.name?.split(' ')[0] || ''}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -110,7 +110,7 @@ export default async function CheckoutPage({
                     </label>
                     <input 
                       type="text" 
-                      defaultValue={user.lastName || ''}
+                      defaultValue={user.name?.split(' ')[1] || ''}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
@@ -121,7 +121,7 @@ export default async function CheckoutPage({
                     </label>
                     <input 
                       type="email" 
-                      defaultValue={user.emailAddresses[0]?.emailAddress || ''}
+                      defaultValue={user.email || ''}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />

@@ -1,31 +1,46 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { getUserId } from '@/lib/server-auth';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
+    const userId = await getUserId();
+    
     if (!userId) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      );
     }
 
-    const { lessonId } = await request.json();
+    const body = await request.json();
+    const { lessonId } = body;
 
-    const user = await prisma.user.findUnique({
-      where: { clerkId: userId }
+    if (!lessonId) {
+      return NextResponse.json(
+        { error: 'lessonId es requerido' },
+        { status: 400 }
+      );
+    }
+
+    // Ensure user exists
+    await prisma.user.upsert({
+      where: { id: userId },
+      update: {},
+      create: {
+        id: userId,
+        email: `user-${userId}@temp.local`,
+        subscriptionStatus: "free"
+      }
     });
 
-    if (!user) {
-      return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 });
-    }
-
-    // Mark lesson as completed
+    // Mark lesson as complete
     const progress = await prisma.lessonProgress.upsert({
       where: {
         userId_lessonId: {
-          userId: user.id,
+          userId: userId,
           lessonId: lessonId
         }
       },
@@ -35,17 +50,21 @@ export async function POST(request: Request) {
         watchPercentage: 100
       },
       create: {
-        userId: user.id,
+        userId: userId,
         lessonId: lessonId,
         isCompleted: true,
         completedAt: new Date(),
-        watchPercentage: 100
+        watchPercentage: 100,
+        watchTime: 0
       }
     });
 
-    return NextResponse.json(progress);
+    return NextResponse.json({ success: true, progress });
   } catch (error) {
-    console.error('Error completing lesson:', error);
-    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+    console.error('Error marking lesson complete:', error);
+    return NextResponse.json(
+      { error: 'Error al marcar lección como completada' },
+      { status: 500 }
+    );
   }
 }

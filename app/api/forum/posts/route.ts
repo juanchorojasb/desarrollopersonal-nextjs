@@ -1,22 +1,19 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getUserId } from '@/lib/server-auth';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const posts = await prisma.forumPost.findMany({
-      where: { isDeleted: false },
       include: {
-        author: {
+        user: {
           select: {
             id: true,
-            firstName: true,
-            lastName: true,
+            name: true,
             email: true,
-            imageUrl: true
+            image: true
           }
         },
-        category: true,
         _count: {
           select: {
             replies: true,
@@ -24,13 +21,11 @@ export async function GET(request: NextRequest) {
           }
         }
       },
-      orderBy: { lastActivityAt: 'desc' },
-      take: 20
+      orderBy: { createdAt: 'desc' }
     });
 
     return NextResponse.json(posts);
   } catch (error) {
-    console.error('Error fetching posts:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
@@ -38,10 +33,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const { userId } = await auth();
-    
+    const userId = await getUserId();
     if (!userId) {
       return NextResponse.json(
         { error: 'No autorizado' },
@@ -49,34 +43,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { title, content, categoryId } = await request.json();
-    
-    if (!title || !content || !categoryId) {
-      return NextResponse.json(
-        { error: 'Faltan campos requeridos' },
-        { status: 400 }
-      );
-    }
+    const body = await request.json();
+    const { title, content, category } = body;
 
-    const user = await prisma.user.findUnique({
-      where: { clerkId: userId }
+    const post = await prisma.forumPost.create({
+      data: {
+        title,
+        content,
+        category,
+        userId
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            image: true
+          }
+        }
+      }
     });
 
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Usuario no encontrado en base de datos' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ 
-      message: 'API POST funcionando con autenticación', 
-      userId: userId,
-      userDbId: user.id 
-    });
-    
+    return NextResponse.json(post, { status: 201 });
   } catch (error) {
-    console.error('Error in POST:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
