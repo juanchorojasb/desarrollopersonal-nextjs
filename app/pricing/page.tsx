@@ -26,37 +26,37 @@ export default function PricingPage() {
 
   const handlePlanSelect = async (planId: string) => {
     if (planId === 'free') {
-      window.location.href = '/sign-up'
+      window.location.href = '/auth/signup'
       return
     }
-    
-    if (promoApplied && promoCode.toLowerCase() === 'prueba') {
-      try {
-        const response = await fetch('/api/promo/apply', {
-          method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-          body: JSON.stringify({
-            promoCode: promoCode,
-            selectedPlan: planId
-          })
-        })
-
-        const data = await response.json()
-
-        if (response.ok) {
-          window.location.href = `/dashboard?welcome=true&plan=${planId}`
-          return
-        } else {
-          setPromoError(data.error || 'Error aplicando código promocional')
-          return
-        }
-      } catch (error) {
-        setPromoError('Error de conexión')
-        return
-      }
-    }
+//     
+//     if (promoApplied && promoCode.toLowerCase() === 'prueba') {
+//       try {
+//         const response = await fetch('/api/promo/apply', {
+//           method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json'
+//         },
+//           body: JSON.stringify({
+//             promoCode: promoCode,
+//             selectedPlan: planId
+//           })
+//         })
+// 
+//         const data = await response.json()
+// 
+//         if (response.ok) {
+//           window.location.href = `/dashboard?welcome=true&plan=${planId}`
+//           return
+//         } else {
+//           setPromoError(data.error || 'Error aplicando código promocional')
+//           return
+//         }
+//       } catch (error) {
+//         setPromoError('Error de conexión')
+//         return
+//       }
+//     }
     
     if (planId === 'personal') {
       window.location.href = '/contact'
@@ -406,7 +406,7 @@ export default function PricingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a 
-              href="/sign-up" 
+              href="/auth/signup" 
               className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
             >
               Empezar Gratis

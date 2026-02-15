@@ -1,24 +1,24 @@
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { getCurrentUser } from '@/lib/server-auth';
 import { prisma } from '@/lib/prisma';
-import { getUserId } from '@/lib/server-auth';
+import { onReplyCreated } from '@/lib/gamification/events';
 
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json(
-        { message: 'No autorizado' },
+        { error: 'No autorizado' },
         { status: 401 }
       );
     }
 
     const body = await request.json();
-    const { content, postId } = body;
+    const { postId, content } = body;
 
-    if (!content || !postId) {
+    if (!postId || !content) {
       return NextResponse.json(
-        { message: 'Contenido y ID de post requeridos' },
+        { error: 'Faltan campos requeridos' },
         { status: 400 }
       );
     }
@@ -27,65 +27,28 @@ export async function POST(request: NextRequest) {
       data: {
         content,
         postId,
-        userId
+        userId: user.id
       },
       include: {
         user: {
           select: {
             id: true,
             name: true,
+            email: true,
             image: true
           }
         }
       }
     });
 
-    return NextResponse.json({ reply });
+    // Otorgar puntos de gamificación (+10 puntos por responder)
+    await onReplyCreated(user.id, reply.id);
+
+    return NextResponse.json(reply, { status: 201 });
   } catch (error) {
     console.error('Error creating reply:', error);
     return NextResponse.json(
-      { message: 'Error al crear respuesta' },
-      { status: 500 }
-    );
-  }
-}
-
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const postId = searchParams.get('postId');
-
-    if (!postId) {
-      return NextResponse.json(
-        { message: 'ID de post requerido' },
-        { status: 400 }
-      );
-    }
-
-    const replies = await prisma.forumReply.findMany({
-      where: { postId },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            image: true
-          }
-        },
-        _count: {
-          select: {
-            reactions: true
-          }
-        }
-      },
-      orderBy: { createdAt: 'asc' }
-    });
-
-    return NextResponse.json(replies);
-  } catch (error) {
-    console.error('Error fetching replies:', error);
-    return NextResponse.json(
-      { message: 'Error al obtener respuestas' },
+      { error: 'Error interno del servidor' },
       { status: 500 }
     );
   }

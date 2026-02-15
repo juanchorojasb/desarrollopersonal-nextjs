@@ -1,55 +1,56 @@
 import { NextResponse } from 'next/server';
+import { getCurrentUser } from '@/lib/server-auth';
 import { prisma } from '@/lib/prisma';
-import { getUserId } from '@/lib/server-auth';
 
 export async function POST(request: Request) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'No autorizado' },
+        { status: 401 }
+      );
     }
 
     const body = await request.json();
-    const { type, postId, replyId } = body;
+    const { postId, replyId, type } = body;
 
-    const reaction = await prisma.forumReaction.create({
-      data: {
-        type,
-        userId,
-        postId,
-        replyId
+    if (!type || (!postId && !replyId)) {
+      return NextResponse.json(
+        { error: 'Faltan campos requeridos' },
+        { status: 400 }
+      );
+    }
+
+    // Verificar si ya existe la reacción
+    const existingReaction = await prisma.forumReaction.findFirst({
+      where: {
+        userId: user.id,
+        ...(postId ? { postId } : { replyId })
       }
     });
 
-    return NextResponse.json(reaction, { status: 201 });
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Error interno del servidor' },
-      { status: 500 }
-    );
-  }
-}
+    if (existingReaction) {
+      // Eliminar reacción (toggle)
+      await prisma.forumReaction.delete({
+        where: { id: existingReaction.id }
+      });
 
-export async function DELETE(request: Request) {
-  try {
-    const userId = await getUserId();
-    if (!userId) {
-      return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+      return NextResponse.json({ action: 'removed' });
+    } else {
+      // Crear reacción
+      const reaction = await prisma.forumReaction.create({
+        data: {
+          type,
+          userId: user.id,
+          ...(postId ? { postId } : { replyId })
+        }
+      });
+
+      return NextResponse.json({ action: 'added', reaction }, { status: 201 });
     }
-
-    const { searchParams } = new URL(request.url);
-    const reactionId = searchParams.get('id');
-
-    if (!reactionId) {
-      return NextResponse.json({ error: 'ID requerido' }, { status: 400 });
-    }
-
-    await prisma.forumReaction.delete({
-      where: { id: reactionId, userId }
-    });
-
-    return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('Error handling reaction:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }

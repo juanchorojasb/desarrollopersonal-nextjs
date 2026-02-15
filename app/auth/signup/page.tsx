@@ -1,13 +1,14 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Sparkles } from 'lucide-react';
 
-export default function SignUpPage() {
+function SignUpForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -50,7 +51,6 @@ export default function SignUpPage() {
         throw new Error(data.error || 'Error al crear la cuenta');
       }
 
-      // Auto login después del registro
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
@@ -60,7 +60,8 @@ export default function SignUpPage() {
       if (result?.error) {
         setError('Cuenta creada pero error al iniciar sesión');
       } else {
-        router.push('/dashboard');
+        const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (err: any) {
@@ -71,7 +72,7 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4 py-12">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
@@ -81,10 +82,10 @@ export default function SignUpPage() {
             </span>
           </Link>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Comienza tu viaje
+            Crea tu cuenta
           </h2>
           <p className="text-gray-600">
-            Crea tu cuenta gratuita en segundos
+            Comienza tu viaje de desarrollo personal
           </p>
         </div>
 
@@ -136,7 +137,6 @@ export default function SignUpPage() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                minLength={8}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none"
                 placeholder="Mínimo 8 caracteres"
               />
@@ -153,7 +153,7 @@ export default function SignUpPage() {
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-600 focus:border-transparent outline-none"
-                placeholder="Repite tu contraseña"
+                placeholder="Confirma tu contraseña"
               />
             </div>
 
@@ -162,7 +162,7 @@ export default function SignUpPage() {
               disabled={loading}
               className="w-full py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creando cuenta...' : 'Crear Cuenta Gratis'}
+              {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
             </button>
           </form>
 
@@ -177,5 +177,17 @@ export default function SignUpPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">Cargando...</div>
+      </div>
+    }>
+      <SignUpForm />
+    </Suspense>
   );
 }

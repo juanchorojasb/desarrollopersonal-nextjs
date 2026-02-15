@@ -151,12 +151,12 @@ export default function CoursePage() {
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Video Player */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-lg overflow-hidden">
               {selectedLesson?.videoUrl ? (
-                <div className="relative" style={{ paddingTop: '56.25%' }}>
+                <div className="relative min-h-[450px] sm:min-h-[500px] lg:min-h-0" style={{ paddingTop: '56.25%' }}>
                   <iframe
                     src={selectedLesson.videoUrl}
                     className="absolute inset-0 w-full h-full"

@@ -13,7 +13,6 @@ export const authConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
-      
       if (isOnDashboard) {
         if (isLoggedIn) return true;
         return false;
@@ -30,13 +29,12 @@ export const authConfig = {
         token.name = user.name;
         token.subscriptionStatus = user.subscriptionStatus;
         token.isAdmin = user.isAdmin;
+        token.role = user.role; // ⭐ AGREGADO
       }
-
       // Update session (cuando se llama update())
       if (trigger === "update" && session) {
         token.subscriptionStatus = session.subscriptionStatus;
       }
-
       return token;
     },
     async session({ session, token }) {
@@ -46,6 +44,7 @@ export const authConfig = {
         session.user.name = token.name as string;
         session.user.subscriptionStatus = token.subscriptionStatus as string;
         session.user.isAdmin = token.isAdmin as boolean;
+        session.user.role = token.role as string; // ⭐ AGREGADO
       }
       return session;
     },
@@ -86,7 +85,8 @@ export const authConfig = {
           email: user.email,
           name: user.name,
           subscriptionStatus: user.subscriptionStatus,
-          isAdmin: user.isAdmin
+          isAdmin: user.isAdmin,
+          role: user.role // ⭐ AGREGADO
         };
       }
     })

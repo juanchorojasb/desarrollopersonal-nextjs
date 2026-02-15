@@ -5,7 +5,7 @@ export default async function PaymentErrorPage() {
   const user = await getCurrentUser()
   
   if (!user) {
-    redirect('/sign-in')
+    redirect('/auth/signin')
   }
 
   return (

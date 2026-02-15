@@ -70,7 +70,6 @@ export async function POST(request: Request) {
         watchTime: watchTime || 0,
         watchPercentage: percentage,
         isCompleted: isCompleted,
-        lastWatchedAt: new Date(),
         ...(isCompleted ? { completedAt: new Date() } : {})
       }
     });

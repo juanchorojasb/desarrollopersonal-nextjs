@@ -23,12 +23,20 @@ model User {
   bio               String?   @db.Text
   subscriptionStatus String   @default("free")
   isAdmin           Boolean   @default(false)
+  role              String    @default("user")
 
   enrollments       Enrollment[]
   lessonProgress    LessonProgress[]
   forumPosts        ForumPost[]
   forumReplies      ForumReply[]
   forumReactions    ForumReaction[]
+  achievements      UserAchievement[]
+  stats             UserStats?
+  dailyActivities   DailyActivity[]
+  notifications     Notification[]
+  certificates      Certificate[]
+  activityLogs     ActivityLog[]
+  badges           UserBadge[]
 
   accounts          Account[]
   sessions          Session[]
@@ -86,6 +94,7 @@ model Course {
 
   modules     Module[]
   enrollments Enrollment[]
+  certificates Certificate[]
 }
 
 model Module {
@@ -156,21 +165,36 @@ model LessonProgress {
   @@index([lessonId])
 }
 
-model ForumPost {
-  id        String   @id @default(cuid())
-  title     String
-  content   String   @db.Text
-  category  String
-  userId    String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model ForumCategory {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique
+  description String?     @db.Text
+  icon        String?
+  color       String?
+  isActive    Boolean     @default(true)
+  position    Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  posts       ForumPost[]
+}
 
-  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  replies   ForumReply[]
-  reactions ForumReaction[]
+model ForumPost {
+  id         String          @id @default(cuid())
+  title      String
+  content    String          @db.Text
+  categoryId String
+  userId     String
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  category   ForumCategory   @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  replies    ForumReply[]
+  reactions  ForumReaction[]
 
   @@index([userId])
-  @@index([category])
+  @@index([categoryId])
 }
 
 model ForumReply {
@@ -206,14 +230,145 @@ model ForumReaction {
   @@index([userId])
 }
 
-model ForumCategory {
+model Achievement {
   id          String   @id @default(cuid())
-  name        String   @unique
-  description String?  @db.Text
-  icon        String?
-  color       String?
-  isActive    Boolean  @default(true)
-  position    Int      @default(0)
+  slug        String   @unique
+  title       String
+  description String
+  icon        String
+  category    String
+  points      Int      @default(0)
+  tier        String
+  requirement Json
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  
+  unlockedBy UserAchievement[]
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+}
+
+model UserStats {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  totalPoints     Int       @default(0)
+  level           Int       @default(1)
+  currentStreak   Int       @default(0)
+  longestStreak   Int       @default(0)
+  lastActiveDate  DateTime?
+  coursesCompleted Int      @default(0)
+  lessonsCompleted Int      @default(0)
+  forumPosts      Int       @default(0)
+  forumReplies    Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model DailyActivity {
+  id         String   @id @default(cuid())
+  userId     String
+  date       DateTime @db.Date
+  points     Int      @default(0)
+  activities Json
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // achievement, reply, course_complete, streak, admin
+  title     String
+  message   String   @db.Text
+  link      String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([isRead])
+  @@index([createdAt])
+}
+
+model Certificate {
+  id          String   @id @default(cuid())
+  userId      String
+  courseId    String
+  courseName  String
+  userName    String
+  issuedAt    DateTime @default(now())
+  pdfUrl      String?
+  
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  userId      String
+  activityType String  // lesson_view, course_view, forum_view
+  resourceId  String?  // ID del recurso (lesson, course, post)
+  duration    Int?     // Duración en segundos
+  timestamp   DateTime @default(now())
+  metadata    Json?    // Datos adicionales
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@index([activityType])
+  @@index([timestamp])
+}
+
+model Badge {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String
+  icon        String   // Emoji o URL
+  category    String   // skill, milestone, special, seasonal
+  rarity      String   // common, rare, epic, legendary
+  color       String   // Color hex del badge
+  requirement Json     // Condiciones para desbloquear
+  createdAt   DateTime @default(now())
+  
+  unlockedBy UserBadge[]
+  
+  @@index([category])
+  @@index([rarity])
+}
+
+model UserBadge {
+  id          String   @id @default(cuid())
+  userId      String
+  badgeId     String
+  unlockedAt  DateTime @default(now())
+  isFavorite  Boolean  @default(false)
+  
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([isFavorite])
 }

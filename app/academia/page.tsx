@@ -89,7 +89,7 @@ export default function AcademiaPage() {
               Formación estructurada, certificaciones oficiales y acompañamiento profesional.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/auth/sign-up" className="bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors">
+              <Link href="/auth/signup" className="bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors">
                 Comenzar Formación
               </Link>
               <Link href="/cursos" className="border-2 border-white text-white font-bold py-3 px-8 rounded-lg hover:bg-white hover:text-blue-600 transition-colors">
@@ -230,7 +230,7 @@ export default function AcademiaPage() {
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-8 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">¿Listo para transformar tu vida?</h2>
           <p className="text-lg mb-6">Únete a más de 2,500 estudiantes que ya están en su proceso de crecimiento</p>
-          <Link href="/auth/sign-up" className="bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors">
+          <Link href="/auth/signup" className="bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors">
             Comenzar mi Formación Ahora
           </Link>
         </div>

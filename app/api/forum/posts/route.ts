@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getUserId } from '@/lib/server-auth';
+import { getCurrentUser } from '@/lib/server-auth';
+import { onPostCreated } from '@/lib/gamification/events';
 
 export async function GET() {
   try {
@@ -14,6 +15,14 @@ export async function GET() {
             image: true
           }
         },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
+            color: true
+          }
+        },
         _count: {
           select: {
             replies: true,
@@ -23,9 +32,9 @@ export async function GET() {
       },
       orderBy: { createdAt: 'desc' }
     });
-
     return NextResponse.json(posts);
   } catch (error) {
+    console.error('Error fetching posts:', error);
     return NextResponse.json(
       { error: 'Error interno del servidor' },
       { status: 500 }
@@ -35,8 +44,8 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const userId = await getUserId();
-    if (!userId) {
+    const user = await getCurrentUser();
+    if (!user) {
       return NextResponse.json(
         { error: 'No autorizado' },
         { status: 401 }
@@ -44,14 +53,21 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { title, content, category } = body;
+    const { title, content, categoryId } = body;
+
+    if (!title || !content || !categoryId) {
+      return NextResponse.json(
+        { error: 'Faltan campos requeridos' },
+        { status: 400 }
+      );
+    }
 
     const post = await prisma.forumPost.create({
       data: {
         title,
         content,
-        category,
-        userId
+        categoryId,
+        userId: user.id
       },
       include: {
         user: {
@@ -60,14 +76,25 @@ export async function POST(request: Request) {
             name: true,
             image: true
           }
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+            slug: true
+          }
         }
       }
     });
 
+    // Otorgar puntos de gamificación
+    await onPostCreated(user.id, post.id);
+
     return NextResponse.json(post, { status: 201 });
   } catch (error) {
+    console.error('Error creating post:', error);
     return NextResponse.json(
-      { error: 'Error interno del servidor' },
+      { error: 'Error interno del servidor', details: error instanceof Error ? error.message : 'Unknown' },
       { status: 500 }
     );
   }
