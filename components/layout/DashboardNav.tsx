@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   Home,
   BookOpen,
+  Bot,
   Calendar,
   Users,
   Crown,
@@ -30,6 +31,7 @@ const navigation = [
   { name: 'Certificados', href: '/dashboard/certificados', icon: Award },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Insignias', href: '/dashboard/insignias', icon: Award },
+  { name: 'Asistente IA', href: '/dashboard/asistente', icon: Bot },
   { name: 'Perfil', href: '/dashboard/perfil', icon: User },
   { name: 'Configuración', href: '/dashboard/configuracion', icon: Settings },
   { name: 'Ayuda', href: '/dashboard/ayuda', icon: HelpCircle },
